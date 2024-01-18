@@ -42,7 +42,7 @@ function App() {
       <Route path='/AddBranch' element={<AddBranch />}></Route>
       <Route path='/AddEmployee' element={<AddEmployee />}></Route>
       <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
-      <Route path="/AddStudentReceipt/:studentId" element={<AddStudentReceipt />} />
+      <Route path="/AddStudentReceipt/:firstName" element={<AddStudentReceipt />}></Route>
     </Routes>
   </Router>  
   
