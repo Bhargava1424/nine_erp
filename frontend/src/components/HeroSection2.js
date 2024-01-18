@@ -39,6 +39,7 @@ function HeroSection2() {
         student.firstName.toLowerCase().includes(term) ||
         student.surName.toLowerCase().includes(term) ||
         student.fatherName.toLowerCase().includes(term) ||
+        student.branch.toLowerCase().includes(term) ||
         student.primaryContact.includes(term) ||
         student.secondaryContact.includes(term) ||
         student.gender.toLowerCase().includes(term) ||
@@ -99,6 +100,7 @@ function renderContentBasedOnRole(userRole, students) {
                   <th className="px-4 py-2">SurName</th>
                   <th className="px-4 py-2">Father's Name</th>
                   <th className="px-4 py-2">Primary Contact</th>
+                  <th className="px-4 py-2">Branch</th>
                   <th className="px-4 py-2">Secondary Contact</th>
                   <th className="px-4 py-2">Gender</th>
                   <th className="px-4 py-2">Batch</th>
@@ -125,6 +127,7 @@ function renderContentBasedOnRole(userRole, students) {
                     <td className="border px-4 py-2">{student.firstName}</td>
                     <td className="border px-4 py-2">{student.surName}</td>
                     <td className="border px-4 py-2">{student.fatherName}</td>
+                    <td className="border px-4 py-2">{student.branch}</td>
                     <td className="border px-4 py-2">{student.primaryContact}</td>
                     <td className="border px-4 py-2">{student.secondaryContact}</td>
                     <td className="border px-4 py-2">{student.gender}</td>

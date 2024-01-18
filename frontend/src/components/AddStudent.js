@@ -59,7 +59,7 @@ const handleInputChange = (e) => {
 
   // Convert firstName, surName, and fatherName to uppercase and allow only alphabets
   if (name === 'firstName' || name === 'surName' || name === 'fatherName') {
-    updatedValue = value.toUpperCase().replace(/[^A-Z]/g, '');
+    updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
   }
 
   // Handling contact numbers validation

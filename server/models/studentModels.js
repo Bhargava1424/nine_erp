@@ -9,6 +9,7 @@ const studentSchema = new Schema({
     secondaryContact: { type: String, required: false },
     gender: { type: String, required: true },
     batch: { type: String, required: true },
+    branch: { type: String, required: true },
     dateOfJoining: { type: Date, required: true },
     course: { type: String, required: true },
     modeOfResidence: { type: String, required: true },
