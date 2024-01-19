@@ -83,13 +83,14 @@ function renderContentBasedOnRole(userRole, students, searchQuery, handleSearchC
     case 'Admin':
       return (
         <div className="main-container">
-          <input
-            type="text"
-            placeholder="Search students..."
-            className="input input-bordered w-full max-w-xs text-black"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
+<input
+  type="text"
+  placeholder="Search students..."
+  className="input input-bordered w-full max-w-xs text-black placeholder-black dark:text-white dark:placeholder-white"
+  value={searchQuery}
+  onChange={handleSearchChange}
+/>
+
           
           <div className="overflow-x-auto mt-3">
             <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
