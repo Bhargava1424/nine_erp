@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // MongoDB Connection
-const dbUrl = 'mongodb://localhost:27017/9erp'; 
+const dbUrl = 'mongodb://0.0.0.0:27017/9erp'; 
 mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const connection = mongoose.connection;

@@ -120,11 +120,11 @@ function Navbar() {
           )}
         </div>
         <div className="navbar-center logo-container">
-          <button><Link to='/'><img
-            alt="logo"
-            src={process.env.PUBLIC_URL + '9logo.jpg'}
-            className="responsive-logo"
-          /></Link></button>
+    <Link to='/'>
+        <img alt="logo" src="/9logo.jpg" className="responsive-logo" />
+    </Link>
+
+
         </div>
         <div className="navbar-end">
           {user && (

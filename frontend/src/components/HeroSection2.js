@@ -67,15 +67,8 @@ function HeroSection2() {
 
   return (
     <div className="hero-section">
-      <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered w-full max-w-xs"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
       {userRole ? (
-        renderContentBasedOnRole(userRole, filteredStudents)
+        renderContentBasedOnRole(userRole, filteredStudents, searchQuery, handleSearchChange)
       ) : (
         <Login2 />
       )}
@@ -85,11 +78,19 @@ function HeroSection2() {
 
 
 // Helper function to render content based on role
-function renderContentBasedOnRole(userRole, students) {
+function renderContentBasedOnRole(userRole, students, searchQuery, handleSearchChange) {
   switch (userRole) {
     case 'Admin':
       return (
         <div className="main-container">
+          <input
+            type="text"
+            placeholder="Search students..."
+            className="input input-bordered w-full max-w-xs"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          
           <div className="overflow-x-auto mt-3">
             <h2 className="text-2xl font-bold text-gray-500 mb-4">Student Data</h2>
             
