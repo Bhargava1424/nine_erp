@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 
+
 function AddStudentReceipt() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ function AddStudentReceipt() {
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
+    
 
     const handleAmountChange = (e) => {
         setAmountPaid(e.target.value);
@@ -33,8 +35,10 @@ function AddStudentReceipt() {
         // Replace 'feeType' with your actual fee type identifier
         setShowReceiptSection(true);
     };
+    
 
     useEffect(() => {
+
         const fetchStudentData = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/students/name/${firstName}`);
@@ -74,6 +78,8 @@ function AddStudentReceipt() {
             // Replace with the correct URL and adjust according to your API and data structure
             const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
 
+            
+
             // Check for success response, then update state
             if (response.status === 200) {
                 setStudentData(prevState => ({
@@ -88,9 +94,21 @@ function AddStudentReceipt() {
                 // Handle any other response
                 console.error('An error occurred:', response);
             }
+            if (response.status === 200) {
+                // Prepare the data to be sent
+                
+        
+                if (response.status === 200) {
+                    // Include the amountPaid in the URL
+                    const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&firstName=${studentData.firstName}`;
+                    window.open(receiptUrl, '_blank');
+
+                }
+            }
         } catch (error) {
             console.error('Error submitting payment:', error);
         }
+        
     };
 
     if (loading) {
