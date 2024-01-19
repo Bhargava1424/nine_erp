@@ -59,6 +59,7 @@ function AddStudentReceipt() {
                       const responseBody = response.body; // Assuming response.body is already in JSON format
                       console.log(responseBody);
                       setStudentData(responseBody) // Assuming the actual data is in responseBody.data
+                      setLoading(false);
                     } catch (parseError) {
                       console.error('Error parsing response:', parseError);
                     }
@@ -107,6 +108,11 @@ function AddStudentReceipt() {
                 setAmountPaid(''); // Reset the amount
                 setModeOfPayment(''); // Reset the mode of payment
                 setChequeNumber(''); // Reset the cheque number
+                if (response.status === 200) {
+                    // Include the amountPaid in the URL
+                    const receiptUrl = '/DownloadReceipt?amountPaid=${amountPaid}&applicationNumber=${studentData.applicationNumber}';
+                    window.open(receiptUrl, '_blank');
+                }
             } else {
                 // Handle any other response
                 console.error('An error occurred:', response);
@@ -133,7 +139,7 @@ function AddStudentReceipt() {
         <div>
             <Navbar/>
 
-            <h1 className='text-2xl font-bold text-gray-500 mb-4'>{studentData.firstName}'s Receipt Details</h1>
+            <h1 className='text-2xl font-bold text-gray-500 mb-4'>{studentData.applicationNumber}'s Receipt Details</h1>
 
             <div>
                 <div className="overflow-x-auto">        {/* First Year Tuition Fee */}

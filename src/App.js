@@ -15,6 +15,7 @@ import AddBranch from './components/AddBranch';
 import AddEmployee from './components/AddEmployee';
 import ForgotPassword from './components/ForgotPassword';
 import AddStudentReceipt from './components/AddStudentReceipt';
+import DownloadReceipt from './components/DownloadReceipt';
 function App() {
   const dispatch = useDispatch();
   const { user } = useAuth();
@@ -42,6 +43,7 @@ function App() {
       <Route path='/AddBranch' element={<AddBranch />}></Route>
       <Route path='/AddEmployee' element={<AddEmployee />}></Route>
       <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/DownloadReceipt' element={<DownloadReceipt />}></Route>
       <Route path="/AddStudentReceipt/:applicationNumber" element={<AddStudentReceipt />}></Route>
     </Routes>
   </Router>  
