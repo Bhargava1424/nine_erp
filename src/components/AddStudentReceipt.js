@@ -7,7 +7,7 @@ function AddStudentReceipt() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { firstName } = useParams();
+    const { applicationNumber } = useParams();
     const [showReceiptSection, setShowReceiptSection] = useState(false);
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
@@ -37,19 +37,42 @@ function AddStudentReceipt() {
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/students/name/${firstName}`);
-                setStudentData(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-            }
+                var SchoolManagementSystemApi = require('school_management_system_api');
+                var api = new SchoolManagementSystemApi.DbApi();
+                const opts = {
+                  body: {
+                    "collectionName": "students",
+                    "query": {
+                        "applicationNumber": applicationNumber
+                    },
+                    "type": 'findOne'
+                  }
+                };
+            
+                console.log(opts.body);
+            
+                api.dbGet(opts, function(error, data, response) {
+                  if (error) {
+                    console.error('API Error:', error);
+                  } else {
+                    try {
+                      const responseBody = response.body; // Assuming response.body is already in JSON format
+                      console.log(responseBody);
+                      setStudentData(responseBody) // Assuming the actual data is in responseBody.data
+                    } catch (parseError) {
+                      console.error('Error parsing response:', parseError);
+                    }
+                  }
+                });
+              } catch (error) {
+                console.error('Error during fetch:', error);
+              }
         };
 
-        if (firstName) {
+        if (applicationNumber) {
             fetchStudentData();
         }
-    }, [firstName]);
+    }, [applicationNumber]);
 
 
     const handleSubmit = async () => {
@@ -137,7 +160,7 @@ function AddStudentReceipt() {
                                 </button>
                                 {showReceiptSection && (
                                     <div>
-                                        <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
+                                        <h2>{studentData.applicationNumber}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Paid:
                                             <input type="number" value={amountPaid} onChange={handleAmountChange} />

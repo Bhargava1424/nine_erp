@@ -14,7 +14,7 @@
  *
  */
 import superagent from "superagent";
-import querystring from "querystring";
+import querystring from "querystring-es3";
 
 /**
 * @module ApiClient

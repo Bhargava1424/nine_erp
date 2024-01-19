@@ -1,6 +1,5 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
-import axios from 'axios';
 
 
 const AddStudent = () => {
@@ -173,26 +172,41 @@ const handleInputChange = (e) => {
           pendingSecondYearHostelFee: studentData.secondYearHostelFee
       };
         try {
-            // Replace with your backend server URL and appropriate endpoint
-            const response = await axios.post('http://localhost:5000/api/students/add', updatedStudentData);
-            
+          var SchoolManagementSystemApi = require('school_management_system_api')
 
-            if (response.status === 200) {
-                console.log('Form Submission Successful:', response.data);
-                setShowSuccessMessage(true);
-                setTimeout(() => {
-                    setShowSuccessMessage(false);
-                }, 3000);
-            } else {
-                console.error('Server responded with non-200 status:', response.status);
+          var api = new SchoolManagementSystemApi.StudentsApi()
+          var body = new SchoolManagementSystemApi.Student(updatedStudentData); // Pass the updatedStudentData object to the Student model
+          SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
+          
+          // console.log(body);
+
+          api.studentsPost(body, function(error, data, response) {
+            if (error) {
+              console.error('API Error:', error);
+          } else {
+              // console.log('API Response:', response); // Log the full HTTP response
+              try {
+                var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
+                if (responseBody && responseBody.message) {
+                    console.log('Message:', responseBody.message); // Logging the message from the response
+                }
+                console.log(responseBody.data)
+            } catch (parseError) {
+                console.error('Error parsing response:', parseError);
             }
-        } catch (error) {
-            console.error('Error during form submission:', error);
-        }
-    } else {
-        console.error('Validation failed');
-    }
-  };
+            
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 3000);
+          }
+      });
+  } catch (error) {
+      console.error('Error:', error);
+  }
+}
+}
+
   const generateBatchOptions = () => {
     const startYear = 2022;
     const endYear = 2048;
@@ -211,18 +225,37 @@ const handleInputChange = (e) => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/branch');
-        if (response.ok) {
-          const data = await response.json();
-          setBranches(data);
-        } else {
-          console.error('Failed to fetch branches');
-        }
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "branches",
+            "query": {
+            },
+            "type": 'findMany'
+          }
+        };
+    
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setBranches(responseBody); // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error during fetch:', error);
       }
     };
-  
+
     fetchBranches();
   }, []);
 
@@ -555,8 +588,8 @@ const handleInputChange = (e) => {
                   onChange={handleInputChange}
               >
                   <option value="" disabled>Choose Student Status</option>
-                  <option value="active">ACTIVE</option>
-                  <option value="cancelled">CANCELLED</option>
+                  <option value="Active">ACTIVE</option>
+                  <option value="Cancelled">CANCELLED</option>
               </select>
           </label>
         </div>

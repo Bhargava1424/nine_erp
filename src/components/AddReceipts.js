@@ -11,13 +11,38 @@ function AddReceipts() {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
       try {
-        // Replace with the correct URL of your backend API
-        const response = await axios.get('http://localhost:5000/api/students');
-        setStudents(response.data);
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "students",
+            "query": {
+              "studentStatus": "Active"
+            },
+            "type": "findMany"
+          }
+        };
+        
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
+
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
-    };    
+    };   
 
     fetchStudents();
   }, []);
@@ -60,8 +85,8 @@ function AddReceipts() {
               <tbody className="">
                 {students.map((student, index) => (
                   <tr className="hover:bg-gray-50" key={index}>
-                    <td className="border px-4 py-2"><Link to={`/AddStudentReceipt/${student.firstName}`}>
-                                                        {student.firstName}
+                    <td className="border px-4 py-2"><Link to={`/AddStudentReceipt/${student.applicationNumber}`}>
+                                                        {student.applicationNumber}
                                                       </Link>
                                                       </td>
                     <td className="border px-4 py-2">{student.surName}</td>

@@ -1,6 +1,6 @@
 {
-  "name": "kundan_erp",
-  "version": "0.1.0",
+  "name": "nine_erp",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
@@ -10,6 +10,7 @@
     "axios": "^1.6.5",
     "emailjs-com": "^3.2.0",
     "jspdf": "^2.5.1",
+    "querystring-es3": "^0.2.1",
     "react": "^18.2.0",
     "react-daisyui": "^5.0.0",
     "react-dom": "^18.2.0",
@@ -17,6 +18,7 @@
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
     "redux": "^5.0.1",
+    "school_management_system_api": "file:clients",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -44,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "daisyui": "^4.4.23",
     "tailwindcss": "^3.4.0"
   }

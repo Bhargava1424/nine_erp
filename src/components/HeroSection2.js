@@ -12,9 +12,34 @@ function HeroSection2() {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
       try {
-        // Replace with the correct URL of your backend API
-        const response = await axios.get('http://localhost:5000/api/students');
-        setStudents(response.data);
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "students",
+            "query": {
+              "studentStatus": "Active"
+            },
+            "type": "findMany"
+          }
+        };
+        
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
+
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -38,7 +63,7 @@ function HeroSection2() {
       return searchTerms.every(term =>
         student.firstName.toLowerCase().includes(term) ||
         student.surName.toLowerCase().includes(term) ||
-        student.fatherName.toLowerCase().includes(term) ||
+        student.parentName.toLowerCase().includes(term) ||
         student.branch.toLowerCase().includes(term) ||
         student.primaryContact.includes(term) ||
         student.secondaryContact.includes(term) ||
@@ -98,7 +123,7 @@ function renderContentBasedOnRole(userRole, students) {
                 <tr>
                   <th className="px-4 py-2">First Name</th>
                   <th className="px-4 py-2">SurName</th>
-                  <th className="px-4 py-2">Father's Name</th>
+                  <th className="px-4 py-2">Parent's Name</th>
                   <th className="px-4 py-2">Primary Contact</th>
                   <th className="px-4 py-2">Branch</th>
                   <th className="px-4 py-2">Secondary Contact</th>
@@ -126,7 +151,7 @@ function renderContentBasedOnRole(userRole, students) {
                   <tr className="hover:bg-gray-50" key={index} style={{ backgroundColor: '#00A0E3' }}>
                     <td className="border px-4 py-2">{student.firstName}</td>
                     <td className="border px-4 py-2">{student.surName}</td>
-                    <td className="border px-4 py-2">{student.fatherName}</td>
+                    <td className="border px-4 py-2">{student.parentName}</td>
                     <td className="border px-4 py-2">{student.branch}</td>
                     <td className="border px-4 py-2">{student.primaryContact}</td>
                     <td className="border px-4 py-2">{student.secondaryContact}</td>

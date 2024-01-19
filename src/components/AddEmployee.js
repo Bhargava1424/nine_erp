@@ -1,7 +1,6 @@
 
 import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 
 function SelectField({ label, name, options, value, handleChange }) {
@@ -108,9 +107,30 @@ function AddEmployee() {
   
     // Make the POST request
     try {
-      const response = await axios.post('http://localhost:5000/api/employees/add', employeeData);
-      console.log(response.data);
-      setShowSuccessMessage(true);
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.EmployeesApi();
+      var body = new SchoolManagementSystemApi.Employee();
+      body.employeeName = employeeData.firstName +'' +  employeeData.lastName;
+      body.role = employeeData.role;
+      body.branch = employeeData.branch;
+      body.username = employeeData.username;
+      body.password = employeeData.password;
+      console.log('Employee Request Body', body); // Logging the constructed branch object
+      
+      api.employeesPost(body, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setShowSuccessMessage(true);
+            // setBranches(responseBody); // Assuming the actual data is in responseBody.data
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
       setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error) {
       console.error('There was an error!', error);
@@ -140,19 +160,36 @@ function AddEmployee() {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/branch');
-        if (response.ok) {
-          const data = await response.json();
-          setBranches(data);
-        } else {
-          console.error('Failed to fetch branches');
-        }
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "branches",
+            "query": {
+            },
+            "type": 'findMany'
+          }
+        };
+    
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setBranches(responseBody); // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error during fetch:', error);
       }
-      
     };
-
     fetchBranches();
 
     
@@ -197,7 +234,7 @@ function AddEmployee() {
             {/* ... existing input fields */}
             <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
             <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-            <SelectField label="Role" name="role" options={['MANAGER', 'EXECUTIVE', 'ACCOUNTANT']} value={employeeData.role} handleChange={handleChange} />
+            <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
             <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
             <SelectField
               label="Branch"

@@ -9,7 +9,7 @@ function AddBranch() {
   });
 
   const [showInstructions, setShowInstructions] = useState(true);
-  const [errors, setErrors] = useState({});
+  const [errors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleChange = (e) => {
@@ -19,63 +19,70 @@ function AddBranch() {
   const handleSubmit = async  (e) => {
     e.preventDefault();
     let isValid = true;
-    let newErrors = {};
+    // let newErrors = {};
 
     // Check for empty fields
-    Object.keys(branchData).forEach(key => {
-      if (!branchData[key]) {
-        isValid = false;
-        newErrors[key] = 'This field is required';
-      }
+    // Object.keys(branchData).forEach(key => {
+    //   if (!branchData[key]) {
+    //     isValid = false;
+    //     newErrors[key] = 'This field is required';
+    //   }
 
-      if (isValid) {
-        console.log(branchData); // Replace with backend submission logic
+    //   if (isValid) {
+    //     console.log(branchData); // Replace with backend submission logic
 
-        // Show success message
-        setShowSuccessMessage(true);
+    //     console.log(4+5);
 
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-            setShowSuccessMessage(false);
-        }, 3000);
-    } else {
-        setErrors(newErrors);
-    }
-    });
+    //     // Show success message
+    //     setShowSuccessMessage(true);
 
-    setErrors(newErrors);
+    //     // Hide success message after 3 seconds
+    //     setTimeout(() => {
+    //         setShowSuccessMessage(false);
+    //     }, 3000);
+    // } else {
+    //     setErrors(newErrors);
+    // }
+    // });
+
+    // setErrors(newErrors);
 
   
     if (isValid) {
-
-      console.log(branchData); // Replace with backend submission logic
+      console.log(branchData); // Logging the branch data before submission
       try {
-          const response = await fetch('http://localhost:5000/api/branch/add', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(branchData)
+          var SchoolManagementSystemApi = require('school_management_system_api');
+          var api = new SchoolManagementSystemApi.BranchesApi();
+          var body = new SchoolManagementSystemApi.Branch();
+          SchoolManagementSystemApi.Branch.constructFromObject(branchData, body);
+  
+          console.log(body); // Logging the constructed branch object
+  
+          api.branchesPost(body, function(error, data, response) {
+              if (error) {
+                  console.error('API Error:', error);
+              } else {
+                  // console.log('API Response:', response); // Log the full HTTP response
+                  try {
+                      var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
+                      if (responseBody && responseBody.message) {
+                          console.log('Message:', responseBody.message); // Logging the message from the response
+                      }
+                  } catch (parseError) {
+                      console.error('Error parsing response:', parseError);
+                  }
+                  
+                  setShowSuccessMessage(true);
+                  setTimeout(() => {
+                      setShowSuccessMessage(false);
+                  }, 3000);
+              }
           });
-
-          if (response.ok) {
-              const result = await response.json();
-              console.log(result);
-              setShowSuccessMessage(true);
-              setTimeout(() => {
-                  setShowSuccessMessage(false);
-              }, 3000);
-          } else {
-              // Handle errors
-              console.error('Failed to add branch');
-          }
       } catch (error) {
           console.error('Error:', error);
       }
+    }
   }
-
-
-  };
 
   return (
     <>
