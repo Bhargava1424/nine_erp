@@ -569,7 +569,7 @@ const handleInputChange = (e) => {
             </div>
         )}
         {/* Submit Button */}
-        <button type="submit" className="btn btn-primary mt-4">
+        <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
           Submit
         </button>
       </form>

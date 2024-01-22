@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../reducers/authReducer';
 
@@ -8,7 +8,15 @@ function Navbar() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const location = useLocation();  
+  // Check if the current pathname is '/AddStudentReceipt'
+  const isAddStudentReceiptPage = location.pathname.startsWith('/AddStudentReceipt'); 
+  const handleLogoClick = (e) => {
+    if (isAddStudentReceiptPage) {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isAddAttributeDropdownOpen, setAddAttributeDropdownOpen] = useState(false);
@@ -80,7 +88,7 @@ function Navbar() {
     <>
       <div className="navbar bg-base-100 custom-navbar-padding">
         <div className="navbar-start">
-          {user && (
+          {user && !isAddStudentReceiptPage && (
             <div className="dropdown relative" ref={dropdownRef}>
               <div
                 tabIndex={0}
@@ -120,14 +128,14 @@ function Navbar() {
           )}
         </div>
         <div className="navbar-center logo-container">
-    <Link to='/'>
+    <Link to='/' onClick={handleLogoClick}>
         <img alt="logo" src="/9logo.jpg" className="responsive-logo" />
     </Link>
 
 
         </div>
         <div className="navbar-end">
-          {user && (
+          {user && !isAddStudentReceiptPage && (
             <div className="dropdown dropdown-end" ref={profileDropdownRef}>
               <div
                 tabIndex={0}

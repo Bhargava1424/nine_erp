@@ -125,34 +125,34 @@ function AddStudentReceipt() {
     
 
     return (
-        <div>
+        <>
             <Navbar/>
 
-            <h1 className='text-2xl font-bold text-gray-500 mb-4'>{studentData.firstName}'s Receipt Details</h1>
+            <h1 className='text-2xl font-bold text-black  mb-4'>{studentData.firstName}'s Receipt Details</h1>
 
             <div>
                 <div className="overflow-x-auto">        {/* First Year Tuition Fee */}
-                    <h2 className='text-xl font-bold text-black-500 mb-4'>1st Year Tuition Fee:</h2>
-                    <table className="table">
+                    <h2 className='text-xl font-bold text-black mb-4'>1st Year Tuition Fee:</h2>
+                    <table className="table border border-black">
                         {/* head */}
-                        <thead style={{ backgroundColor: '#2D5990' }}>
-                        <tr >
-                            <th className="px-4 py-2 text-lg">Applied Fee</th>
-                            <th className="px-4 py-2 text-lg">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg">Add Receipt</th>
+                        <thead>
+                        <tr>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
                         </tr>
                         </thead>
                         <tbody>
                         {/* body */}
-                        <tr style={{ backgroundColor: '#00A0E3' }}>
-                            <td className="text-lg text-black-500 font-bold">{studentData.firstYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.paidFirstYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.pendingFirstYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold">
-                                <button className="btn btn-outline" onClick={() => handleAddReceiptClick('feeType')}>
+                        <tr className="hover:bg-[#00A0E3]">
+                            <td className="text-lg text-black font-bold border border-black">{studentData.firstYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.paidFirstYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingFirstYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">
+                                <button  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick('feeType')}>
                                     Add Receipt
-                                </button>
+                                </button > 
                                 {showReceiptSection && (
                                     <div>
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
@@ -181,7 +181,7 @@ function AddStudentReceipt() {
                                             {modeOfPayment === 'CHEQUE' && (
                                                 <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
                                             )}
-                                            <button onClick={handleSubmit} className="btn btn-primary">
+                                            <button onClick={handleSubmit}  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
                                                 Submit Payment
                                             </button>                      
 
@@ -196,77 +196,77 @@ function AddStudentReceipt() {
                     </table>
                 </div>
                 <div className="overflow-x-auto">        {/* First Year Hostel Fee */}
-                    <h2 className='text-xl font-bold text-black-500 mb-4'>1st Year Hostel Fee:</h2>
-                    <table className="table">
+                    <h2 className='text-xl font-bold text-black mb-4'>1st Year Hostel Fee:</h2>
+                    <table className="table border border-black">
                         {/* head */}
-                        <thead style={{ backgroundColor: '#2D5990' }}>
+                        <thead>
                         <tr>
-                            <th className="px-4 py-2 text-lg" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg">Add Receipt</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
                         </tr>
                         </thead>
                         <tbody>
                         {/*body*/}
-                        <tr style={{ backgroundColor: '#00A0E3' }}>
-                            <td className="text-lg text-black-500 font-bold">{studentData.firstYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.paidFirstYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.pendingFirstYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold"><button className="btn btn-outline">Add Receipt</button></td>
+                        <tr className="hover:bg-[#00A0E3]">
+                            <td className="text-lg text-black font-bold border border-black">{studentData.firstYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.paidFirstYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingFirstYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 <div className="overflow-x-auto">        {/* Second Year Tuition Fee */}
-                    <h2 className='text-xl font-bold text-black-500 mb-4'>2nd Year Tuition Fee</h2>
-                    <table className="table">
+                    <h2 className='text-xl font-bold text-black mb-4'>2nd Year Tuition Fee</h2>
+                    <table className="table border border-black">
                         {/* head */}
-                        <thead style={{ backgroundColor: '#2D5990' }}>
+                        <thead>
                         <tr>
-                            <th className="px-4 py-2 text-lg" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg">Add Receipt</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
                         </tr>
                         </thead>
                         <tbody>
                         {/* body */}
-                        <tr style={{ backgroundColor: '#00A0E3' }}>
-                            <td className="text-lg text-black-500 font-bold">{studentData.secondYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.paidSecondYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.pendingSecondYearTuitionFee}</td>
-                            <td className="text-lg text-black-500 font-bold"><button className="btn btn-outline">Add Receipt</button></td>
+                        <tr className="hover:bg-[#00A0E3]">
+                            <td className="text-lg text-black font-bold border border-black">{studentData.secondYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.paidSecondYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingSecondYearTuitionFee}</td>
+                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 <div className="overflow-x-auto">        {/* Second Year Hostel Fee */}
-                    <h2 className='text-xl font-bold text-black-500 mb-4'>2nd Year Hostel Fee</h2>
-                    <table className="table">
+                    <h2 className='text-xl font-bold text-black mb-4'>2nd Year Hostel Fee</h2>
+                    <table className="table border border-black">
                         {/* head */}
-                        <thead style={{ backgroundColor: '#2D5990' }}>
+                        <thead>
                         <tr>
-                            <th className="px-4 py-2 text-lg" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg">Add Receipt</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
+                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
                         </tr>
                         </thead>
                         <tbody>
                         {/* body */}
-                        <tr style={{ backgroundColor: '#00A0E3' }}>
-                            <td className="text-lg text-black-500 font-bold">{studentData.secondYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.paidSecondYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold">{studentData.pendingSecondYearHostelFee}</td>
-                            <td className="text-lg text-black-500 font-bold"><button className="btn btn-outline">Add Receipt</button></td>
+                        <tr className="hover:bg-[#00A0E3]">
+                            <td className="text-lg text-black font-bold border border-black">{studentData.secondYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.paidSecondYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingSecondYearHostelFee}</td>
+                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-        </div>
+        </>
     );
 }
 
