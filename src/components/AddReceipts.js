@@ -60,7 +60,7 @@ function AddReceipts() {
                 <tr>
                 <th className="px-4 py-2">First Name</th>
                   <th className="px-4 py-2">SurName</th>
-                  <th className="px-4 py-2">Father's Name</th>
+                  <th className="px-4 py-2">Parent's Name</th>
                   <th className="px-4 py-2">Primary Contact</th>
                   <th className="px-4 py-2">Secondary Contact</th>
                   <th className="px-4 py-2">Gender</th>
@@ -90,7 +90,7 @@ function AddReceipts() {
                                                       </Link>
                                                       </td>
                     <td className="border px-4 py-2">{student.surName}</td>
-                    <td className="border px-4 py-2">{student.fatherName}</td>
+                    <td className="border px-4 py-2">{student.parentName}</td>
                     <td className="border px-4 py-2">{student.primaryContact}</td>
                     <td className="border px-4 py-2">{student.secondaryContact}</td>
                     <td className="border px-4 py-2">{student.gender}</td>

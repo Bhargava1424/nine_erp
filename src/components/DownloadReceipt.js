@@ -95,7 +95,7 @@ function DownloadReceipt() {
             <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
                 
                 <div>
-                    <p className="text-lg">Student's Name <span className="font-bold">{firstName}</span></p>
+                    <p className="text-lg">Student's Name <span className="font-bold">{applicationNumber}</span></p>
                     <p className="text-lg">Parent's Name : <span className="font-bold">[Receipt No:]</span></p>
                     <p className="text-lg">Application Number :  <span className="font-bold">[Receipt No:]</span></p>
                     <p className="text-lg">Registered Mobile Number : <span className="font-bold">[Receipt No:]</span></p>

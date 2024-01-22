@@ -64,10 +64,10 @@ AddConcessionRequest.prototype.applicationNumber = undefined;
  */
 AddConcessionRequest.FeeTypeEnum = {
   /**
-   * value: "firstYearTutionFee"
+   * value: "firstYeartuitionFee"
    * @const
    */
-  firstYearTutionFee: "firstYearTutionFee",
+  firstYeartuitionFee: "firstYeartuitionFee",
 
   /**
    * value: "firstYearHostelFee"
@@ -76,10 +76,10 @@ AddConcessionRequest.FeeTypeEnum = {
   firstYearHostelFee: "firstYearHostelFee",
 
   /**
-   * value: "secondYearTutionFee"
+   * value: "secondYeartuitionFee"
    * @const
    */
-  secondYearTutionFee: "secondYearTutionFee",
+  secondYeartuitionFee: "secondYeartuitionFee",
 
   /**
    * value: "secondYearHostelFee"

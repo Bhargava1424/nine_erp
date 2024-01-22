@@ -6,7 +6,7 @@ const AddStudent = () => {
   const [studentData, setStudentData] = useState({
     firstName: '',
     surName: '',
-    fatherName: '',
+    parentName: '',
     branch: '',
     primaryContact: '',
     secondaryContact: '',
@@ -56,8 +56,8 @@ const handleInputChange = (e) => {
   let newErrors = { ...errors };
   let updatedValue = value;
 
-  // Convert firstName, surName, and fatherName to uppercase and allow only alphabets
-  if (name === 'firstName' || name === 'surName' || name === 'fatherName') {
+  // Convert firstName, surName, and parentName to uppercase and allow only alphabets
+  if (name === 'firstName' || name === 'surName' || name === 'parentName') {
     updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
   }
 
@@ -114,7 +114,7 @@ const handleInputChange = (e) => {
     if (name === 'primaryContact' || name === 'secondaryContact') {
       return /^[0-9]*$/.test(value);
     }
-    if (name === 'firstName' || name === 'surName' || name === 'fatherName') {
+    if (name === 'firstName' || name === 'surName' || name === 'parentName') {
       return /^[a-zA-Z\s]*$/.test(value);
     }
     return true;
@@ -135,7 +135,7 @@ const handleInputChange = (e) => {
     // Validate other fields as normal
     if (!studentData.firstName.trim() ||
         !studentData.surName.trim() ||
-        !studentData.fatherName.trim() || 
+        !studentData.parentName.trim() || 
         !studentData.primaryContact.trim() || 
         !studentData.secondaryContact.trim() || 
         !studentData.gender || 
@@ -281,7 +281,7 @@ const handleInputChange = (e) => {
           <p className="font-bold">Please Read Before Filling Out the Form</p>
           <ul className="list-disc list-inside">
             <li><strong>Student Name:</strong> Enter the student's name exactly as it appears on their 10th certificate.</li>
-            <li><strong>Father's Name:</strong> Enter the father's name as per the student's 10th certificate.</li>
+            <li><strong>Parent's Name:</strong> Enter the parent's name as per the student's 10th certificate.</li>
             <li><strong>Primary and Secondary Contact:</strong> Only numeric values are allowed. Do not include spaces or special characters.</li>
             <li><strong>Gender:</strong> Select the appropriate gender from the dropdown menu.</li>
             <li><strong>Batch:</strong> Choose the relevant batch. Note: If 'On TC' is selected, the fields for 1st year tuition and hostel fees will be disabled.</li>
@@ -335,24 +335,24 @@ const handleInputChange = (e) => {
             <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Name according to 10th certificate</span>
           </label>
         </div>
-        <div className="flex justify-between space-x-1">        {/* father Name and branch Field */}
+        <div className="flex justify-between space-x-1">        {/* parent Name and branch Field */}
           <label className="form-control w-1/2 pr-2">
             <div className="label">
-              <span className="label-text">Father's Name</span>
+              <span className="label-text">Parent's Name</span>
             </div>
             <input
               type="text"
-              placeholder="Father's Name"
+              placeholder="Parent's Name"
               className="input input-bordered w-full max-w-xs"
-              name="fatherName"
-              value={studentData.fatherName}
+              name="parentName"
+              value={studentData.parentName}
               onChange={(e) => {
                 if (validateInput(e.target.name, e.target.value)) {
                   handleInputChange(e);
                 }
               }}
             />
-            <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Father's name according to 10th certificate</span>
+            <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Parent's name according to 10th certificate</span>
           </label>
 
           {/* branch Name Field */}

@@ -67,12 +67,12 @@ export class Student {
         obj.secondaryContact = ApiClient.convertToType(data['secondaryContact'], 'String');
       if (data.hasOwnProperty('firstYearHostelFee'))
         obj.firstYearHostelFee = ApiClient.convertToType(data['firstYearHostelFee'], 'Number');
-      if (data.hasOwnProperty('firstYearTutionFee'))
-        obj.firstYearTutionFee = ApiClient.convertToType(data['firstYearTutionFee'], 'Number');
+      if (data.hasOwnProperty('firstYeartuitionFee'))
+        obj.firstYeartuitionFee = ApiClient.convertToType(data['firstYeartuitionFee'], 'Number');
       if (data.hasOwnProperty('secondYearHostelFee'))
         obj.secondYearHostelFee = ApiClient.convertToType(data['secondYearHostelFee'], 'Number');
-      if (data.hasOwnProperty('secondYearTutionFee'))
-        obj.secondYearTutionFee = ApiClient.convertToType(data['secondYearTutionFee'], 'Number');
+      if (data.hasOwnProperty('secondYeartuitionFee'))
+        obj.secondYeartuitionFee = ApiClient.convertToType(data['secondYeartuitionFee'], 'Number');
       if (data.hasOwnProperty('pendingFirstYearTuitionFee'))
         obj.pendingFirstYearTuitionFee = ApiClient.convertToType(data['pendingFirstYearTuitionFee'], 'Number');
       if (data.hasOwnProperty('pendingFirstYearHostelFee'))
@@ -185,9 +185,9 @@ Student.prototype.secondaryContact = undefined;
 Student.prototype.firstYearHostelFee = undefined;
 
 /**
- * @member {Number} firstYearTutionFee
+ * @member {Number} firstYeartuitionFee
  */
-Student.prototype.firstYearTutionFee = undefined;
+Student.prototype.firstYeartuitionFee = undefined;
 
 /**
  * @member {Number} secondYearHostelFee
@@ -195,9 +195,9 @@ Student.prototype.firstYearTutionFee = undefined;
 Student.prototype.secondYearHostelFee = undefined;
 
 /**
- * @member {Number} secondYearTutionFee
+ * @member {Number} secondYeartuitionFee
  */
-Student.prototype.secondYearTutionFee = undefined;
+Student.prototype.secondYeartuitionFee = undefined;
 
 /**
  * @member {Number} pendingFirstYearTuitionFee

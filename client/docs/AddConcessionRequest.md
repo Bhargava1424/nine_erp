@@ -11,8 +11,8 @@ Name | Type | Description | Notes
 <a name="FeeTypeEnum"></a>
 ## Enum: FeeTypeEnum
 
-* `firstYearTutionFee` (value: `"firstYearTutionFee"`)
+* `firstYeartuitionFee` (value: `"firstYeartuitionFee"`)
 * `firstYearHostelFee` (value: `"firstYearHostelFee"`)
-* `secondYearTutionFee` (value: `"secondYearTutionFee"`)
+* `secondYeartuitionFee` (value: `"secondYeartuitionFee"`)
 * `secondYearHostelFee` (value: `"secondYearHostelFee"`)
 

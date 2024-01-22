@@ -1,7 +1,6 @@
 import Login2 from './Login2';
 import { useSelector } from 'react-redux';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 function HeroSection2() {
   const userRole = useSelector((state) => state.auth.user?.role);
