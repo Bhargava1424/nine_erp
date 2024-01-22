@@ -13,6 +13,7 @@ function Login2() {
     // Sample admin and accountant credentials
     const adminCredentials = { email: 'admin@example.com', password: '123' };
     const accountantCredentials = { email: 'accountant@example.com', password: '123' };
+    const executiveCredentials = { email: 'executive@example.com', password: '123' };
 
     // Validation using regular expressions
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -29,6 +30,8 @@ function Login2() {
       userRole = 'Admin';
     } else if (email === accountantCredentials.email && password === accountantCredentials.password) {
       userRole = 'Accountant';
+    } else if (email === executiveCredentials.email && password === executiveCredentials.password) {
+      userRole = 'Executive';
     } else {
       alert('Invalid credentials.');
       return;
