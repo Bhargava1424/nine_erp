@@ -100,7 +100,7 @@ const handleCodeVerification = (e) => {
         onChange={(e) => setEmail(e.target.value)}
       />
     </div>
-    <button type="submit" className="btn btn-primary w-full">
+    <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
       Send Reset Code
     </button>
   </form>
@@ -124,7 +124,7 @@ const handleCodeVerification = (e) => {
         onChange={(e) => setResetCode(e.target.value)}
       />
     </div>
-    <button type="submit" className="btn btn-primary w-full">
+    <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
       Verify Code
     </button>
   </form>
@@ -159,7 +159,7 @@ const handleCodeVerification = (e) => {
       />
       {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
     </div>
-    <button type="submit" className="btn btn-primary w-full">
+    <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
       Reset Password
     </button>
   </form>

@@ -213,7 +213,7 @@ function AddEmployee() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="text-lg px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
           >
             Add Employee
           </button>

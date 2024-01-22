@@ -69,10 +69,10 @@ function Login2() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <label className="text-xs text-blue-500 cursor-pointer mt-1"><Link to='/ForgotPassword'>Forgot password?</Link></label>
+            <label className="text-s text-black cursor-pointer mt-1"><Link to='/ForgotPassword'>Forgot password?</Link></label>
           </div>
           <div className="flex justify-end">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
               Login
             </button>
           </div>

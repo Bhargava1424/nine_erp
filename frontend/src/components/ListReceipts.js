@@ -84,10 +84,10 @@ class ListReceipts extends Component {
                     </>
                 )}
                 <div className="receipt-actions">
-                    <button onClick={() => this.handleEdit(index)} className="edit-button">
+                    <button onClick={() => this.handleEdit(index)} className="edit-button text-white" style={{ backgroundColor: '#2D5990' }}>
                         {isEditing ? 'Save' : 'Edit'}
                     </button>
-                    <button onClick={() => this.handleDownload(receipt)} className="download-button" disabled={isEditing}>
+                    <button onClick={() => this.handleDownload(receipt)} className="download-button text-white" disabled={isEditing} style={{ backgroundColor: '#2D5990' }}>
                         Download Receipt
                     </button>
                 </div>

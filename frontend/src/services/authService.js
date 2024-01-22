@@ -6,7 +6,7 @@ export const useAuth = () => {
   const dispatch = useDispatch();
   // Define getRandomColor function within authService.js
   const getRandomColor = () => {
-    const colors = ['#121212', '#303030', '#3B88FF', '#5D40C1', '#28B485'];
+    const colors = ['#2D5990', '#00A0E3'];
     const randomIndex = Math.floor(Math.random() * colors.length);
     return colors[randomIndex];
   };
