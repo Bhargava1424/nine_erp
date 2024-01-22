@@ -9,12 +9,14 @@ function ForgotPassword() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [currentStage, setCurrentStage] = useState('emailSubmission');
+  const [passwordError, setPasswordError] = useState('');  
   const navigate = useNavigate();
 
 // Function to retrieve user emails
 const getUserEmails = (username) => {
+  const emails=['hello@9ed.in', 'bharathteja@9ed.in', 'edunine001@gmail.com','kundannanubala@gmail.com'];
     if (username === 'admin@example.com') {
-      return ['nanubalakundan.007@gmail.com', 'kundannanubala@gmail.com', 'nirmayeenanubala@gmail.com'];
+      return emails;
     }
     // Add more cases for different users if needed
     return [];
@@ -71,7 +73,7 @@ const handleCodeVerification = (e) => {
   const handlePasswordReset = (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      alert('Passwords do not match.');
+      setPasswordError('Passwords do not match.');
       return;
     }
     // Simulate password update
@@ -84,74 +86,85 @@ const handleCodeVerification = (e) => {
         <Navbar/>
       {currentStage === 'emailSubmission' && (
         // Email Submission Form
-        <form onSubmit={handleEmailSubmission} className="space-y-4">
-          <h1 className="text-3xl font-bold mb-4">Reset Your Password</h1>
-          <div className="flex flex-col">
-            <label className="text-sm mb-1">Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="input input-bordered w-full max-w-xs"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Send Reset Code
-          </button>
-        </form>
+<div className="flex items-center justify-center min-h-screen bg-gray">
+  <form onSubmit={handleEmailSubmission} className="border border-gray-300 rounded-lg bg-gray p-6 space-y-4 max-w-md mx-auto">
+    <h1 className="text-1xl mb-4">Forgot Your Password? No problem. Just let us know your username and we will email you a password reset code that will allow you to choose a new one.</h1>
+    <div className="flex flex-col">
+      <label className="text-sm mb-1">Email</label>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        className="input input-bordered w-full"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+    </div>
+    <button type="submit" className="btn btn-primary w-full">
+      Send Reset Code
+    </button>
+  </form>
+</div>
+
+
       )}
       {currentStage === 'codeVerification' && (
         // Code Verification Form
-        <form onSubmit={handleCodeVerification} className="space-y-4">
-          <h1 className="text-3xl font-bold mb-4">Enter Your Reset Code</h1>
-          <div className="flex flex-col">
-            <label className="text-sm mb-1">Reset Code</label>
-            <input
-              type="text"
-              placeholder="Enter the code"
-              className="input input-bordered w-full max-w-xs"
-              required
-              value={resetCode}
-              onChange={(e) => setResetCode(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Verify Code
-          </button>
-        </form>
+<div className="flex items-center justify-center min-h-screen bg-gray">
+  <form onSubmit={handleCodeVerification} className="border border-gray-300 rounded-lg bg-gray p-6 space-y-4 max-w-md mx-auto">
+    <h1 className="text-3xl font-bold mb-4">Enter Your Reset Code</h1>
+    <div className="flex flex-col">
+      <label className="text-sm mb-1">Reset Code</label>
+      <input
+        type="text"
+        placeholder="Enter the code"
+        className="input input-bordered w-full"
+        required
+        value={resetCode}
+        onChange={(e) => setResetCode(e.target.value)}
+      />
+    </div>
+    <button type="submit" className="btn btn-primary w-full">
+      Verify Code
+    </button>
+  </form>
+</div>
+
       )}
       {currentStage === 'passwordReset' && (
         // Password Reset Form
-        <form onSubmit={handlePasswordReset} className="space-y-4">
-          <h1 className="text-3xl font-bold mb-4">Set Your New Password</h1>
-          <div className="flex flex-col">
-            <label className="text-sm mb-1">New Password</label>
-            <input
-              type="password"
-              placeholder="New password"
-              className="input input-bordered w-full max-w-xs"
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm mb-1">Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm password"
-              className="input input-bordered w-full max-w-xs"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Reset Password
-          </button>
-        </form>
+<div className="flex items-center justify-center min-h-screen bg-gray">
+  <form onSubmit={handlePasswordReset} className="border border-gray-300 rounded-lg bg-gray p-6 space-y-4 max-w-md mx-auto">
+    <h1 className="text-3xl font-bold mb-4">Set Your New Password</h1>
+    <div className="flex flex-col">
+      <label className="text-sm mb-1">New Password</label>
+      <input
+        type="password"
+        placeholder="New password"
+        className="input input-bordered w-full"
+        required
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+    </div>
+    <div className="flex flex-col">
+      <label className="text-sm mb-1">Confirm Password</label>
+      <input
+        type="password"
+        placeholder="Confirm password"
+        className="input input-bordered w-full"
+        required
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+      />
+      {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
+    </div>
+    <button type="submit" className="btn btn-primary w-full">
+      Reset Password
+    </button>
+  </form>
+</div>
+
       )}
     </div>
   );
