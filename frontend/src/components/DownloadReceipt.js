@@ -66,17 +66,17 @@ function DownloadReceipt() {
                     <p className="text-lg">Receipt No: <span className="font-bold">[Receipt No:]</span></p>
                 </div>
                 <div className="text-right">
-                    <p className="text-lg">Date: <span className="font-bold">[Date:]</span></p> 
+                    <p className="text-lg">Date: <span className="font-bold">{new Date().toISOString().split('T')[0]}</span></p> 
                 </div>
             </div>
             <h1 className="text-2xl font-bold text-center">STUDENT DETAILS</h1>
             <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
                 
                 <div>
-                    <p className="text-lg">Student's Name <span className="font-bold">{firstName}</span></p>
-                    <p className="text-lg">Parent's Name : <span className="font-bold">[Receipt No:]</span></p>
-                    <p className="text-lg">Application Number :  <span className="font-bold">[Receipt No:]</span></p>
-                    <p className="text-lg">Registered Mobile Number : <span className="font-bold">[Receipt No:]</span></p>
+                    <p className="text-lg">Student's Name <span className="font-bold">{firstName} {studentData.surName}</span></p>
+                    <p className="text-lg">Parent's Name : <span className="font-bold">{studentData.fatherName}</span></p>
+                    <p className="text-lg">Application Number :  <span className="font-bold">VDN2024000002</span></p>
+                    <p className="text-lg">Registered Mobile Number : <span className="font-bold">{studentData.primaryContact}</span></p>
                 </div>
             </div>
             <h1 className="text-2xl font-bold text-center">REGISTRATION DETAIL</h1>
