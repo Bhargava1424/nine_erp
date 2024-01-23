@@ -90,6 +90,7 @@ All URIs are relative to *http://localhost:8080/v1*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *SchoolManagementSystemApi.AuthorizationApi* | [**login**](docs/AuthorizationApi.md#login) | **POST** /login | Login
+*SchoolManagementSystemApi.AuthorizationApi* | [**sendPassword**](docs/AuthorizationApi.md#sendPassword) | **POST** /send_password | Send password
 *SchoolManagementSystemApi.BranchesApi* | [**branchesPost**](docs/BranchesApi.md#branchesPost) | **POST** /branches | Create a new branch
 *SchoolManagementSystemApi.DbApi* | [**dbGet**](docs/DbApi.md#dbGet) | **POST** /db/get | Retrieve all data from database
 *SchoolManagementSystemApi.DbApi* | [**dbUpdate**](docs/DbApi.md#dbUpdate) | **POST** /db/update | Update data in database
@@ -109,9 +110,8 @@ Class | Method | HTTP request | Description
  - [SchoolManagementSystemApi.LoginRequest](docs/LoginRequest.md)
  - [SchoolManagementSystemApi.Receipt](docs/Receipt.md)
  - [SchoolManagementSystemApi.ReceiptCreateRequest](docs/ReceiptCreateRequest.md)
- - [SchoolManagementSystemApi.ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [SchoolManagementSystemApi.Response](docs/Response.md)
- - [SchoolManagementSystemApi.SendOtpRequest](docs/SendOtpRequest.md)
+ - [SchoolManagementSystemApi.SendPasswordRequest](docs/SendPasswordRequest.md)
  - [SchoolManagementSystemApi.Student](docs/Student.md)
 
 ## Documentation for Authorization

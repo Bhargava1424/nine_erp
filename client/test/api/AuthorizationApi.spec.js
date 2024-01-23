@@ -55,6 +55,26 @@
           done();
         });
       });
+      describe('sendPassword', function() {
+        it('should call sendPassword successfully', function(done) {
+          // TODO: uncomment, update parameter values for sendPassword call and complete the assertions
+          /*
+
+          instance.sendPassword(body, function(error, data, response) {
+            if (error) {
+              done(error);
+              return;
+            }
+            // TODO: update response assertions
+            expect(data).to.be.a(SchoolManagementSystemApi.Response);
+
+            done();
+          });
+          */
+          // TODO: uncomment and complete method invocation above, then delete this line and the next:
+          done();
+        });
+      });
     });
   });
 

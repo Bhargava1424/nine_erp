@@ -23,9 +23,8 @@ import {Error} from './model/Error';
 import {LoginRequest} from './model/LoginRequest';
 import {Receipt} from './model/Receipt';
 import {ReceiptCreateRequest} from './model/ReceiptCreateRequest';
-import {ResetPasswordRequest} from './model/ResetPasswordRequest';
 import {Response} from './model/Response';
-import {SendOtpRequest} from './model/SendOtpRequest';
+import {SendPasswordRequest} from './model/SendPasswordRequest';
 import {Student} from './model/Student';
 import {AuthorizationApi} from './api/AuthorizationApi';
 import {BranchesApi} from './api/BranchesApi';
@@ -127,22 +126,16 @@ export {
     ReceiptCreateRequest,
 
     /**
-     * The ResetPasswordRequest model constructor.
-     * @property {module:model/ResetPasswordRequest}
-     */
-    ResetPasswordRequest,
-
-    /**
      * The Response model constructor.
      * @property {module:model/Response}
      */
     Response,
 
     /**
-     * The SendOtpRequest model constructor.
-     * @property {module:model/SendOtpRequest}
+     * The SendPasswordRequest model constructor.
+     * @property {module:model/SendPasswordRequest}
      */
-    SendOtpRequest,
+    SendPasswordRequest,
 
     /**
      * The Student model constructor.
