@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
 
@@ -6,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 function DownloadReceipt() {
 
     const [amountPaid, setAmountPaid] = useState('');
-    const [applicationNumber, setFirstYearTuitionFee] = useState('');
+    const [firstName, setFirstYearTuitionFee] = useState('');
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,53 +18,29 @@ function DownloadReceipt() {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const amount = queryParams.get('amountPaid');
-        const applicationNumber = queryParams.get('applicationNumber');
+        const firstName = queryParams.get('firstName');
     
         if (amount) setAmountPaid(amount);
-        if (applicationNumber) setFirstYearTuitionFee(applicationNumber);
+        if (firstName) setFirstYearTuitionFee(firstName);
     }, [location]);
 
     useEffect(() => {
 
         const fetchStudentData = async () => {
             try {
-                var SchoolManagementSystemApi = require('school_management_system_api');
-                var api = new SchoolManagementSystemApi.DbApi();
-                const opts = {
-                  body: {
-                    "collectionName": "students",
-                    "query": {
-                        "applicationNumber": applicationNumber
-                    },
-                    "type": 'findOne'
-                  }
-                };
-            
-                console.log(opts.body);
-            
-                api.dbGet(opts, function(error, data, response) {
-                  if (error) {
-                    console.error('API Error:', error);
-                  } else {
-                    try {
-                      const responseBody = response.body; // Assuming response.body is already in JSON format
-                      console.log(responseBody);
-                      setStudentData(responseBody) // Assuming the actual data is in responseBody.data
-                      setLoading(false);
-                    } catch (parseError) {
-                      console.error('Error parsing response:', parseError);
-                    }
-                  }
-                });
-              } catch (error) {
-                console.error('Error during fetch:', error);
+                const response = await axios.get(`http://localhost:5000/api/students/name/${firstName}`);
+                setStudentData(response.data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
             }
         };
 
-        if (applicationNumber) {
+        if (firstName) {
             fetchStudentData();
         }
-    }, [applicationNumber]);
+    }, [firstName]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -88,17 +66,17 @@ function DownloadReceipt() {
                     <p className="text-lg">Receipt No: <span className="font-bold">[Receipt No:]</span></p>
                 </div>
                 <div className="text-right">
-                    <p className="text-lg">Date: <span className="font-bold">[Date:]</span></p> 
+                    <p className="text-lg">Date: <span className="font-bold">{new Date().toISOString().split('T')[0]}</span></p> 
                 </div>
             </div>
             <h1 className="text-2xl font-bold text-center">STUDENT DETAILS</h1>
             <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
                 
                 <div>
-                    <p className="text-lg">Student's Name <span className="font-bold">{applicationNumber}</span></p>
-                    <p className="text-lg">Parent's Name : <span className="font-bold">[Receipt No:]</span></p>
-                    <p className="text-lg">Application Number :  <span className="font-bold">[Receipt No:]</span></p>
-                    <p className="text-lg">Registered Mobile Number : <span className="font-bold">[Receipt No:]</span></p>
+                    <p className="text-lg">Student's Name <span className="font-bold">{firstName} {studentData.surName}</span></p>
+                    <p className="text-lg">Parent's Name : <span className="font-bold">{studentData.fatherName}</span></p>
+                    <p className="text-lg">Application Number :  <span className="font-bold">VDN2024000002</span></p>
+                    <p className="text-lg">Registered Mobile Number : <span className="font-bold">{studentData.primaryContact}</span></p>
                 </div>
             </div>
             <h1 className="text-2xl font-bold text-center">REGISTRATION DETAIL</h1>
@@ -156,3 +134,5 @@ function DownloadReceipt() {
 }
 
 export default DownloadReceipt;
+
+
