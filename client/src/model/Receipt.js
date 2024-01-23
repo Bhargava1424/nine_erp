@@ -63,34 +63,34 @@ export class Receipt {
         obj.branch = ApiClient.convertToType(data['branch'], 'String');
       if (data.hasOwnProperty('residenceType'))
         obj.residenceType = ApiClient.convertToType(data['residenceType'], 'String');
-      if (data.hasOwnProperty('firstYeartuitionFeePayable'))
-        obj.firstYeartuitionFeePayable = ApiClient.convertToType(data['firstYeartuitionFeePayable'], 'Number');
-      if (data.hasOwnProperty('firstYeartuitionFeePaid'))
-        obj.firstYeartuitionFeePaid = ApiClient.convertToType(data['firstYeartuitionFeePaid'], 'Number');
+      if (data.hasOwnProperty('firstYearTuitionFeePayable'))
+        obj.firstYearTuitionFeePayable = ApiClient.convertToType(data['firstYearTuitionFeePayable'], 'Number');
+      if (data.hasOwnProperty('firstYearTuitionFeePaid'))
+        obj.firstYearTuitionFeePaid = ApiClient.convertToType(data['firstYearTuitionFeePaid'], 'Number');
       if (data.hasOwnProperty('firstYearHostelFeePayable'))
         obj.firstYearHostelFeePayable = ApiClient.convertToType(data['firstYearHostelFeePayable'], 'Number');
       if (data.hasOwnProperty('firstYearHostelFeePaid'))
         obj.firstYearHostelFeePaid = ApiClient.convertToType(data['firstYearHostelFeePaid'], 'Number');
-      if (data.hasOwnProperty('secondYeartuitionFeePayable'))
-        obj.secondYeartuitionFeePayable = ApiClient.convertToType(data['secondYeartuitionFeePayable'], 'Number');
-      if (data.hasOwnProperty('secondYeartuitionFeePaid'))
-        obj.secondYeartuitionFeePaid = ApiClient.convertToType(data['secondYeartuitionFeePaid'], 'Number');
+      if (data.hasOwnProperty('secondYearTuitionFeePayable'))
+        obj.secondYearTuitionFeePayable = ApiClient.convertToType(data['secondYearTuitionFeePayable'], 'Number');
+      if (data.hasOwnProperty('secondYearTuitionFeePaid'))
+        obj.secondYearTuitionFeePaid = ApiClient.convertToType(data['secondYearTuitionFeePaid'], 'Number');
       if (data.hasOwnProperty('secondYearHostelFeePayable'))
         obj.secondYearHostelFeePayable = ApiClient.convertToType(data['secondYearHostelFeePayable'], 'Number');
       if (data.hasOwnProperty('secondYearHostelFeePaid'))
         obj.secondYearHostelFeePaid = ApiClient.convertToType(data['secondYearHostelFeePaid'], 'Number');
-      if (data.hasOwnProperty('firstYearTotaltuitionFeePaid'))
-        obj.firstYearTotaltuitionFeePaid = ApiClient.convertToType(data['firstYearTotaltuitionFeePaid'], 'Number');
-      if (data.hasOwnProperty('firstYearTotaltuitionFeePending'))
-        obj.firstYearTotaltuitionFeePending = ApiClient.convertToType(data['firstYearTotaltuitionFeePending'], 'Number');
+      if (data.hasOwnProperty('firstYearTotalTuitionFeePaid'))
+        obj.firstYearTotalTuitionFeePaid = ApiClient.convertToType(data['firstYearTotalTuitionFeePaid'], 'Number');
+      if (data.hasOwnProperty('firstYearTotalTuitionFeePending'))
+        obj.firstYearTotalTuitionFeePending = ApiClient.convertToType(data['firstYearTotalTuitionFeePending'], 'Number');
       if (data.hasOwnProperty('firstYearTotalHostelFeePaid'))
         obj.firstYearTotalHostelFeePaid = ApiClient.convertToType(data['firstYearTotalHostelFeePaid'], 'Number');
       if (data.hasOwnProperty('firstYearTotalHostelFeePending'))
         obj.firstYearTotalHostelFeePending = ApiClient.convertToType(data['firstYearTotalHostelFeePending'], 'Number');
-      if (data.hasOwnProperty('secondYearTotaltuitionFeePaid'))
-        obj.secondYearTotaltuitionFeePaid = ApiClient.convertToType(data['secondYearTotaltuitionFeePaid'], 'Number');
-      if (data.hasOwnProperty('secondYearTotaltuitionFeePending'))
-        obj.secondYearTotaltuitionFeePending = ApiClient.convertToType(data['secondYearTotaltuitionFeePending'], 'Number');
+      if (data.hasOwnProperty('secondYearTotalTuitionFeePaid'))
+        obj.secondYearTotalTuitionFeePaid = ApiClient.convertToType(data['secondYearTotalTuitionFeePaid'], 'Number');
+      if (data.hasOwnProperty('secondYearTotalTuitionFeePending'))
+        obj.secondYearTotalTuitionFeePending = ApiClient.convertToType(data['secondYearTotalTuitionFeePending'], 'Number');
       if (data.hasOwnProperty('secondYearTotalHostelFeePaid'))
         obj.secondYearTotalHostelFeePaid = ApiClient.convertToType(data['secondYearTotalHostelFeePaid'], 'Number');
       if (data.hasOwnProperty('secondYearTotalHostelFeePending'))
@@ -183,14 +183,14 @@ Receipt.prototype.branch = undefined;
 Receipt.prototype.residenceType = undefined;
 
 /**
- * @member {Number} firstYeartuitionFeePayable
+ * @member {Number} firstYearTuitionFeePayable
  */
-Receipt.prototype.firstYeartuitionFeePayable = undefined;
+Receipt.prototype.firstYearTuitionFeePayable = undefined;
 
 /**
- * @member {Number} firstYeartuitionFeePaid
+ * @member {Number} firstYearTuitionFeePaid
  */
-Receipt.prototype.firstYeartuitionFeePaid = undefined;
+Receipt.prototype.firstYearTuitionFeePaid = undefined;
 
 /**
  * @member {Number} firstYearHostelFeePayable
@@ -203,14 +203,14 @@ Receipt.prototype.firstYearHostelFeePayable = undefined;
 Receipt.prototype.firstYearHostelFeePaid = undefined;
 
 /**
- * @member {Number} secondYeartuitionFeePayable
+ * @member {Number} secondYearTuitionFeePayable
  */
-Receipt.prototype.secondYeartuitionFeePayable = undefined;
+Receipt.prototype.secondYearTuitionFeePayable = undefined;
 
 /**
- * @member {Number} secondYeartuitionFeePaid
+ * @member {Number} secondYearTuitionFeePaid
  */
-Receipt.prototype.secondYeartuitionFeePaid = undefined;
+Receipt.prototype.secondYearTuitionFeePaid = undefined;
 
 /**
  * @member {Number} secondYearHostelFeePayable
@@ -223,14 +223,14 @@ Receipt.prototype.secondYearHostelFeePayable = undefined;
 Receipt.prototype.secondYearHostelFeePaid = undefined;
 
 /**
- * @member {Number} firstYearTotaltuitionFeePaid
+ * @member {Number} firstYearTotalTuitionFeePaid
  */
-Receipt.prototype.firstYearTotaltuitionFeePaid = undefined;
+Receipt.prototype.firstYearTotalTuitionFeePaid = undefined;
 
 /**
- * @member {Number} firstYearTotaltuitionFeePending
+ * @member {Number} firstYearTotalTuitionFeePending
  */
-Receipt.prototype.firstYearTotaltuitionFeePending = undefined;
+Receipt.prototype.firstYearTotalTuitionFeePending = undefined;
 
 /**
  * @member {Number} firstYearTotalHostelFeePaid
@@ -243,14 +243,14 @@ Receipt.prototype.firstYearTotalHostelFeePaid = undefined;
 Receipt.prototype.firstYearTotalHostelFeePending = undefined;
 
 /**
- * @member {Number} secondYearTotaltuitionFeePaid
+ * @member {Number} secondYearTotalTuitionFeePaid
  */
-Receipt.prototype.secondYearTotaltuitionFeePaid = undefined;
+Receipt.prototype.secondYearTotalTuitionFeePaid = undefined;
 
 /**
- * @member {Number} secondYearTotaltuitionFeePending
+ * @member {Number} secondYearTotalTuitionFeePending
  */
-Receipt.prototype.secondYearTotaltuitionFeePending = undefined;
+Receipt.prototype.secondYearTotalTuitionFeePending = undefined;
 
 /**
  * @member {Number} secondYearTotalHostelFeePaid

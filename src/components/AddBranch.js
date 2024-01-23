@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+
 import Navbar from './Navbar'; // Adjust the import path if necessary
+import React, { useState, useEffect } from 'react';
 
 function AddBranch() {
   const [branchData, setBranchData] = useState({
@@ -7,9 +8,10 @@ function AddBranch() {
     branchCode: '',
     branchAddress: '',
   });
+  
 
   const [showInstructions, setShowInstructions] = useState(true);
-  const [errors] = useState({});
+  const [errors, setErrors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleChange = (e) => {
@@ -19,33 +21,31 @@ function AddBranch() {
   const handleSubmit = async  (e) => {
     e.preventDefault();
     let isValid = true;
-    // let newErrors = {};
+    let newErrors = {};
 
     // Check for empty fields
-    // Object.keys(branchData).forEach(key => {
-    //   if (!branchData[key]) {
-    //     isValid = false;
-    //     newErrors[key] = 'This field is required';
-    //   }
+    Object.keys(branchData).forEach(key => {
+      if (!branchData[key]) {
+        isValid = false;
+        newErrors[key] = 'This field is required';
+      }
 
-    //   if (isValid) {
-    //     console.log(branchData); // Replace with backend submission logic
+      if (isValid) {
+        console.log(branchData); // Replace with backend submission logic
 
-    //     console.log(4+5);
+        // Show success message
+        setShowSuccessMessage(true);
 
-    //     // Show success message
-    //     setShowSuccessMessage(true);
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+            setShowSuccessMessage(false);
+        }, 3000);
+    } else {
+        setErrors(newErrors);
+    }
+    });
 
-    //     // Hide success message after 3 seconds
-    //     setTimeout(() => {
-    //         setShowSuccessMessage(false);
-    //     }, 3000);
-    // } else {
-    //     setErrors(newErrors);
-    // }
-    // });
-
-    // setErrors(newErrors);
+    setErrors(newErrors);
 
   
     if (isValid) {
@@ -55,9 +55,9 @@ function AddBranch() {
           var api = new SchoolManagementSystemApi.BranchesApi();
           var body = new SchoolManagementSystemApi.Branch();
           SchoolManagementSystemApi.Branch.constructFromObject(branchData, body);
-  
+
           console.log(body); // Logging the constructed branch object
-  
+
           api.branchesPost(body, function(error, data, response) {
               if (error) {
                   console.error('API Error:', error);
@@ -71,7 +71,7 @@ function AddBranch() {
                   } catch (parseError) {
                       console.error('Error parsing response:', parseError);
                   }
-                  
+
                   setShowSuccessMessage(true);
                   setTimeout(() => {
                       setShowSuccessMessage(false);
@@ -83,6 +83,46 @@ function AddBranch() {
       }
     }
   }
+
+  const [branches, setBranches] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredBranches, setFilteredBranches] = useState([]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/branch');
+        if (response.ok) {
+          const data = await response.json();
+          setBranches(data);
+          setFilteredBranches(data); // Initially show all branches
+        } else {
+          console.error('Failed to fetch branches');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = branches.filter(branch => {
+      return branch.branchName.toLowerCase().includes(query) ||
+             branch.branchCode.toLowerCase().includes(query) ||
+             branch.branchAddress.toLowerCase().includes(query);
+      // Add other fields if needed
+    });
+
+    setFilteredBranches(filtered);
+  };
+
+  
+
 
   return (
     <>
@@ -121,9 +161,41 @@ function AddBranch() {
           <InputField label="Branch Address" name="branchAddress" value={branchData.branchAddress} handleChange={handleChange} error={errors.branchAddress} />
 
           <div className="flex justify-end">
-            <button type="submit" className="text-lg px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Branch</button>
+          <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>Add Branch</button>
           </div>
         </form>
+
+
+        {/* Search Bar */}
+        <input 
+          type="text" 
+          className="input input-bordered w-full max-w-xs mt-4" 
+          placeholder="Search branches..."
+          value={searchQuery}
+          onChange={handleSearchChange} 
+        />
+
+        {/* Branches Table */}
+        <div className="overflow-x-auto mt-4">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Branch Name</th>
+                <th>Branch Code</th>
+                <th>Branch Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBranches.map((branch, index) => (
+                <tr key={index}>
+                  <td>{branch.branchName}</td>
+                  <td>{branch.branchCode}</td>
+                  <td>{branch.branchAddress}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

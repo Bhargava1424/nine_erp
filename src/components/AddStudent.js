@@ -45,6 +45,7 @@ const AddStudent = () => {
   }, []);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [serverResponse, setServerResponse] = useState('None')
   const [errors, setErrors] = useState({
     primaryContactError: '',
     secondaryContactError: '',
@@ -171,42 +172,43 @@ const handleInputChange = (e) => {
           pendingSecondYearTuitionFee: studentData.secondYearTuitionFee,
           pendingSecondYearHostelFee: studentData.secondYearHostelFee
       };
-        try {
-          var SchoolManagementSystemApi = require('school_management_system_api')
+      try {
+        var SchoolManagementSystemApi = require('school_management_system_api')
 
-          var api = new SchoolManagementSystemApi.StudentsApi()
-          var body = new SchoolManagementSystemApi.Student(updatedStudentData); // Pass the updatedStudentData object to the Student model
-          SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
-          
-          // console.log(body);
+        var api = new SchoolManagementSystemApi.StudentsApi()
+        var body = new SchoolManagementSystemApi.Student(updatedStudentData); // Pass the updatedStudentData object to the Student model
+        SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
 
-          api.studentsPost(body, function(error, data, response) {
-            if (error) {
-              console.error('API Error:', error);
-          } else {
-              // console.log('API Response:', response); // Log the full HTTP response
-              try {
-                var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
-                if (responseBody && responseBody.message) {
-                    console.log('Message:', responseBody.message); // Logging the message from the response
-                }
-                console.log(responseBody.data)
-            } catch (parseError) {
-                console.error('Error parsing response:', parseError);
-            }
-            
-            setShowSuccessMessage(true);
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-            }, 3000);
+        // console.log(body);
+
+        api.studentsPost(body, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+        } else {
+            // console.log('API Response:', response); // Log the full HTTP response
+            try {
+              var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
+              if (responseBody && responseBody.message) {
+                  console.log('Message:', responseBody.message); // Logging the message from the response
+              }
+              setServerResponse(responseBody.message)
+              console.log(responseBody.data)
+          } catch (parseError) {
+              console.error('Error parsing response:', parseError);
           }
-      });
-  } catch (error) {
-      console.error('Error:', error);
-  }
-}
-}
 
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+              setShowSuccessMessage(false);
+          }, 3000);
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+    }
+
+  };
   const generateBatchOptions = () => {
     const startYear = 2022;
     const endYear = 2048;
@@ -235,9 +237,9 @@ const handleInputChange = (e) => {
             "type": 'findMany'
           }
         };
-    
+
         console.log(opts.body);
-    
+
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -255,7 +257,7 @@ const handleInputChange = (e) => {
         console.error('Error during fetch:', error);
       }
     };
-
+  
     fetchBranches();
   }, []);
 
@@ -284,7 +286,7 @@ const handleInputChange = (e) => {
             <li><strong>Parent's Name:</strong> Enter the parent's name as per the student's 10th certificate.</li>
             <li><strong>Primary and Secondary Contact:</strong> Only numeric values are allowed. Do not include spaces or special characters.</li>
             <li><strong>Gender:</strong> Select the appropriate gender from the dropdown menu.</li>
-            <li><strong>Batch:</strong> Choose the relevant batch. Note: If 'On TC' is selected, the fields for 1st year tuition and hostel fees will be disabled.</li>
+            <li><strong>Batch:</strong> Choose the relevant batch. Note: If 'On TC' is selected, the fields for 1st year Tuition and hostel fees will be disabled.</li>
             <li><strong>Date of Joining:</strong> Select the date from the calendar. The 'Year of Joining' will automatically update based on this date.</li>
             <li><strong>Course:</strong> Select the course the student is enrolling in (MPC/BiPC).</li>
             <li><strong>Mode of Residence:</strong> Choose between 'Day Scholar' and 'Hostel'.</li>
@@ -598,11 +600,11 @@ const handleInputChange = (e) => {
         {showSuccessMessage && (
             <div role="alert" className="alert alert-success">
                 <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span>Submission Successful!</span>
+                <span>{serverResponse}</span>
             </div>
         )}
         {/* Submit Button */}
-        <button type="submit" className="btn btn-primary mt-4">
+        <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
           Submit
         </button>
       </form>

@@ -1,6 +1,7 @@
 
 import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 
 function SelectField({ label, name, options, value, handleChange }) {
@@ -116,7 +117,7 @@ function AddEmployee() {
       body.username = employeeData.username;
       body.password = employeeData.password;
       console.log('Employee Request Body', body); // Logging the constructed branch object
-      
+
       api.employeesPost(body, function(error, data, response) {
         if (error) {
           console.error('API Error:', error);
@@ -156,44 +157,63 @@ function AddEmployee() {
     setEmployeeData({ ...employeeData, [e.target.name]: validName });
   };
   const [branches, setBranches] = useState([]);
+  const [employees, setEmployees] = useState([]); 
 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        var SchoolManagementSystemApi = require('school_management_system_api');
-        var api = new SchoolManagementSystemApi.DbApi();
-        const opts = {
-          body: {
-            "collectionName": "branches",
-            "query": {
-            },
-            "type": 'findMany'
-          }
-        };
-    
-        console.log(opts.body);
-    
-        api.dbGet(opts, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-          } else {
-            try {
-              const responseBody = response.body; // Assuming response.body is already in JSON format
-              console.log(responseBody);
-              setBranches(responseBody); // Assuming the actual data is in responseBody.data
-            } catch (parseError) {
-              console.error('Error parsing response:', parseError);
-            }
-          }
-        });
+        const response = await fetch('http://localhost:5000/api/branch');
+        if (response.ok) {
+          const data = await response.json();
+          setBranches(data);
+        } else {
+          console.error('Failed to fetch branches');
+        }
       } catch (error) {
-        console.error('Error during fetch:', error);
+        console.error('Error:', error);
+      }
+      
+    };
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/employees');
+        setEmployees(response.data);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
       }
     };
-    fetchBranches();
 
+    fetchEmployees();
+    fetchBranches(); 
     
   }, []);
+
+  const [searchQuery, setSearchQuery] = useState(""); // State for storing the search query
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Function to filter employees based on search query
+  const filterEmployees = (employees) => {
+    if (!searchQuery) {
+      return employees; // Return all employees if search query is empty
+    }
+
+    const searchTerms = searchQuery.toLowerCase().split(',').map(term => term.trim());
+    return employees.filter(employee => 
+      searchTerms.some(term => 
+        employee.firstName.toLowerCase().includes(term) ||
+        employee.lastName.toLowerCase().includes(term) ||
+        employee.role.toLowerCase().includes(term) ||
+        employee.phoneNumber.includes(term) ||
+        employee.branch.toLowerCase().includes(term)
+        // Add other attributes as needed
+      )
+    );
+  };
+
+  const filteredEmployees = filterEmployees(employees);
+
   
   
 
@@ -234,7 +254,7 @@ function AddEmployee() {
             {/* ... existing input fields */}
             <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
             <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-            <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
+            <SelectField label="Role" name="role" options={['MANAGER', 'EXECUTIVE', 'ACCOUNTANT']} value={employeeData.role} handleChange={handleChange} />
             <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
             <SelectField
               label="Branch"
@@ -250,13 +270,52 @@ function AddEmployee() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="text-lg px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
           >
             Add Employee
           </button>
 
           </div>
         </form>
+
+        <div>
+          <div className="container mx-auto p-4">
+          <input
+            type="text"
+            placeholder="Search employees..."
+            className="input input-bordered w-full max-w-xs"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <h2 className="text-2xl font-bold mb-4">Employees List</h2>
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">First Name</th>
+                  <th className="px-4 py-2">Last Name</th>
+                  <th className="px-4 py-2">Role</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Branch</th>
+                  {/* Add other headers as needed */}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmployees.map((employee, index) => (
+                  <tr key={index}>
+                    <td className="border px-4 py-2">{employee.firstName}</td>
+                    <td className="border px-4 py-2">{employee.lastName}</td>
+                    <td className="border px-4 py-2">{employee.role}</td>
+                    <td className="border px-4 py-2">{employee.phoneNumber}</td>
+                    <td className="border px-4 py-2">{employee.branch}</td>
+                    {/* Add other columns as needed */}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        </div>
       </div>
     </>
   );

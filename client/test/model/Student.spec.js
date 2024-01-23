@@ -124,10 +124,10 @@
         // expect(instance.firstYearHostelFee).to.be(expectedValueLiteral);
       });
 
-      it('should have the property firstYeartuitionFee (base name: "firstYeartuitionFee")', function() {
-        // TODO: update the code to test the property firstYeartuitionFee
-        expect(instance).to.have.property('firstYeartuitionFee');
-        // expect(instance.firstYeartuitionFee).to.be(expectedValueLiteral);
+      it('should have the property firstYearTuitionFee (base name: "firstYearTuitionFee")', function() {
+        // TODO: update the code to test the property firstYearTuitionFee
+        expect(instance).to.have.property('firstYearTuitionFee');
+        // expect(instance.firstYearTuitionFee).to.be(expectedValueLiteral);
       });
 
       it('should have the property secondYearHostelFee (base name: "secondYearHostelFee")', function() {
@@ -136,10 +136,10 @@
         // expect(instance.secondYearHostelFee).to.be(expectedValueLiteral);
       });
 
-      it('should have the property secondYeartuitionFee (base name: "secondYeartuitionFee")', function() {
-        // TODO: update the code to test the property secondYeartuitionFee
-        expect(instance).to.have.property('secondYeartuitionFee');
-        // expect(instance.secondYeartuitionFee).to.be(expectedValueLiteral);
+      it('should have the property secondYearTuitionFee (base name: "secondYearTuitionFee")', function() {
+        // TODO: update the code to test the property secondYearTuitionFee
+        expect(instance).to.have.property('secondYearTuitionFee');
+        // expect(instance.secondYearTuitionFee).to.be(expectedValueLiteral);
       });
 
       it('should have the property pendingFirstYearTuitionFee (base name: "pendingFirstYearTuitionFee")', function() {

@@ -1,12 +1,10 @@
 // AddReceipts.js
-import axios from 'axios';
 import Navbar from './Navbar';
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 
 function AddReceipts() {
     const [students, setStudents] = useState([]);
-
+    const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
@@ -22,9 +20,9 @@ function AddReceipts() {
             "type": "findMany"
           }
         };
-        
+
         console.log(opts.body);
-    
+
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -42,74 +40,94 @@ function AddReceipts() {
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
-    };   
+    }; 
 
     fetchStudents();
   }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
 
+  const handleSearch = (searchQuery) => {
+    if (!searchQuery) {
+      return students; // Return all students if the search query is empty
+    }
 
+    const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
+
+    return students.filter(student => {
+      return searchTerms.every(term =>
+        student.firstName.toLowerCase().includes(term) ||
+        student.surName.toLowerCase().includes(term) ||
+        student.parentName.toLowerCase().includes(term) ||
+        student.branch.toLowerCase().includes(term) ||
+        student.primaryContact.includes(term) ||
+        student.secondaryContact.includes(term) ||
+        student.gender.toLowerCase().includes(term) ||
+        student.batch.includes(term) ||
+        student.course.toLowerCase().includes(term) ||
+        student.modeOfResidence.toLowerCase().includes(term) ||
+        // Excluding fields related to Tuition and hostel fees
+        student.pendingFirstYearTuitionFee.toString().includes(term) ||
+        student.pendingFirstYearHostelFee.toString().includes(term) ||
+        student.pendingSecondYearTuitionFee.toString().includes(term) ||
+        student.pendingSecondYearHostelFee.toString().includes(term)
+      );
+    });
+  };
+  const filteredStudents = handleSearch(searchQuery);
     return (
         <div className="main-container">
           <Navbar />
-      
+          <input
+        type="text"
+        placeholder="Search students..."
+        className="input input-bordered w-full max-w-xs text-black placeholder-black"
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
           <div className="overflow-x-auto mt-3">
-            <h2 className="text-2xl font-bold text-gray-500 mb-4">Student Data</h2>
-            <table className="min-w-full " style={{ backgroundColor: '#00A0E3'  }}>
-              <thead className="bg-cyan-200" style={{ backgroundColor:'#2D5990'  }}>
-                <tr>
-                <th className="px-4 py-2">First Name</th>
-                  <th className="px-4 py-2">SurName</th>
-                  <th className="px-4 py-2">Parent's Name</th>
-                  <th className="px-4 py-2">Primary Contact</th>
-                  <th className="px-4 py-2">Secondary Contact</th>
-                  <th className="px-4 py-2">Gender</th>
-                  <th className="px-4 py-2">Batch</th>
-                  <th className="px-4 py-2">Date of Joining</th>
-                  <th className="px-4 py-2">Course</th>
-                  <th className="px-4 py-2">Mode of Residence</th>
-                  <th className="px-4 py-2">1st Year Tuition Fee</th>
-                  <th className="px-4 py-2">1st Year Hostel Fee</th>
-                  <th className="px-4 py-2">2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2">2nd Year Hostel Fee</th>
-                  <th className="px-4 py-2">Paid 1st Year Tuition Fee</th>
-                  <th className="px-4 py-2">Paid 1st Year Hostel Fee</th>
-                  <th className="px-4 py-2">Paid 2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2">Paid 2nd Year Hostel Fee</th>
-                  <th className="px-4 py-2">Pending 1st Year Tuition Fee</th>
-                  <th className="px-4 py-2">Pending 1st Year Hostel Fee</th>
-                  <th className="px-4 py-2">Pending 2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2">Pending 2nd Year Hostel Fee</th>
+            <h2 className="text-2xl font-bold text-black-500 mb-4">Add Receipts</h2>
+            <table className="min-w-full border border-gray-800 border-collapse">
+              <thead>
+              <tr>
+                <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
+
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Secondary Contact</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
                 </tr>
               </thead>
-              <tbody className="">
-                {students.map((student, index) => (
-                  <tr className="hover:bg-gray-50" key={index}>
-                    <td className="border px-4 py-2"><Link to={`/AddStudentReceipt/${student.applicationNumber}`}>
-                                                        {student.applicationNumber}
-                                                      </Link>
-                                                      </td>
-                    <td className="border px-4 py-2">{student.surName}</td>
-                    <td className="border px-4 py-2">{student.parentName}</td>
-                    <td className="border px-4 py-2">{student.primaryContact}</td>
-                    <td className="border px-4 py-2">{student.secondaryContact}</td>
-                    <td className="border px-4 py-2">{student.gender}</td>
-                    <td className="border px-4 py-2">{student.batch}</td>
-                    <td className="border px-4 py-2">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
-                    <td className="border px-4 py-2">{student.course}</td>
-                    <td className="border px-4 py-2">{student.modeOfResidence}</td>
-                    <td className="border px-4 py-2">{student.firstYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.firstYearHostelFee}</td>
-                    <td className="border px-4 py-2">{student.secondYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.secondYearHostelFee}</td>
-                    <td className="border px-4 py-2">{student.paidFirstYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.paidFirstYearHostelFee}</td>
-                    <td className="border px-4 py-2">{student.paidSecondYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.paidSecondYearHostelFee}</td>
-                    <td className="border px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.pendingFirstYearHostelFee}</td>
-                    <td className="border px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
-                    <td className="border px-4 py-2">{student.pendingSecondYearHostelFee}</td>
+              <tbody>
+                {filteredStudents.map((student, index) => (
+                  <tr className="hover:bg-[#00A0E3]" key={index}>
+      <td className="border-2 border-gray-800 px-4 py-2 text-black">
+        <a href={`/AddStudentReceipt/${student.firstName}`} target="_blank" rel="noopener noreferrer">
+          {`${student.firstName} ${student.surName}`.trim()}
+        </a>
+      </td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondaryContact}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
                   </tr>
                 ))}
               </tbody>

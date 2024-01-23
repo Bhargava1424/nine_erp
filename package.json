@@ -1,6 +1,6 @@
 {
-  "name": "nine_erp",
-  "version": "0.2.0",
+  "name": "kundan_erp",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
@@ -18,7 +18,6 @@
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
     "redux": "^5.0.1",
-    "school_management_system_api": "file:clients",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -46,7 +45,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "daisyui": "^4.4.23",
     "tailwindcss": "^3.4.0"
   }
