@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 function DownloadReceipt() {
 
     const [amountPaid, setAmountPaid] = useState('');
-    const [firstName, setFirstYearTuitionFee] = useState('');
+    const [applicationNumber, setApplicationNumber] = useState('');
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -17,17 +17,17 @@ function DownloadReceipt() {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const amount = queryParams.get('amountPaid');
-        const firstName = queryParams.get('firstName');
+        const applicationNumber = queryParams.get('applicationNumber');
     
         if (amount) setAmountPaid(amount);
-        if (firstName) setFirstYearTuitionFee(firstName);
+        if (applicationNumber) setApplicationNumber(applicationNumber);
     }, [location]);
 
     useEffect(() => {
 
         const fetchStudentData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/students/name/${firstName}`);
+                const response = await axios.get(`http://localhost:5000/api/students/name/${applicationNumber}`);
                 setStudentData(response.data);
                 setLoading(false);
             } catch (err) {
@@ -36,10 +36,10 @@ function DownloadReceipt() {
             }
         };
 
-        if (firstName) {
+        if (applicationNumber) {
             fetchStudentData();
         }
-    }, [firstName]);
+    }, [applicationNumber]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -72,7 +72,7 @@ function DownloadReceipt() {
             <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
                 
                 <div>
-                    <p className="text-lg">Student's Name <span className="font-bold">{firstName} {studentData.surName}</span></p>
+                    <p className="text-lg">Student's Name <span className="font-bold">{studentData.firstName} {studentData.surName}</span></p>
                     <p className="text-lg">Parent's Name : <span className="font-bold">{studentData.parentName}</span></p>
                     <p className="text-lg">Application Number :  <span className="font-bold">VDN2024000002</span></p>
                     <p className="text-lg">Registered Mobile Number : <span className="font-bold">{studentData.primaryContact}</span></p>

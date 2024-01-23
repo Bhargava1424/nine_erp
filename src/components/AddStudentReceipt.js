@@ -8,7 +8,7 @@ function AddStudentReceipt() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { firstName } = useParams();
+    const { applicationNumber } = useParams();
     const [showReceiptSection, setShowReceiptSection] = useState(false);
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
@@ -41,7 +41,7 @@ function AddStudentReceipt() {
 
         const fetchStudentData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/students/name/${firstName}`);
+                const response = await axios.get(`http://localhost:5000/api/students/name/${applicationNumber}`);
                 setStudentData(response.data);
                 setLoading(false);
             } catch (err) {
@@ -50,10 +50,10 @@ function AddStudentReceipt() {
             }
         };
 
-        if (firstName) {
+        if (applicationNumber) {
             fetchStudentData();
         }
-    }, [firstName]);
+    }, [applicationNumber]);
 
 
     const handleSubmit = async () => {
