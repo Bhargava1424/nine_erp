@@ -4,6 +4,9 @@ import axios from 'axios';
 function AccountantComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  // New state for managing edit functionality
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -53,6 +56,100 @@ function AccountantComponent() {
   };
 
   const filteredStudents = handleSearch(searchQuery);
+  // New function to open the edit modal
+  const openEditModal = (student) => {
+    setEditingStudent({ ...student });
+    setIsEditModalOpen(true);
+  };
+  // New function to handle field change in the edit modal
+  const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    let updatedValue = value;
+    let newValidationErrors = { ...validationErrors };
+  
+    // Validation for names
+    if (name === 'firstName' || name === 'surName' || name === 'fatherName') {
+      updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
+    }
+  
+    // Validation for contacts
+    if (name === 'primaryContact' || name === 'secondaryContact') {
+      updatedValue = value.replace(/[^0-9]/g, '');
+  
+      // Check for 10 digit length
+      if (updatedValue.length !== 10) {
+        newValidationErrors[name] = 'Contact number must be 10 digits.';
+      } else {
+        newValidationErrors[name] = '';
+      }
+    }
+  
+    // Check if primary and secondary contacts are not the same
+    const newPrimaryContact = name === 'primaryContact' ? updatedValue : editingStudent.primaryContact;
+    const newSecondaryContact = name === 'secondaryContact' ? updatedValue : editingStudent.secondaryContact;
+  
+    if (newPrimaryContact === newSecondaryContact && newPrimaryContact.length === 10 && newSecondaryContact.length === 10) {
+      newValidationErrors.primaryContact = 'Primary and Secondary contacts must be different.';
+      newValidationErrors.secondaryContact = 'Primary and Secondary contacts must be different.';
+    } else {
+      if (newPrimaryContact.length === 10) newValidationErrors.primaryContact = '';
+      if (newSecondaryContact.length === 10) newValidationErrors.secondaryContact = '';
+    }
+  
+    setValidationErrors(newValidationErrors);
+    setEditingStudent({ ...editingStudent, [name]: updatedValue });
+  };
+  
+  
+   
+  // New function to submit edited data without actual backend update
+  const handleEditSubmit = () => {
+    // Check for validation errors
+    const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
+  
+    if (hasValidationErrors) {
+      alert("Please correct the errors before submitting.");
+      return;
+    }
+  
+    try {
+      // Update the students array with the edited student locally
+      const updatedStudents = students.map(student => {
+        return student ;
+      });
+  
+      setStudents(updatedStudents);
+      console.log("Updated Students:", updatedStudents); // Debugging
+  
+      // Close the modal and reset editingStudent
+      setIsEditModalOpen(false);
+      
+      // Display success message with changes
+      alert(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
+  
+      setEditingStudent(null);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating student: ", error);
+    }
+  };
+  
+  
+  
+
+  const generateBatchOptions = () => {
+    const startYear = 2022;
+    const endYear = 2048;
+    const options = [];
+
+    for (let year = startYear; year <= endYear; year++) {
+      options.push(`${year}-${year + 2}`);
+    }
+
+    return options;
+  };   
 
   return (
     <div className="main-container">
@@ -71,6 +168,7 @@ function AccountantComponent() {
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr>
+        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Father's Name</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
@@ -90,6 +188,13 @@ function AccountantComponent() {
     <tbody>
       {filteredStudents.map((student, index) => (
         <tr className="hover:bg-[#00A0E3]" key={index}>
+         <td className="border-2 border-gray-800 px-4 py-2 text-black">
+         <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+  <i className="fas fa-edit"></i>
+</button>
+
+</td>
+
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
@@ -111,6 +216,76 @@ function AccountantComponent() {
     </tbody>
   </table>
 </div>
+
+{isEditModalOpen && (
+  <div className="edit-modal">
+    <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
+
+    <label className="form-control">
+      <span className="label-text">First Name</span>
+      <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
+    </label>
+    <label className="form-control">
+      <span className="label-text">Surname</span>
+      <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
+    </label>
+    <label className="form-control">
+      <span className="label-text">Parent Name</span>
+      <input type="text" name="fatherName" value={editingStudent.fatherName} onChange={handleEditChange} />
+    </label>
+    <label className="form-control">
+      <span className="label-text">Primary Contact</span>
+      <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
+      {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
+    </label>
+    <label className="form-control">
+      <span className="label-text">Secondary Contact</span>
+      <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
+      {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
+    </label>
+
+
+    <label className="form-control">
+      <span className="label-text">Gender</span>
+      <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
+        <option value="" disabled>Choose Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </label>
+
+    <label className="form-control">
+      <span className="label-text">Batch</span>
+      <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
+        {generateBatchOptions().map(batch => (
+          <option key={batch} value={batch}>{batch}</option>
+        ))}
+      </select>
+    </label>
+
+    <label className="form-control">
+      <span className="label-text">Course</span>
+      <select name="course" value={editingStudent.course} onChange={handleEditChange}>
+        <option value="" disabled>Select Course</option>
+        <option value="MPC">MPC</option>
+        <option value="BiPC">BiPC</option>
+      </select>
+    </label>
+
+    <label className="form-control">
+      <span className="label-text">Mode of Residence</span>
+      <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
+        <option value="" disabled>Select Mode of Residence</option>
+        <option value="Day Scholar">Day Scholar</option>
+        <option value="Hostel">Hostel</option>
+      </select>
+    </label>
+
+    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+  </div>
+)}
+
     </div>
   );
 }
