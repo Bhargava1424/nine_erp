@@ -14,8 +14,8 @@ function AddStudentReceipt() {
 
 
 
-    const handleAddReceiptClick = (feeTypeKey) => {
-        setSelectedFeeType(feeTypeKey); // Set the selected fee type
+    const handleAddReceiptClick = (feeType) => {
+        setSelectedFeeType(feeType); // Set the selected fee type
     };
 
 
@@ -46,8 +46,6 @@ function AddStudentReceipt() {
     // Using the function to get the application number
     const applicationNumber = getApplicationNumber();
 
-    // Now you can use applicationNumber in your script
-    console.log(applicationNumber); // For testing purposes
 
 
     useEffect(() => {
@@ -96,7 +94,7 @@ function AddStudentReceipt() {
     }, [applicationNumber]);
 
 
-    const handleSubmit = async (feeTypeKey) => {
+    const handleSubmit = async (feeType) => {
         if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
             alert("Please enter a valid amount.");
             return;
@@ -122,40 +120,41 @@ function AddStudentReceipt() {
             var body = new SchoolManagementSystemApi.ReceiptCreateRequest();
             
             body.applicationNumber = applicationNumber;
-            body.feeTypeKey = feeTypeKey;
+            body.feeType = feeType;
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
 
             console.log(body);
             
-                    api.receiptPost(body, function(error, response) {
+                    api.receiptsPost(body, function(error, response) {
                         if (error) {
                             console.error('API Error:', error);
                         } else {
                             // console.log('API Response:', response); // Log the full HTTP response
                             try {
-                                var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
-                                if (responseBody && responseBody.message) {
-                                    console.log('Message:', responseBody.message); // Logging the message from the response
+                                console.log(response);
+                                if (response && response.message) {
+                                    console.log('Message:', response.message); // Logging the message from the response
                                     setStudentData(prevState => ({
                                         ...prevState,
                                         ...updatedFees,
                                     }));
-                                    setReceiptNumber(responseBody.data.receiptNumber); // Set the receipt number
+                                    setReceiptNumber(response.data.receiptNumber); // Set the receipt number
                                     setAmountPaid(''); // Reset the amount
                                     setModeOfPayment(''); // Reset the mode of payment
                                     setChequeNumber(''); // Reset the cheque number
+                                    console.log(response.data[feeType + 'Paid']);
+                                    console.log(paymentDetails.amountPaid);
+                                    if (response.data[feeType + 'Paid'] === paymentDetails.amountPaid) {
+                                        // Include the amountPaid in the URL
+                                        const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receiptNumber}&feeType=${feeType}`;
+                                        window.open(receiptUrl, '_blank');
+                                    }
                                 }
                             } catch (parseError) {
                                 console.error('Error parsing response:', parseError);
                             }
-                        }
-                        if (response.status === 200) {
-                            // Include the amountPaid in the URL
-                            const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receiptNumber}`;
-                            window.open(receiptUrl, '_blank');
-
                         }
                     });
                 } catch (err) {
@@ -236,7 +235,7 @@ function AddStudentReceipt() {
                                             {modeOfPayment === 'CHEQUE' && (
                                                 <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
                                             )}
-                                            <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
+                                            <button onClick={() => handleSubmit(fee.key)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
                                                 Submit Payment
                                             </button>                    
 
