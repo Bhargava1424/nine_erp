@@ -18,7 +18,9 @@
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
+    "react-to-print": "^2.14.15",
     "redux": "^5.0.1",
+    "school_management_system_api": "file:client",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },

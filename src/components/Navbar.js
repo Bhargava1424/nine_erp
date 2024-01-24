@@ -121,7 +121,7 @@ function Navbar() {
                   </li>
                   <li><Link to='/AddReceipts'>Add Receipts</Link></li>
                   <li><Link to='/ListReceipts'>List Receipts</Link></li>
-                  {user.role === 'Admin' && <li><Link to='/Concessions'>Concessions</Link></li>}
+                  {user.role === 'Manager' && <li><Link to='/Concessions'>Concessions</Link></li>}
                 </ul>
               )}
             </div>

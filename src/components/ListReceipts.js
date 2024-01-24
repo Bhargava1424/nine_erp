@@ -1,4 +1,3 @@
-
 import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect } from 'react';
 
@@ -10,16 +9,27 @@ function ListReceipts() {
     const [rowsPerPage, setRowsPerPage] = useState(100);
     const [amountPaid, setAmountPaid] = useState("");
     const [feeType, setFeeType] = useState("");
-    
+    const currentDate = new Date();
+    const fourDaysAgo = new Date(currentDate);
+    fourDaysAgo.setDate(currentDate.getDate() - 4);
+
 
     const fetchReceipts = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
+        let query = {};
+        const userRole = localStorage.getItem('userRole');
+        console.log(userRole);
+        if (userRole === 'Accountant' || userRole === 'Executive') {
+          query = {
+            'dateOfPayment': {'$gte': fourDaysAgo}
+          }
+        };
         const opts = {
           body: {
             "collectionName": "receipts",
-            "query": {},
+            "query": query,
             "type": "findMany"
           }
         };

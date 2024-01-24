@@ -7,10 +7,13 @@ import AccountantComponent from './AccountantComponent';
 function HeroSection2() {
   const userRole = useSelector((state) => state.auth.user?.role);
 
+  // Save userRole to local storage
+  localStorage.setItem('userRole', userRole);
+  
   return (
     <div className="hero-section">
       {!userRole && <LoginComponent />}
-      {userRole === 'Admin' && <AdminComponent/>}
+      {userRole === 'Manager' && <AdminComponent/>}
       {userRole === 'Executive' && <ExecutiveComponent />}
       {userRole === 'Accountant' && <AccountantComponent />}
     </div>

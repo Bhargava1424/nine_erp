@@ -1,7 +1,6 @@
 
 import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 
 function SelectField({ label, name, options, value, handleChange }) {
@@ -111,11 +110,12 @@ function AddEmployee() {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.EmployeesApi();
       var body = new SchoolManagementSystemApi.Employee();
-      body.employeeName = employeeData.firstName +'' +  employeeData.lastName;
+      body.employeeName = employeeData.firstName +''+  employeeData.lastName;
       body.role = employeeData.role;
       body.branch = employeeData.branch;
       body.username = employeeData.username;
       body.password = employeeData.password;
+      body.phoneNumber = employeeData.phoneNumber;
       console.log('Employee Request Body', body); // Logging the constructed branch object
 
       api.employeesPost(body, function(error, data, response) {
@@ -162,29 +162,78 @@ function AddEmployee() {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/branch');
-        if (response.ok) {
-          const data = await response.json();
-          setBranches(data);
-        } else {
-          console.error('Failed to fetch branches');
-        }
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "branches",
+            "query": {
+            },
+            "type": 'findMany'
+          }
+        };
+    
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setBranches(responseBody); // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
       } catch (error) {
-        console.error('Error:', error);
-      }
-      
-    };
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/employees');
-        setEmployees(response.data);
-      } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error('Error during fetch:', error);
       }
     };
 
-    fetchEmployees();
+    
     fetchBranches(); 
+    
+  }, []);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "employees",
+            "query": {
+            },
+            "type": 'findMany'
+          }
+        };
+    
+        console.log(opts.body);
+    
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              const responseBody = response.body; // Assuming response.body is already in JSON format
+              console.log(responseBody);
+              setEmployees  (responseBody); // Assuming the actual data is in responseBody.data
+            } catch (parseError) {
+              console.error('Error parsing response:', parseError);
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error during fetch:', error);
+      }
+    };
+
+    
+    fetchEmployees(); 
     
   }, []);
 
@@ -202,10 +251,8 @@ function AddEmployee() {
     const searchTerms = searchQuery.toLowerCase().split(',').map(term => term.trim());
     return employees.filter(employee => 
       searchTerms.some(term => 
-        employee.firstName.toLowerCase().includes(term) ||
-        employee.lastName.toLowerCase().includes(term) ||
+        employee.employeeName.toLowerCase().includes(term) ||
         employee.role.toLowerCase().includes(term) ||
-        employee.phoneNumber.includes(term) ||
         employee.branch.toLowerCase().includes(term)
         // Add other attributes as needed
       )
@@ -254,7 +301,7 @@ function AddEmployee() {
             {/* ... existing input fields */}
             <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
             <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-            <SelectField label="Role" name="role" options={['MANAGER', 'EXECUTIVE', 'ACCOUNTANT']} value={employeeData.role} handleChange={handleChange} />
+            <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
             <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
             <SelectField
               label="Branch"
@@ -292,8 +339,7 @@ function AddEmployee() {
             <table className="table-auto w-full">
               <thead>
                 <tr>
-                  <th className="px-4 py-2">First Name</th>
-                  <th className="px-4 py-2">Last Name</th>
+                  <th className="px-4 py-2">Employee Name</th>
                   <th className="px-4 py-2">Role</th>
                   <th className="px-4 py-2">Phone</th>
                   <th className="px-4 py-2">Branch</th>
@@ -303,8 +349,7 @@ function AddEmployee() {
               <tbody>
                 {filteredEmployees.map((employee, index) => (
                   <tr key={index}>
-                    <td className="border px-4 py-2">{employee.firstName}</td>
-                    <td className="border px-4 py-2">{employee.lastName}</td>
+                    <td className="border px-4 py-2">{employee.employeeName}</td>
                     <td className="border px-4 py-2">{employee.role}</td>
                     <td className="border px-4 py-2">{employee.phoneNumber}</td>
                     <td className="border px-4 py-2">{employee.branch}</td>

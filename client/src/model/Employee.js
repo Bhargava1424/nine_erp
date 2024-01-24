@@ -49,6 +49,8 @@ export class Employee {
         obj.username = ApiClient.convertToType(data['username'], 'String');
       if (data.hasOwnProperty('password'))
         obj.password = ApiClient.convertToType(data['password'], 'String');
+      if (data.hasOwnProperty('phoneNumber'))
+        obj.employeeId = ApiClient.convertToType(data['phoneNumber'], 'String');
     }
     return obj;
   }
@@ -102,4 +104,9 @@ Employee.prototype.username = undefined;
  * @member {String} password
  */
 Employee.prototype.password = undefined;
+
+/**
+ * @member {String} phoneNumber
+ */
+Employee.prototype.phoneNumber = undefined;
 

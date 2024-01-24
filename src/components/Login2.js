@@ -6,14 +6,48 @@ function Login2() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
+  let userRole = '';
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Sample admin and accountant credentials
-    const adminCredentials = { email: 'admin@example.com', password: '123' };
-    const accountantCredentials = { email: 'accountant@example.com', password: '123' };
-    const executiveCredentials = { email: 'executive@example.com', password: '123' };
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.AuthorizationApi();
+      var body = new SchoolManagementSystemApi.LoginRequest();
+      body.username = email;
+      body.password = password;
+      console.log(body);
+      api.login(body, function (error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            var responseBody = JSON.parse(response.text); // Assuming response.body is already in JSON format
+            console.log(responseBody.message);
+            console.log(responseBody.data.employeeRole);
+            if (responseBody.message === 'Login Successful') {
+              userRole = responseBody.data.employeeRole;
+              localStorage.setItem('userRole', userRole);
+              authServiceLogin({ role: userRole });
+            }
+            else {
+              alert(responseBody.message);
+            }
+
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    // // Sample admin and accountant credentials
+    // const adminCredentials = { email: 'admin@example.com', password: '123' };
+    // const accountantCredentials = { email: 'accountant@example.com', password: '123' };
+    // const executiveCredentials = { email: 'executive@example.com', password: '123' };
 
     // Validation using regular expressions
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,27 +57,22 @@ function Login2() {
       return;
     }
 
-    let userRole = '';
 
     // Check user credentials and set role
-    if (email === adminCredentials.email && password === adminCredentials.password) {
-      userRole = 'Admin';
-    } else if (email === accountantCredentials.email && password === accountantCredentials.password) {
-      userRole = 'Accountant';
-    } else if (email === executiveCredentials.email && password === executiveCredentials.password) {
-      userRole = 'Executive';
-    } else {
-      alert('Invalid credentials.');
-      return;
-    }
+    // if (email === adminCredentials.email && password === adminCredentials.password) {
+    //   userRole = 'Admin';
+    // } else if (email === accountantCredentials.email && password === accountantCredentials.password) {
+    //   userRole = 'Accountant';
+    // } else if (email === executiveCredentials.email && password === executiveCredentials.password) {
+    //   userRole = 'Executive';
+    // } else {
+    //   alert('Invalid credentials.');
+    //   return;
+    // }
     // Log in logic (you may want to use authentication libraries or APIs here)
 
     // Call the login function from authService
-    authServiceLogin({ role: userRole });
-
-  
   };
-
 
   return (
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
@@ -75,7 +104,7 @@ function Login2() {
             <label className="text-s text-black cursor-pointer mt-1"><Link to='/ForgotPassword'>Forgot password?</Link></label>
           </div>
           <div className="flex justify-end">
-            <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
+            <button type="submit" className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
               Login
             </button>
           </div>
@@ -83,8 +112,6 @@ function Login2() {
       </div>
     </div>
   );
-  
-  
 }
 
 export default Login2;
