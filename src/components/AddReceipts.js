@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 function AddReceipts() {
     const [students, setStudents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
@@ -111,11 +112,11 @@ function AddReceipts() {
               <tbody>
                 {filteredStudents.map((student, index) => (
                   <tr className="hover:bg-[#00A0E3]" key={index}>
-      <td className="border-2 border-gray-800 px-4 py-2 text-black">
-        <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
-          {`${student.firstName} ${student.surName}`.trim()}
-        </a>
-      </td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
+                      <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
+                        {`${student.firstName} ${student.surName}`.trim()}
+                      </a>
+                    </td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondaryContact}</td>

@@ -44,7 +44,8 @@ function App() {
       <Route path='/AddEmployee' element={<AddEmployee />}></Route>
       <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
       <Route path='/DownloadReceipt' element={<DownloadReceipt />}></Route>
-      <Route path="/AddStudentReceipt/:applicationNumber" element={<AddStudentReceipt />}></Route>
+      <Route path="/AddStudentReceipt" element={<AddStudentReceipt />} />
+
     </Routes>
   </Router>  
   

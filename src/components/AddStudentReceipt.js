@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import Navbar from './Navbar';
 
 function AddStudentReceipt() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showReceiptSection, setShowReceiptSection] = useState(false);
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
     const [receiptNumber, setReceiptNumber] = useState(''); // Add receipt number to the state
+    const [selectedFeeType, setSelectedFeeType] = useState(null);
+
+
+
+    const handleAddReceiptClick = (feeTypeKey) => {
+        setSelectedFeeType(feeTypeKey); // Set the selected fee type
+    };
 
 
     const handleAmountChange = (e) => {
@@ -19,7 +25,6 @@ function AddStudentReceipt() {
 
     const handleModeOfPaymentChange = (e) => {
         setModeOfPayment(e.target.value);
-        // Reset cheque number if the mode of payment is not 'CHEQUE'
         if (e.target.value !== 'CHEQUE') {
             setChequeNumber('');
         }
@@ -29,10 +34,7 @@ function AddStudentReceipt() {
         setChequeNumber(e.target.value);
     };
 
-    const handleAddReceiptClick = (feeType) => {
-        // Replace 'feeType' with your actual fee type identifier
-        setShowReceiptSection(true);
-    };
+    
 
 
     // Function to get the application number from the URL
@@ -94,7 +96,7 @@ function AddStudentReceipt() {
     }, [applicationNumber]);
 
 
-    const handleSubmit = async (feeType) => {
+    const handleSubmit = async (feeTypeKey) => {
         if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
             alert("Please enter a valid amount.");
             return;
@@ -120,7 +122,7 @@ function AddStudentReceipt() {
             var body = new SchoolManagementSystemApi.ReceiptCreateRequest();
             
             body.applicationNumber = applicationNumber;
-            body.feeType = feeType;
+            body.feeTypeKey = feeTypeKey;
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
@@ -141,7 +143,6 @@ function AddStudentReceipt() {
                                         ...updatedFees,
                                     }));
                                     setReceiptNumber(responseBody.data.receiptNumber); // Set the receipt number
-                                    setShowReceiptSection(false); // Hide the receipt section after successful update
                                     setAmountPaid(''); // Reset the amount
                                     setModeOfPayment(''); // Reset the mode of payment
                                     setChequeNumber(''); // Reset the cheque number
@@ -173,38 +174,41 @@ function AddStudentReceipt() {
     if (!studentData) {
         return <div>Student not found</div>;
     }
+
+    const feeTypes = [
+        { label: '1st Year Tuition Fee', key: 'firstYearTuitionFee', fee: studentData.firstYearTuitionFee , pendingFee: studentData.pendingFirstYearTuitionFee , paidFee: studentData.paidFirstYearTuitionFee},
+        { label: '1st Year Hostel Fee', key: 'firstYearHostelFee', fee: studentData.firstYearHostelFee , pendingFee: studentData.pendingFirstYearHostelFee , paidFee: studentData.paidFirstYearHostelFee },
+        { label: '2nd Year Tuition Fee', key: 'secondYearTuitionFee', fee: studentData.secondYearTuitionFee , pendingFee: studentData.pendingSecondYearTuitionFee , paidFee: studentData.paidSecondYearTuitionFee },
+        { label: '2nd Year Hostel Fee', key: 'secondYearHostelFee', fee: studentData.secondYearHostelFee , pendingFee: studentData.pendingSecondYearHostelFee , paidFee: studentData.paidSecondYearHostelFee }
+    ];
+
     
 
     return (
-        <>
-            <Navbar/>
-
-            <h1 className='text-2xl font-bold text-black  mb-4'>{studentData.firstName}'s Receipt Details</h1>
-
-            <div>
-                <div className="overflow-x-auto">        {/* First Year Tuition Fee */}
-                    <h2 className='text-xl font-bold text-black mb-4'>1st Year Tuition Fee:</h2>
+        <div className="main-container">
+            <Navbar />
+            {feeTypes.map((fee, index) => (
+                <div key={index}>
+                    <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
                     <table className="table border border-black">
-                        {/* head */}
                         <thead>
-                        <tr>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
-                        </tr>
+                            <tr>
+                                <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {/* body */}
-                        <tr className="hover:bg-[#00A0E3]">
-                            <td className="text-lg text-black font-bold border border-black">{studentData.firstYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.paidFirstYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingFirstYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">
-                                <button  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick('feeType')}>
-                                    Add Receipt
-                                </button > 
-                                {showReceiptSection && (
+                            <tr className="hover:bg-[#00A0E3]">
+                                <td className="text-lg text-black font-bold border border-black">{fee.fee}</td>
+                                <td className="text-lg text-black font-bold border border-black">{fee.paidFee}</td>
+                                <td className="text-lg text-black font-bold border border-black">{fee.pendingFee}</td>
+                                <td className="text-lg text-black font-bold border border-black">
+                                    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick(fee.key)}>
+                                        Add Receipt
+                                    </button>
+                                    {selectedFeeType === fee.key && (
                                     <div>
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
@@ -232,92 +236,24 @@ function AddStudentReceipt() {
                                             {modeOfPayment === 'CHEQUE' && (
                                                 <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
                                             )}
-                                            <button onClick={handleSubmit('firstYearTuitionFee')}  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
+                                            <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
                                                 Submit Payment
-                                            </button>                      
+                                            </button>                    
 
                                             
                                         </div>
                                         {/* Add submission button or form handlers as needed */}
                                     </div>
-                                )}    
-                            </td>
-                        </tr>
+                                )} 
+                                    {/* The form section should go here */}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-                <div className="overflow-x-auto">        {/* First Year Hostel Fee */}
-                    <h2 className='text-xl font-bold text-black mb-4'>1st Year Hostel Fee:</h2>
-                    <table className="table border border-black">
-                        {/* head */}
-                        <thead>
-                        <tr>
-                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {/*body*/}
-                        <tr className="hover:bg-[#00A0E3]">
-                            <td className="text-lg text-black font-bold border border-black">{studentData.firstYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.paidFirstYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingFirstYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className="overflow-x-auto">        {/* Second Year Tuition Fee */}
-                    <h2 className='text-xl font-bold text-black mb-4'>2nd Year Tuition Fee</h2>
-                    <table className="table border border-black">
-                        {/* head */}
-                        <thead>
-                        <tr>
-                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {/* body */}
-                        <tr className="hover:bg-[#00A0E3]">
-                            <td className="text-lg text-black font-bold border border-black">{studentData.secondYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.paidSecondYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingSecondYearTuitionFee}</td>
-                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className="overflow-x-auto">        {/* Second Year Hostel Fee */}
-                    <h2 className='text-xl font-bold text-black mb-4'>2nd Year Hostel Fee</h2>
-                    <table className="table border border-black">
-                        {/* head */}
-                        <thead>
-                        <tr>
-                            <th className="px-4 py-2 text-lg border border-black text-black" >Applied Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                            <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {/* body */}
-                        <tr className="hover:bg-[#00A0E3]">
-                            <td className="text-lg text-black font-bold border border-black">{studentData.secondYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.paidSecondYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black">{studentData.pendingSecondYearHostelFee}</td>
-                            <td className="text-lg text-black font-bold border border-black"><button className="btn btn-outline text-white" onClick={() => handleAddReceiptClick('feeType')} style={{ backgroundColor: '#2D5990' }}>Add Receipt</button></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </>
+            ))}
+            {/* Repeat the above block for each fee type */}
+        </div>
     );
 }
 
