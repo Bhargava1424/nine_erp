@@ -88,7 +88,7 @@ const handleCodeVerification = (e) => {
         // Email Submission Form
 <div className="flex items-center justify-center min-h-screen bg-gray">
   <form onSubmit={handleEmailSubmission} className="border border-gray-300 rounded-lg bg-gray p-6 space-y-4 max-w-md mx-auto">
-    <h1 className="text-1xl mb-4">Forgot Your Password? No problem. Just let us know your username and we will email you a password reset code that will allow you to choose a new one.</h1>
+    <h1 className="text-1xl mb-4">Forgot Your Password? The reset link is sent to 'hello@9ed.in', 'bharathteja@9ed.in', 'edunine001@gmail.com'  .</h1>
     <div className="flex flex-col">
       <label className="text-sm mb-1">Email</label>
       <input
@@ -101,7 +101,7 @@ const handleCodeVerification = (e) => {
       />
     </div>
     <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
-      Send Reset Code
+      Send Email
     </button>
   </form>
 </div>

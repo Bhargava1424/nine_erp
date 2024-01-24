@@ -11,7 +11,6 @@ function DownloadReceipt() {
     const [feeType, setFeeType] = useState('');
     const [receiptsData, setReceiptsData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const location = useLocation();
 
     useEffect(() => {
@@ -82,16 +81,12 @@ function DownloadReceipt() {
         return <div>Loading...</div>;
     }
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
     if (!receiptsData) {
         return <div>Student not found</div>;
     }
     
     return (
-        <div className="bg-white p-8">
+        <div className="bg-white p-8" id="download-receipt-content">
             <div className="border-b-2 border-black mb-4">
                 <h1 className="text-4xl font-bold text-center">NINE EDUCATION</h1>
                 <h1 className="text-3xl font-bold text-center">Receipt</h1>
@@ -162,9 +157,6 @@ function DownloadReceipt() {
                 </div>
             </div>
 
-            <div className="border-t-2 border-black pt-4">
-                <p className="text-lg">Authorized Signature</p>
-            </div>
         </div>
     );
 }
