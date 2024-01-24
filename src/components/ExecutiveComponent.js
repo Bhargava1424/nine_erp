@@ -62,6 +62,7 @@ function AccountantComponent() {
     return students.filter(student => {
       return searchTerms.every(term =>
         student.firstName.toLowerCase().includes(term) ||
+        student.applicationNumber.toLowerCase().includes(term) ||
         student.surName.toLowerCase().includes(term) ||
         student.parentName.toLowerCase().includes(term) ||
         student.branch.toLowerCase().includes(term) ||
@@ -160,9 +161,6 @@ function AccountantComponent() {
       console.error("Error updating student: ", error);
     }
   };
-  
-  
-  
 
   const generateBatchOptions = () => {
     const startYear = 2022;
@@ -195,6 +193,7 @@ function AccountantComponent() {
       <tr>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
@@ -223,6 +222,7 @@ function AccountantComponent() {
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.branch}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>

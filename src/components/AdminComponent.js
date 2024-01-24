@@ -6,6 +6,8 @@ function AccountantComponent() {
   // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -62,6 +64,7 @@ function AccountantComponent() {
     return students.filter(student => {
         return searchTerms.every(term =>
             student.firstName.toLowerCase().includes(term) ||
+            student.applicationNumber.toLowerCase().includes(term) ||
             student.surName.toLowerCase().includes(term) ||
             student.parentName.toLowerCase().includes(term) ||
             student.branch.toLowerCase().includes(term) ||
@@ -88,6 +91,38 @@ function AccountantComponent() {
   };
 
   const filteredStudents = handleSearch(searchQuery);
+
+
+  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+
+  // Get current page students
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Handle change in rows per page
+  const handleRowsPerPageChange = (e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setCurrentPage(1); // Reset to first page
+  };
+
+  // Render pagination
+  const renderPageNumbers = () => {
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
+
   // New function to open the edit modal
   const openEditModal = (student) => {
     setEditingStudent({ ...student });
@@ -196,12 +231,23 @@ function AccountantComponent() {
 
 <div className="overflow-x-auto mt-3">
   <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
+  <div className="rows-per-page">
+        <label htmlFor="rowsPerPage">Rows per page:</label>
+        <select id="rowsPerPage" value={rowsPerPage} onChange={handleRowsPerPageChange}>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
@@ -225,7 +271,7 @@ function AccountantComponent() {
       </tr>
     </thead>
     <tbody>
-      {filteredStudents.map((student, index) => (
+      {currentStudents.map((student, index) => (
         <tr className="hover:bg-[#00A0E3]" key={index}>
          <td className="border-2 border-gray-800 px-4 py-2 text-black">
          <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
@@ -237,6 +283,7 @@ function AccountantComponent() {
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.branch}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
@@ -263,76 +310,79 @@ function AccountantComponent() {
   </table>
 </div>
 
-{isEditModalOpen && (
-  <div className="edit-modal">
-    <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
+    {isEditModalOpen && (
+      <div className="edit-modal">
+        <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
 
-    <label className="form-control">
-      <span className="label-text">First Name</span>
-      <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
-    </label>
-    <label className="form-control">
-      <span className="label-text">Surname</span>
-      <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
-    </label>
-    <label className="form-control">
-      <span className="label-text">Parent Name</span>
-      <input type="text" name="parentName" value={editingStudent.parentName} onChange={handleEditChange} />
-    </label>
-    <label className="form-control">
-      <span className="label-text">Primary Contact</span>
-      <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
-      {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
-    </label>
-    <label className="form-control">
-      <span className="label-text">Secondary Contact</span>
-      <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
-      {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
-    </label>
+        <label className="form-control">
+          <span className="label-text">First Name</span>
+          <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
+        </label>
+        <label className="form-control">
+          <span className="label-text">Surname</span>
+          <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
+        </label>
+        <label className="form-control">
+          <span className="label-text">Parent Name</span>
+          <input type="text" name="parentName" value={editingStudent.parentName} onChange={handleEditChange} />
+        </label>
+        <label className="form-control">
+          <span className="label-text">Primary Contact</span>
+          <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
+          {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
+        </label>
+        <label className="form-control">
+          <span className="label-text">Secondary Contact</span>
+          <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
+          {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
+        </label>
 
 
-    <label className="form-control">
-      <span className="label-text">Gender</span>
-      <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
-        <option value="" disabled>Choose Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-    </label>
+        <label className="form-control">
+          <span className="label-text">Gender</span>
+          <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
+            <option value="" disabled>Choose Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </label>
 
-    <label className="form-control">
-      <span className="label-text">Batch</span>
-      <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
-        {generateBatchOptions().map(batch => (
-          <option key={batch} value={batch}>{batch}</option>
-        ))}
-      </select>
-    </label>
+        <label className="form-control">
+          <span className="label-text">Batch</span>
+          <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
+            {generateBatchOptions().map(batch => (
+              <option key={batch} value={batch}>{batch}</option>
+            ))}
+          </select>
+        </label>
 
-    <label className="form-control">
-      <span className="label-text">Course</span>
-      <select name="course" value={editingStudent.course} onChange={handleEditChange}>
-        <option value="" disabled>Select Course</option>
-        <option value="MPC">MPC</option>
-        <option value="BiPC">BiPC</option>
-      </select>
-    </label>
+        <label className="form-control">
+          <span className="label-text">Course</span>
+          <select name="course" value={editingStudent.course} onChange={handleEditChange}>
+            <option value="" disabled>Select Course</option>
+            <option value="MPC">MPC</option>
+            <option value="BiPC">BiPC</option>
+          </select>
+        </label>
 
-    <label className="form-control">
-      <span className="label-text">Mode of Residence</span>
-      <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
-        <option value="" disabled>Select Mode of Residence</option>
-        <option value="Day Scholar">Day Scholar</option>
-        <option value="Hostel">Hostel</option>
-      </select>
-    </label>
+        <label className="form-control">
+          <span className="label-text">Mode of Residence</span>
+          <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
+            <option value="" disabled>Select Mode of Residence</option>
+            <option value="Day Scholar">Day Scholar</option>
+            <option value="Hostel">Hostel</option>
+          </select>
+        </label>
 
-    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
-    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
-  </div>
-)}
+        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+      </div>
+    )}
+      <div className="pagination">
+        {renderPageNumbers()}
+      </div>
 
-    </div>
+</div>
   );
 }
 
