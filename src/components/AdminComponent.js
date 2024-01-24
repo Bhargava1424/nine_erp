@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 function AccountantComponent() {
   const [students, setStudents] = useState([]);
@@ -7,7 +9,7 @@ function AccountantComponent() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -216,7 +218,54 @@ function AccountantComponent() {
     }
 
     return options;
-  };   
+  };  
+  
+  
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, 'students_data.xlsx');
+  };
+
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Application Number': student.applicationNumber,
+      'Parent Name': student.parentName,
+      'Branch': student.branch,
+      'Primary Contact': student.primaryContact,
+      'Gender': student.gender,
+      'Batch': student.batch,
+      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      'Course': student.course,
+      'Mode of Residence': student.modeOfResidence,
+      '1st Year Tuition Fee': student.firstYearTuitionFee,
+      '1st Year Hostel Fee': student.firstYearHostelFee,
+      '2nd Year Tuition Fee': student.secondYearTuitionFee,
+      '2nd Year Hostel Fee': student.secondYearHostelFee,
+      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
+      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
+      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
+      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
+      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
+      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
+      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
+      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+      // Add other fields if necessary
+    }));
+  };
+  
+
 
   return (
     <div className="main-container">
@@ -231,16 +280,19 @@ function AccountantComponent() {
 
 <div className="overflow-x-auto mt-3">
   <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
-  <div className="rows-per-page">
-        <label htmlFor="rowsPerPage">Rows per page:</label>
-        <select id="rowsPerPage" value={rowsPerPage} onChange={handleRowsPerPageChange}>
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
+  <div className="flex items-center">
+                <label htmlFor="rowsPerPage" className="mr-2 text-lg">Rows per page:</label>
+                <select 
+                    id="rowsPerPage"
+                    value={rowsPerPage} 
+                    onChange={handleRowsPerPageChange}
+                    className="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                >
+                    {[5, 10, 20, 30, 40, 50, 100, 200].map(num => (
+                        <option key={num} value={num}>{num}</option>
+                    ))}
+                </select>
+            </div>
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
@@ -381,6 +433,10 @@ function AccountantComponent() {
       <div className="pagination">
         {renderPageNumbers()}
       </div>
+
+      <button onClick={exportToExcel} className="btn btn-primary">
+        Export to Excel
+      </button>
 
 </div>
   );
