@@ -112,7 +112,7 @@ function AddReceipts() {
                 {filteredStudents.map((student, index) => (
                   <tr className="hover:bg-[#00A0E3]" key={index}>
       <td className="border-2 border-gray-800 px-4 py-2 text-black">
-        <a href={`/AddStudentReceipt/${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
+        <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
           {`${student.firstName} ${student.surName}`.trim()}
         </a>
       </td>

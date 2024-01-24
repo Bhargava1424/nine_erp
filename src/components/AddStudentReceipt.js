@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 import Navbar from './Navbar';
-
 
 function AddStudentReceipt() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { applicationNumber } = useParams();
     const [showReceiptSection, setShowReceiptSection] = useState(false);
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
-    
+    const [receiptNumber, setReceiptNumber] = useState(''); // Add receipt number to the state
+
 
     const handleAmountChange = (e) => {
         setAmountPaid(e.target.value);
@@ -35,16 +33,56 @@ function AddStudentReceipt() {
         // Replace 'feeType' with your actual fee type identifier
         setShowReceiptSection(true);
     };
-    
+
+
+    // Function to get the application number from the URL
+    function getApplicationNumber() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('applicationNumber');
+    }
+
+    // Using the function to get the application number
+    const applicationNumber = getApplicationNumber();
+
+    // Now you can use applicationNumber in your script
+    console.log(applicationNumber); // For testing purposes
+
 
     useEffect(() => {
-
         const fetchStudentData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/students/name/${applicationNumber}`);
-                setStudentData(response.data);
-                setLoading(false);
+                setLoading(true);
+                var SchoolManagementSystemApi = require('school_management_system_api');
+                var api = new SchoolManagementSystemApi.DbApi();
+                const opts = {
+                    body: {
+                        "collectionName": "students",
+                        "query": {
+                            'applicationNumber': applicationNumber
+                        },
+                        "type": 'findOne'
+                    }
+                };
+                
+                api.dbGet(opts, function(error, data, response) {
+                    if (error) {
+                        console.error('API Error', error);
+                        setError(error.message);
+                        setLoading(false);
+                    } else {
+                        try {
+                            const responseBody = response.body; // Assuming response.body needs to be parsed
+                            console.log(responseBody);
+                            setStudentData(responseBody); // Adjust according to the structure of responseBody
+                        } catch (parseError) {
+                            console.error('Error parsing response:', parseError);
+                            setError(parseError.message);
+                        }
+                        setLoading(false);
+                    }
+                });
             } catch (err) {
+                console.error('Error:', err);
                 setError(err.message);
                 setLoading(false);
             }
@@ -56,7 +94,7 @@ function AddStudentReceipt() {
     }, [applicationNumber]);
 
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (feeType) => {
         if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
             alert("Please enter a valid amount.");
             return;
@@ -76,40 +114,53 @@ function AddStudentReceipt() {
             };
 
             // Replace with the correct URL and adjust according to your API and data structure
-            const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
-
+            // const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
+            var SchoolManagementSystemApi = require('school_management_system_api');
+            var api = new SchoolManagementSystemApi.ReceiptsApi();
+            var body = new SchoolManagementSystemApi.ReceiptCreateRequest();
             
+            body.applicationNumber = applicationNumber;
+            body.feeType = feeType;
+            body.amount = paymentDetails.amountPaid;
+            body.modeOfPayment = paymentDetails.modeOfPayment;
+            body.chequeNumber = paymentDetails.chequeNumber;
 
-            // Check for success response, then update state
-            if (response.status === 200) {
-                setStudentData(prevState => ({
-                    ...prevState,
-                    ...updatedFees,
-                }));
-                setShowReceiptSection(false); // Hide the receipt section after successful update
-                setAmountPaid(''); // Reset the amount
-                setModeOfPayment(''); // Reset the mode of payment
-                setChequeNumber(''); // Reset the cheque number
-            } else {
-                // Handle any other response
-                console.error('An error occurred:', response);
-            }
-            if (response.status === 200) {
-                // Prepare the data to be sent
-                
-        
-                if (response.status === 200) {
-                    // Include the amountPaid in the URL
-                    const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&firstName=${studentData.firstName}`;
-                    window.open(receiptUrl, '_blank');
+            console.log(body);
+            
+                    api.receiptPost(body, function(error, response) {
+                        if (error) {
+                            console.error('API Error:', error);
+                        } else {
+                            // console.log('API Response:', response); // Log the full HTTP response
+                            try {
+                                var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
+                                if (responseBody && responseBody.message) {
+                                    console.log('Message:', responseBody.message); // Logging the message from the response
+                                    setStudentData(prevState => ({
+                                        ...prevState,
+                                        ...updatedFees,
+                                    }));
+                                    setReceiptNumber(responseBody.data.receiptNumber); // Set the receipt number
+                                    setShowReceiptSection(false); // Hide the receipt section after successful update
+                                    setAmountPaid(''); // Reset the amount
+                                    setModeOfPayment(''); // Reset the mode of payment
+                                    setChequeNumber(''); // Reset the cheque number
+                                }
+                            } catch (parseError) {
+                                console.error('Error parsing response:', parseError);
+                            }
+                        }
+                        if (response.status === 200) {
+                            // Include the amountPaid in the URL
+                            const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receiptNumber}`;
+                            window.open(receiptUrl, '_blank');
 
+                        }
+                    });
+                } catch (err) {
+                    console.error('Error:', err);
                 }
-            }
-        } catch (error) {
-            console.error('Error submitting payment:', error);
-        }
-        
-    };
+            };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -181,7 +232,7 @@ function AddStudentReceipt() {
                                             {modeOfPayment === 'CHEQUE' && (
                                                 <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
                                             )}
-                                            <button onClick={handleSubmit}  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
+                                            <button onClick={handleSubmit('firstYearTuitionFee')}  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
                                                 Submit Payment
                                             </button>                      
 
