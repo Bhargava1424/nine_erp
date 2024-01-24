@@ -1,114 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
-const ListReceipts = () => {
-    const userRole = useSelector((state) => state.auth.user?.role);
-    const [receipts, setReceipts] = useState([
-        {
-            "date_time_of_payment": "23/01/2024, at 10:30",
-            "name_of_student": "Alice Johnson",
-            "amount_paid": 500,
-            "mode_of_payment": "Credit Card",
-            "receipt_number": "R123456",
-            "student_status": "Enrolled",
-            "edit_icon": "M",
-            "download_receipt_icon": "Download Link"
-        },
-        {
-            "date_time_of_payment": "22/01/2024, at 15:45",
-            "name_of_student": "Bob Smith",
-            "amount_paid": 750,
-            "mode_of_payment": "Bank Transfer",
-            "receipt_number": "R123457",
-            "student_status": "Graduated",
-            "edit_icon": "M",
-            "download_receipt_icon": "Download Link"
-        },
-        {
-            "date_time_of_payment": "21/01/2024, at 09:00",
-            "name_of_student": "Charlie Brown",
-            "amount_paid": 300,
-            "mode_of_payment": "Cash",
-            "receipt_number": "R123458",
-            "student_status": "Enrolled",
-            "edit_icon": "M",
-            "download_receipt_icon": "Download Link"
-        }
-    ]
-    );
-    const [editableReceiptIndex, setEditableReceiptIndex] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
+function ListReceipts() {
+    const [receipts, setReceipts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Implement initial sorting by date (latest first)
-        setReceipts(receipts.sort((a, b) => new Date(b.date_time_of_payment) - new Date(a.date_time_of_payment)));
+        const fetchReceipts = async () => {
+            try {
+                setIsLoading(true);
+                // Replace with your API call
+                const response = await fetch('YOUR_API_ENDPOINT_TO_FETCH_RECEIPTS');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setReceipts(data);
+            } catch (e) {
+                setError(e.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchReceipts();
     }, []);
 
-    const handleEditClick = (index) => {
-        setEditableReceiptIndex(index);
-    };
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
-    const handleFieldChange = (e, index, field) => {
-        const updatedReceipts = [...receipts];
-        updatedReceipts[index][field] = e.target.value;
-        setReceipts(updatedReceipts);
-    };
-
-    const filteredReceipts = receipts.filter(receipt => {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        return (
-            receipt.date_time_of_payment.toLowerCase().includes(lowerCaseSearchTerm) ||
-            receipt.name_of_student.toLowerCase().includes(lowerCaseSearchTerm) ||
-            receipt.amount_paid.toString().toLowerCase().includes(lowerCaseSearchTerm) ||
-            receipt.mode_of_payment.toLowerCase().includes(lowerCaseSearchTerm) ||
-            receipt.receipt_number.toLowerCase().includes(lowerCaseSearchTerm) ||
-            receipt.student_status.toLowerCase().includes(lowerCaseSearchTerm)
-        );
-    });
-    
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div>
-            <h1>Payment Receipts</h1>
-            <input type="text" placeholder="Search" onChange={(e) => setSearchTerm(e.target.value)} />
+            <h2>Receipts List</h2>
             <table>
                 <thead>
                     <tr>
-                        {/* Column headers with sorting buttons */}
+                        {/* Add table headers based on your receipt schema */}
+                        <th>Application Number</th>
+                        <th>Student Name</th>
+                        <th>Date of Joining</th>
+                        <th>Course</th>
+                        {/* ... other headers */}
                     </tr>
                 </thead>
                 <tbody>
-                {
-                    filteredReceipts.map((receipt, index) => (
-                        <tr key={index} style={{ backgroundColor: receipt.student_status === "CANCELLED" ? "red" : "" }}>
-                            <td>{receipt.date_time_of_payment}</td>
-                            <td>{receipt.name_of_student}</td>
-                            
-                            {editableReceiptIndex === index ? (
-                                <>
-                                    <td><input type="text" value={receipt.amount_paid} onChange={(e) => handleFieldChange(e, index, 'amount_paid')} /></td>
-                                    <td><input type="text" value={receipt.mode_of_payment} onChange={(e) => handleFieldChange(e, index, 'mode_of_payment')} /></td>
-                                </>
-                            ) : (
-                                <>
-                                    <td>{receipt.amount_paid}</td>
-                                    <td>{receipt.mode_of_payment}</td>
-                                </>
-                            )}
-                            
-                            <td>{receipt.receipt_number}</td>
-                            <td>{receipt.student_status}</td>
-                            <td>{userRole === 'M' && <button onClick={() => handleEditClick(index)}>Edit</button>}</td>
-                            <td><a href={receipt.download_receipt_icon} download>Download</a></td>
+                    {receipts.map((receipt, index) => (
+                        <tr key={index}>
+                            <td>{receipt.applicationNumber}</td>
+                            <td>{`${receipt.firstName} ${receipt.surName}`}</td>
+                            <td>{receipt.dateOfJoining}</td>
+                            <td>{receipt.course}</td>
+                            {/* ... other data */}
                         </tr>
-                    ))
-                }
-
+                    ))}
                 </tbody>
             </table>
-            
         </div>
     );
-};
+}
 
 export default ListReceipts;
