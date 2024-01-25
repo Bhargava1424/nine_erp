@@ -9,6 +9,12 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();  
+  
+
+  const isAccountant = user ? user.role === 'Accountant' : false;
+  const isExecutive = user ? user.role === 'Executive' : false;
+
+
   // Check if the current pathname is '/AddStudentReceipt'
   const isAddStudentReceiptPage = location.pathname.startsWith('/AddStudentReceipt'); 
   const handleLogoClick = (e) => {
@@ -104,24 +110,27 @@ function Navbar() {
                 <ul className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                   <li><Link to='/'>Home</Link></li>
                   <li><Link to='/AddStudent'>Add Student</Link></li>
-                  <li className="dropdown dropdown-right">
-                    <div
-                      tabIndex={0}
-                      role="button"
-                      onClick={toggleAddAttributeDropdown}
-                    >
-                      AddAttribute
-                    </div>
-                    {isAddAttributeDropdownOpen && (
-                      <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                        <li><Link to='/AddEmployee'>Add Employee</Link></li>                      
-                        <li><Link to='/AddBranch'>Add Branch</Link></li>
-                      </ul>
-                    )}
-                  </li>
+                  
+                  {!(isAccountant || isExecutive) && (
+                    <li className="dropdown dropdown-right">
+                      <div
+                        tabIndex={0}
+                        role="button"
+                        onClick={toggleAddAttributeDropdown}
+                      >
+                        AddAttribute
+                      </div>
+                      {isAddAttributeDropdownOpen && (
+                        <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                          <li><Link to='/AddEmployee'>Add Employee</Link></li>                      
+                          <li><Link to='/AddBranch'>Add Branch</Link></li>
+                        </ul>
+                      )}
+                    </li>
+                  )}
                   <li><Link to='/AddReceipts'>Add Receipts</Link></li>
                   <li><Link to='/ListReceipts'>List Receipts</Link></li>
-                  {user.role === 'Manager' && <li><Link to='/Concessions'>Concessions</Link></li>}
+                  {(user.role === 'Manager' || user.role === 'Executive') && <li><Link to='/Concessions'>Concessions</Link></li>}
                 </ul>
               )}
             </div>

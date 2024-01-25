@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 import LoginComponent from './LoginComponent';
-import AdminComponent from './AdminComponent';
-import ExecutiveComponent from './ExecutiveComponent';
-import AccountantComponent from './AccountantComponent';
+import AdminComponent from './AdminDashboardComponent';
+import ExecutiveComponent from './ExecutiveDashboardComponent';
+import AccountantComponent from './AccountantDashboardComponent';
 
 function HeroSection2() {
   const userRole = useSelector((state) => state.auth.user?.role);

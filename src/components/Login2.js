@@ -7,6 +7,7 @@ function Login2() {
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
+  let userBranch = '';
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -28,7 +29,9 @@ function Login2() {
             console.log(responseBody.data.employeeRole);
             if (responseBody.message === 'Login Successful') {
               userRole = responseBody.data.employeeRole;
+              userBranch = responseBody.data.employeeBranch
               localStorage.setItem('userRole', userRole);
+              localStorage.setItem('userBranch', userBranch);
               authServiceLogin({ role: userRole });
             }
             else {
