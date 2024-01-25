@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 
 const AuthCheck = () => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user?.role);
+  console.log(user)
 
   useEffect(() => {
     if (!user || user.role === undefined) {

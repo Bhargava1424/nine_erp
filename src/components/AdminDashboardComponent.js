@@ -177,13 +177,16 @@ function AccountantComponent() {
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
-  
+    
+
     if (hasValidationErrors) {
       alert("Please correct the errors before submitting.");
       return;
     }
   
     try {
+
+      // Placeholder for Edit student
       // Update the students array with the edited student locally
       const updatedStudents = students.map(student => {
         return student ;
@@ -365,6 +368,8 @@ function AccountantComponent() {
     {isEditModalOpen && (
       <div className="edit-modal">
         <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
+        <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
+
 
         <label className="form-control">
           <span className="label-text">First Name</span>
