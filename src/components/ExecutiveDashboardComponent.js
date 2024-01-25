@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-function AccountantComponent() {
+
+function ExecutiveComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const branch = useSelector((state) => state.auth.branch);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -17,7 +21,9 @@ function AccountantComponent() {
           body: {
             "collectionName": "students",
             "query": {
-              "studentStatus": "Active"
+              "studentStatus": "Active",
+              "branch": branch
+
             },
             "type": "findMany"
           }
@@ -315,4 +321,4 @@ function AccountantComponent() {
   );
 }
 
-export default AccountantComponent;
+export default ExecutiveComponent;

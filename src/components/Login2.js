@@ -32,7 +32,7 @@ function Login2() {
               userBranch = responseBody.data.employeeBranch
               localStorage.setItem('userRole', userRole);
               localStorage.setItem('userBranch', userBranch);
-              authServiceLogin({ role: userRole });
+              authServiceLogin({ role: userRole, branch: userBranch }); 
             }
             else {
               alert(responseBody.message);

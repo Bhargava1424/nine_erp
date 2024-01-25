@@ -16,7 +16,7 @@ function HeroSection2() {
       {userRole === 'Manager' && <AdminComponent/>}
       {userRole === 'Executive' && <ExecutiveComponent />}
       {userRole === 'Accountant' && <AccountantComponent />}
-    </div>
+    </div>  
   );
 }
 

@@ -6,13 +6,13 @@ import { logout } from '../reducers/authReducer';
 
 function Navbar() {
   const user = useSelector((state) => state.auth.user);
+  console.log(user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();  
   
 
-  const isAccountant = user ? user.role === 'Accountant' : false;
-  const isExecutive = user ? user.role === 'Executive' : false;
+
 
 
   // Check if the current pathname is '/AddStudentReceipt'
@@ -111,7 +111,7 @@ function Navbar() {
                   <li><Link to='/'>Home</Link></li>
                   <li><Link to='/AddStudent'>Add Student</Link></li>
                   
-                  {!(isAccountant || isExecutive) && (
+                  {(user.role === 'Manager') && (
                     <li className="dropdown dropdown-right">
                       <div
                         tabIndex={0}

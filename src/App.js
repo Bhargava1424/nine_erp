@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useAuth } from './services/authService';
 import { login, logout } from './reducers/authReducer';
@@ -17,22 +18,14 @@ import ForgotPassword from './components/ForgotPassword';
 import AddStudentReceipt from './components/AddStudentReceipt';
 import DownloadReceipt from './components/DownloadReceipt';
 import AddStudentConcession from './components/AddStudentConcession';
+import AuthCheck from './components/AuthCheck';
 function App() {
-  const dispatch = useDispatch();
-  const { user } = useAuth();
 
-  useEffect(() => {
-    // Set up initial authentication state when the app loads
-    if (user) {
-      dispatch(login(user));
-    } else {
-      dispatch(logout());
-    }
-  }, [user, dispatch]);
 
   return (
 <>
   <Router>
+    <AuthCheck />
     <Routes>
       <Route path='/' element={<Home/>} />
       <Route path='/AddStudent' element={<AddStudent />}></Route>

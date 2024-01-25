@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
 
 function AccountantComponent() {
   const [students, setStudents] = useState([]);
@@ -6,6 +8,8 @@ function AccountantComponent() {
   // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const branch = useSelector((state) => state.auth.branch);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -17,7 +21,9 @@ function AccountantComponent() {
           body: {
             "collectionName": "students",
             "query": {
-              "studentStatus": "Active"
+              "studentStatus": "Active",
+              "branch": branch
+
             },
             "type": "findMany"
           }
@@ -161,9 +167,6 @@ function AccountantComponent() {
       console.error("Error updating student: ", error);
     }
   };
-  
-  
-  
 
   const generateBatchOptions = () => {
     const startYear = 2022;
@@ -186,8 +189,6 @@ function AccountantComponent() {
         value={searchQuery}
         onChange={handleSearchChange}
       />
-
-      
       
 
 <div className="overflow-x-auto mt-3">

@@ -1,5 +1,6 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
+import { useSelector } from 'react-redux';
 
 
 const AddStudent = () => {
@@ -233,6 +234,7 @@ const handleInputChange = (e) => {
           body: {
             "collectionName": "branches",
             "query": {
+              
             },
             "type": 'findMany'
           }
@@ -260,6 +262,10 @@ const handleInputChange = (e) => {
   
     fetchBranches();
   }, []);
+
+  const branch = useSelector((state) => state.auth.branch);
+    const role = useSelector((state) => state.auth.role);
+
 
   return (
     <>
@@ -362,17 +368,28 @@ const handleInputChange = (e) => {
             <div className="label">
               <span className="label-text">Branch</span>
             </div>
-            <select
-              className="select select-bordered w-full max-w-xs"
-              name="branch"
-              value={studentData.branch}
-              onChange={handleInputChange}
-            >
-              <option value="" disabled>Choose Branch</option>
-              {branches.map((branch) => (
-                <option key={branch._id} value={branch.branchCode}>{branch.branchName} ({branch.branchCode})</option>
-              ))}
-            </select>
+            {
+              (role === 'Executive' || role === 'Accountant') ? (
+                <input
+                  type="text"
+                  className="input input-bordered w-full max-w-xs"
+                  value={branch}
+                  readOnly
+                />
+              ) : (
+                <select
+                  className="select select-bordered w-full max-w-xs"
+                  name="branch"
+                  value={studentData.branch}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>Choose Branch</option>
+                  {branches.map((branch) => (
+                    <option key={branch.branchCode} value={branch.branchCode}>{branch.branchName}</option>
+                  ))}
+                </select>
+              )
+            }
           </label>
 
         </div>
