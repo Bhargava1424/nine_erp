@@ -12,25 +12,39 @@ function ForgotPassword() {
   const [passwordError, setPasswordError] = useState('');  
   const navigate = useNavigate();
 
-// Function to retrieve user emails
-const getUserEmails = (username) => {
-  const emails=['hello@9ed.in', 'bharathteja@9ed.in', 'edunine001@gmail.com','kundannanubala@gmail.com'];
-    if (username === 'admin@example.com') {
-      return emails;
-    }
-    // Add more cases for different users if needed
-    return [];
-  };
+  // // Function to retrieve user emails
+  // const getUserEmails = (username) => {
+  //   const emails=['hello@9ed.in', 'bharathteja@9ed.in', 'edunine001@gmail.com','kundannanubala@gmail.com'];
+  //     if (username === 'admin@example.com') {
+  //       return emails;
+  //     }
+  //     // Add more cases for different users if needed
+  //     return [];
+  //   };
   
   // Handle Email Submission
   const handleEmailSubmission = (e) => {
     e.preventDefault();
-    const emails = getUserEmails(email);
-    if (emails.length > 0) {
-      const code = Math.random().toString(36).substr(2, 6) + '$#';
-      setGeneratedCode(code); // Store the generated code
-      sendResetCode(emails, code);
-      setCurrentStage('codeVerification');
+    if (email.length > 0) {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.AuthorizationApi();
+      var body = {}
+      body.email = email;
+      console.log(body);
+
+      api.sendPassword(body, function (error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            var responseBody = JSON.parse(response.text); // Assuming response.body is already in JSON format
+            console.log(responseBody.message);
+            alert(responseBody.message);
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
     } else {
       alert('Email not found.');
     }
