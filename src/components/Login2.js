@@ -8,7 +8,6 @@ function Login2() {
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
   let userBranch = '';
-  let userBranch = '';
 
   const handleLogin = (e) => {
     e.preventDefault();
