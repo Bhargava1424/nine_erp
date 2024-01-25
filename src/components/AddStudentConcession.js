@@ -116,7 +116,7 @@ function AddStudentConcession() {
             };
 
             // Replace with the correct URL and adjust according to your API and data structure
-            // const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
+            // const response = await axios.post(`http://34.125.142.249:5000/api/students/update-fees/${studentData._id}`, updatedFees);
             var SchoolManagementSystemApi = require('school_management_system_api');
             var api = new SchoolManagementSystemApi.ConcessionsApi();
             var body = new SchoolManagementSystemApi.ConcessionCreateRequest();

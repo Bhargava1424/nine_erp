@@ -33,9 +33,9 @@ export class ApiClient {
         /**
          * The base URL against which to resolve every API call's (relative) path.
          * @type {String}
-         * @default http://localhost:5000/v1
+         * @default http://34.125.142.249:5000/v1
          */
-        this.basePath = 'http://localhost:5000/v1'.replace(/\/+$/, '');
+        this.basePath = 'http://34.125.142.249:5000/v1'.replace(/\/+$/, '');
 
         /**
          * The authentication methods to be included for all API calls.

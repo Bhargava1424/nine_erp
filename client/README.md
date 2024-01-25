@@ -85,7 +85,7 @@ api.login(body, callback);
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://localhost:5000/v1*
+All URIs are relative to *http://34.125.142.249:5000/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
