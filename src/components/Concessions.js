@@ -103,6 +103,10 @@ function Concessions() {
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee</th>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
@@ -125,6 +129,10 @@ function Concessions() {
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearTuitionFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearHostelFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearTuitionFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearHostelFee}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>

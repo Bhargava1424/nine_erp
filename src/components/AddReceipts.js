@@ -2,6 +2,8 @@
 import Navbar from './Navbar';
 import React, { useState, useEffect } from 'react';
 
+import { useSelector } from 'react-redux';  
+
 function AddReceipts() {
     const [students, setStudents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -77,6 +79,14 @@ function AddReceipts() {
       );
     });
   };
+
+  const user = useSelector((state) => state.auth.user);
+  const userRole = user?.role; // Assuming your user object has a role property
+
+  // If user role is undefined, return an empty div or redirect logic
+  if (userRole === undefined) {
+    return <div />;
+  }
   const filteredStudents = handleSearch(searchQuery);
     return (
         <div className="main-container">
@@ -92,7 +102,7 @@ function AddReceipts() {
             <h2 className="text-2xl font-bold text-black-500 mb-4">Add Receipts</h2>
             <table className="min-w-full border border-gray-800 border-collapse">
               <thead>
-              <tr>
+              <tr>  
                 <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
 
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>

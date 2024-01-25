@@ -17,7 +17,6 @@ import ForgotPassword from './components/ForgotPassword';
 import AddStudentReceipt from './components/AddStudentReceipt';
 import DownloadReceipt from './components/DownloadReceipt';
 import AddStudentConcession from './components/AddStudentConcession';
-import AuthCheck from './components/AuthCheck';
 function App() {
 
   const dispatch = useDispatch();
@@ -36,7 +35,6 @@ function App() {
   return (
 <>
   <Router>
-    <AuthCheck />
     <Routes>
       <Route path='/' element={<Home/>} />
       <Route path='/AddStudent' element={<AddStudent />}></Route>
