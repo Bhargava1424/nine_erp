@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../services/authService';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';  
 
 function Login2() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
-  let userBranch = '';
+  let userBranch = '';;
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -77,6 +77,8 @@ function Login2() {
     // Call the login function from authService
   };
 
+  
+
   return (
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
@@ -115,6 +117,7 @@ function Login2() {
       </div>
     </div>
   );
+
 }
 
 export default Login2;

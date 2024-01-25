@@ -180,6 +180,8 @@ function AccountantComponent() {
     return options;
   };   
 
+  
+
   return (
     <div className="main-container">
       <input
@@ -220,8 +222,8 @@ function AccountantComponent() {
         <tr className="hover:bg-[#00A0E3]" key={index}>
          <td className="border-2 border-gray-800 px-4 py-2 text-black">
          <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-  <i className="fas fa-edit"></i>
-</button>
+            <i className="fas fa-edit"></i>
+          </button>
 
 </td>
 
