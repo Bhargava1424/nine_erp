@@ -11,6 +11,8 @@ function Home() {
   return (
     <div className="main-container">
       <Navbar />
+        
+
       <div className="hero-container">
         <HeroSection2 />
       </div>

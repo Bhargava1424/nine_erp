@@ -136,13 +136,14 @@ function Navbar() {
             </div>
           )}
         </div>
+        {user ? (
         <div className="navbar-center logo-container">
     <Link to='/' onClick={handleLogoClick}>
-        <img alt="logo" src="/9logo.jpg" className="responsive-logo" />
+        <img alt="logo" src="/9logo.webp" className="responsive-logo" />
     </Link>
 
 
-        </div>
+        </div>) : null}
         <div className="navbar-end">
           {user && !isAddStudentReceiptPage && (
             <div className="dropdown dropdown-end" ref={profileDropdownRef}>

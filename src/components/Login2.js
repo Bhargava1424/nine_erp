@@ -82,7 +82,7 @@ function Login2() {
   return (
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
-        <h1 className="text-3xl font-bold mb-4">Please Login To Continue...</h1>
+      <img alt="logo" src="/9logo.webp" className="responsive-logo" />
         <form onSubmit={(e) => handleLogin(e)} className="space-y-4">
           {/* ... (rest of the form) */}
           <div className="flex flex-col">

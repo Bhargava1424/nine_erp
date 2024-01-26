@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 
 function AccountantComponent() {
@@ -52,6 +54,50 @@ function AccountantComponent() {
 
     fetchStudents();
   }, []);
+
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Application Number': student.applicationNumber,
+      'Parent Name': student.parentName,
+      'Branch': student.branch,
+      'Primary Contact': student.primaryContact,
+      'Gender': student.gender,
+      'Batch': student.batch,
+      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      'Course': student.course,
+      'Mode of Residence': student.modeOfResidence,
+      '1st Year Tuition Fee': student.firstYearTuitionFee,
+      '1st Year Hostel Fee': student.firstYearHostelFee,
+      '2nd Year Tuition Fee': student.secondYearTuitionFee,
+      '2nd Year Hostel Fee': student.secondYearHostelFee,
+      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
+      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
+      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
+      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
+      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
+      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
+      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
+      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+      // Add other fields if necessary
+    }));
+  };
+
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, 'students_data.xlsx');
+  };
 
 
   const handleSearchChange = (e) => {
@@ -183,7 +229,19 @@ function AccountantComponent() {
   
 
   return (
+
+    
+    
     <div className="main-container">
+
+    
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
+          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
+          <p className="text-red-600 text-lg font-semibold">
+            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
+          </p>
+        </div>
+      
       <input
         type="text"
         placeholder="Search students..."
@@ -191,48 +249,46 @@ function AccountantComponent() {
         value={searchQuery}
         onChange={handleSearchChange}
       />
+
+                
       
 
 <div className="overflow-x-auto mt-3">
   <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
+
+      <p>
+        <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+          Export to Excel
+        </button>
+      </p>
   
-  <table className="min-w-full border border-gray-800 border-collapse">
+  <table className="min-w-full border border-gray-800 border-collapse"  >
     <thead>
-      <tr>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Secondary Contact</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+      <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Parent's Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Secondary Contact</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Date of Joining</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
       </tr>
     </thead>
     <tbody>
       {filteredStudents.map((student, index) => (
         <tr className="hover:bg-[#00A0E3]" key={index}>
-         <td className="border-2 border-gray-800 px-4 py-2 text-black">
-         <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-            <i className="fas fa-edit"></i>
-          </button>
-
-</td>
-
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.branch}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondaryContact}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>

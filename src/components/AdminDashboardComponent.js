@@ -106,10 +106,6 @@ function AccountantComponent() {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Handle change in rows per page
-  const handleRowsPerPageChange = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setCurrentPage(1); // Reset to first page
-  };
 
   // Render pagination
   const renderPageNumbers = () => {
@@ -271,7 +267,16 @@ function AccountantComponent() {
 
 
   return (
+
+    
     <div className="main-container">
+
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
+          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
+          <p className="text-red-600 text-lg font-semibold">
+            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
+          </p>
+        </div>
       <input
         type="text"
         placeholder="Search students..."
@@ -284,31 +289,23 @@ function AccountantComponent() {
 <div className="overflow-x-auto mt-3">
   <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
   <div className="flex items-center">
-                <label htmlFor="rowsPerPage" className="mr-2 text-lg">Rows per page:</label>
-                <select 
-                    id="rowsPerPage"
-                    value={rowsPerPage} 
-                    onChange={handleRowsPerPageChange}
-                    className="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                >
-                    {[5, 10, 20, 30, 40, 50, 100, 200].map(num => (
-                        <option key={num} value={num}>{num}</option>
-                    ))}
-                </select>
+                <p>
+                <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+                  Export to Excel
+                </button>
+                </p>
+                
             </div>
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
-      <tr>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
+      <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee</th>
@@ -323,28 +320,20 @@ function AccountantComponent() {
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
         <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Action</th>
       </tr>
     </thead>
     <tbody>
       {currentStudents.map((student, index) => (
         <tr className="hover:bg-[#00A0E3]" key={index}>
-         <td className="border-2 border-gray-800 px-4 py-2 text-black">
-         <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-  <i className="fas fa-edit"></i>
-</button>
-
-</td>
-
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.branch}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearTuitionFee}</td>
@@ -359,6 +348,12 @@ function AccountantComponent() {
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
           <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-black">
+                  <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+            <i className="fas fa-edit"></i>
+          </button>
+
+          </td>
         </tr>
       ))}
     </tbody>
@@ -439,9 +434,7 @@ function AccountantComponent() {
         {renderPageNumbers()}
       </div>
 
-      <button onClick={exportToExcel} className="btn btn-primary">
-        Export to Excel
-      </button>
+      
 
 </div>
   );
