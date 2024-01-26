@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
-function AccountantComponent() {
+function AdminComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   // New state for managing edit functionality
@@ -94,13 +94,15 @@ function AccountantComponent() {
 
   const filteredStudents = handleSearch(searchQuery);
 
+  let totalPages = 0;
+  let currentStudents = []; 
+  if (filteredStudents) {
+    totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+    const indexOfLastStudent = currentPage * rowsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+    currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
-  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
-
-  // Get current page students
-  const indexOfLastStudent = currentPage * rowsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -173,36 +175,64 @@ function AccountantComponent() {
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
-    
-
+  
     if (hasValidationErrors) {
       alert("Please correct the errors before submitting.");
       return;
     }
   
     try {
-
-      // Placeholder for Edit student
-      // Update the students array with the edited student locally
-      const updatedStudents = students.map(student => {
-        return student ;
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "students",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber
+          },
+          "type": 'updateOne',
+          "update": {
+            "firstName": editingStudent.firstName,
+            "surName": editingStudent.surName,
+            "parentName": editingStudent.parentName,
+            "primaryContact": editingStudent.primaryContact,
+            "secondaryContact": editingStudent.secondaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "course": editingStudent.course,
+            "modeOfResidence": editingStudent.modeOfResidence,
+            "studentStatus": editingStudent.studentStatus,
+          }
+        }
+      };
+  
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
+  
+            // Close the modal and reset editingStudent
+            setIsEditModalOpen(false);
+            setEditingStudent(null);
+  
+            // Display success message with changes
+            console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
+  
+            // Reload the page
+            window.location.reload();
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
       });
-  
-      setStudents(updatedStudents);
-      console.log("Updated Students:", updatedStudents); // Debugging
-  
-      // Close the modal and reset editingStudent
-      setIsEditModalOpen(false);
-      
-      // Display success message with changes
-      alert(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
-  
-      setEditingStudent(null);
-      window.location.reload();
     } catch (error) {
       console.error("Error updating student: ", error);
     }
-  };
+  }; 
   
   
   
@@ -435,6 +465,14 @@ function AccountantComponent() {
           </select>
         </label>
 
+        <label className="form-control">
+          <span className="label-text">Student Status</span>
+          <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
+            <option value="Active">ACTIVE</option>
+            <option value="Cancelled">CANCELLED</option>
+          </select>
+        </label>
+
         <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
         <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
@@ -449,4 +487,4 @@ function AccountantComponent() {
   );
 }
 
-export default AccountantComponent;
+export default AdminComponent;
