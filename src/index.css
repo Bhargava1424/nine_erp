@@ -91,3 +91,23 @@ code {
   z-index: 900;
 }
 
+#cardbox1 {
+  -moz-box-shadow: 0 0 5px #888;
+  -webkit-box-shadow: 0 0 5px #888;
+  box-shadow: 0 0 5px #888;
+  color: #e4e5e7;
+  cursor: pointer;
+  background-color: #577ea4;
+  height: 104px;
+  margin-bottom: 25px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statistic-box {
+  padding: 12px;
+  width: 100%;
+  text-align: center;
+}
