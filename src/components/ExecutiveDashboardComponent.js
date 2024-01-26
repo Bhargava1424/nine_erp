@@ -183,7 +183,6 @@ function ExecutiveComponent() {
   
   
    
-  // New function to submit edited data without actual backend update
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
@@ -194,13 +193,54 @@ function ExecutiveComponent() {
     }
   
     try {
-      // Update the students array with the edited student locally
-      const updatedStudents = students.map(student => {
-        return student ;
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "students",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber/* Provide the application number here */
+          },
+          "type": 'updateOne',
+          "update": {
+            "firstName": editingStudent.firstName,
+            "surName": editingStudent.surName,
+            "parentName": editingStudent.parentName,
+            "primaryContact": editingStudent.primaryContact,
+            "secondaryContact": editingStudent.secondaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "course": editingStudent.course,
+            "modeOfResidence": editingStudent.modeOfResidence,
+            "studentStatus":editingStudent.studentStatus,
+          }
+        }
+      };
+  
+      console.log(opts.body);
+  
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
       });
   
-      setStudents(updatedStudents);
-      console.log("Updated Students:", updatedStudents); // Debugging
+      // Placeholder for Edit student
+      // Update the students array with the edited student locally
+      // const updatedStudents = students.map(student => {
+      //   return student ;
+      // });
+  
+      // setStudents(updatedStudents);
+      // console.log("Updated Students:", updatedStudents); // Debugging
   
       // Close the modal and reset editingStudent
       setIsEditModalOpen(false);
@@ -209,7 +249,7 @@ function ExecutiveComponent() {
       alert(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
   
       setEditingStudent(null);
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error updating student: ", error);
     }
@@ -373,6 +413,13 @@ function ExecutiveComponent() {
         <option value="Hostel">Hostel</option>
       </select>
     </label>
+    <label className="form-control">
+          <span className="label-text">Student Status</span>
+          <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
+            <option value="Active">ACTIVE</option>
+            <option value="Cancelled">CANCELLED</option>
+          </select>
+        </label>
 
     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
