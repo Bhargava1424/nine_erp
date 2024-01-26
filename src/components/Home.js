@@ -72,9 +72,8 @@ function Home() {
           )}
         </div>
       )}
-      <div className="hero-container">
         <HeroSection2 />
-      </div>
+
       <Footer />
     </div>
   );
