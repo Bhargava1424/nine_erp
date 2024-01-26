@@ -9,7 +9,7 @@ function AdminComponent() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage] = useState(100);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -312,59 +312,60 @@ function AdminComponent() {
 
 <div className="overflow-x-auto mt-3">
   <div className="flex justify-center items-center">
-    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-    <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
-    <div className="flex-grow flex justify-end">
-      <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
+    <div className="flex items-center">
+      <p>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+        Export to Excel
+      </button>
+      </p>
+           
     </div>
+    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+      <div className="flex-grow flex justify-end">
+        <input
+          type="text"
+          placeholder="Search students..."
+          className="input input-bordered max-w-xs text-black placeholder-black"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+      </div>
   </div>
 
 
 
-  <div className="flex items-center">
-                <p>
-                <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
-                  Export to Excel
-                </button>
-                </p>
-                
-            </div>
+  
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 2nd Year Hostel Fee</th>        
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Action</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Parent Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Hostel Fee</th>        
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Action</th>
       </tr>
     </thead>
     <tbody>
       {currentStudents.map((student, index) => (
-        <tr className="hover:bg-[#00A0E3]" key={index}>
+        <tr className="hover:bg-[#00A0E3] hover:text-white"  key={index}>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>

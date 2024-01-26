@@ -270,13 +270,11 @@ const handleInputChange = (e) => {
   return (
     <>
     <Navbar/>
+    
     <div className="container mx-auto p-4">      
-      <h2 className="text-2xl font-bold mb-4">Add Student</h2>
-      <div className="AddStudent">
-
-
-        {/* Rest of your form code */}
-    </div> 
+      <div className="flex justify-center items-center">
+            <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW EMPLOYEE</h2>
+          </div>
     
       <input
         type="checkbox"
@@ -601,14 +599,13 @@ const handleInputChange = (e) => {
                   <span className="label-text">Student Status</span>
               </div>
               <select
-                  className="select select-bordered w-full max-w-xs"
-                  name="studentStatus"
-                  value={studentData.studentStatus}
-                  onChange={handleInputChange}
+                className="select select-bordered w-full max-w-xs"
+                name="studentStatus"
+                value={studentData.studentStatus}
+                onChange={handleInputChange}
               >
-                  <option value="" disabled>Choose Student Status</option>
-                  <option value="Active">ACTIVE</option>
-                  <option value="Cancelled">CANCELLED</option>
+                <option value="Active">ACTIVE</option>
+                <option value="Cancelled">CANCELLED</option>
               </select>
           </label>
         </div>

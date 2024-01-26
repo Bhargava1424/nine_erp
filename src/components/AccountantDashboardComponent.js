@@ -312,29 +312,26 @@ function AccountantComponent() {
 
 <div className="overflow-x-auto mt-3">
   <div className="flex justify-center items-center">
-    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-    <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
-    <div className="flex-grow flex justify-end">
-      <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
+    <div className="flex items-center">
+      <p>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+        Export to Excel
+      </button>
+      </p>
+           
     </div>
+    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+      <div className="flex-grow flex justify-end">
+        <input
+          type="text"
+          placeholder="Search students..."
+          className="input input-bordered max-w-xs text-black placeholder-black"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+      </div>
   </div>
-
-
-
-  <div className="flex items-center">
-                <p>
-                <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
-                  Export to Excel
-                </button>
-                </p>
-                
-            </div>
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>

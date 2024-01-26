@@ -9,7 +9,6 @@ function AddStudentReceipt() {
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
-    const [receiptNumber, setReceiptNumber] = useState(''); // Add receipt number to the state
     const [selectedFeeType, setSelectedFeeType] = useState(null);
 
 
@@ -19,9 +18,18 @@ function AddStudentReceipt() {
     };
 
 
-    const handleAmountChange = (e) => {
-        setAmountPaid(e.target.value);
+    
+    const handleAmountChange = (e, fee) => {
+        const amount = parseFloat(e.target.value);
+        if (amount > fee.pendingFee) {
+            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+            setAmountPaid(''); // Reset the amount field
+        } else {
+            setAmountPaid(amount);
+        }
     };
+    
+    
 
     const handleModeOfPaymentChange = (e) => {
         setModeOfPayment(e.target.value);
@@ -140,7 +148,6 @@ function AddStudentReceipt() {
                                         ...prevState,
                                         ...updatedFees,
                                     }));
-                                    setReceiptNumber(response.data.receiptNumber); // Set the receipt number
                                     setAmountPaid(''); // Reset the amount
                                     setModeOfPayment(''); // Reset the mode of payment
                                     setChequeNumber(''); // Reset the cheque number
@@ -187,6 +194,8 @@ function AddStudentReceipt() {
     return (
         <div className="main-container">
             <Navbar />
+            
+            <h2 className="text-2xl font-bold text-black-500 mb-4">{studentData.firstName} {studentData.surName}</h2>
             {feeTypes.map((fee, index) => (
                 <div key={index}>
                     <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
@@ -213,7 +222,12 @@ function AddStudentReceipt() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Paid:
-                                            <input type="number" value={amountPaid} onChange={handleAmountChange} />
+                                            <input
+                                                type="number"
+                                                value={amountPaid}
+                                                onChange={(e) => handleAmountChange(e, fee)}
+                                                max={fee.pendingFee}
+                                            />
                                         </label>
                                         <div>
                                             <p>Mode of Payment:</p>

@@ -2,6 +2,9 @@
 import Navbar from './Navbar';
 import React, { useState, useEffect } from 'react';
 
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 function Concessions() {
     const [students, setStudents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -78,18 +81,77 @@ function Concessions() {
     });
   };
   const filteredStudents = handleSearch(searchQuery);
+
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, 'students_data.xlsx');
+  };
+
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Application Number': student.applicationNumber,
+      'Parent Name': student.parentName,
+      'Branch': student.branch,
+      'Primary Contact': student.primaryContact,
+      'Gender': student.gender,
+      'Batch': student.batch,
+      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      'Course': student.course,
+      'Mode of Residence': student.modeOfResidence,
+      '1st Year Tuition Fee': student.firstYearTuitionFee,
+      '1st Year Hostel Fee': student.firstYearHostelFee,
+      '2nd Year Tuition Fee': student.secondYearTuitionFee,
+      '2nd Year Hostel Fee': student.secondYearHostelFee,
+      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
+      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
+      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
+      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
+      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
+      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
+      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
+      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+      // Add other fields if necessary
+    }));
+  };
     return (
         <div className="main-container">
           <Navbar />
-          <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered w-full max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
+          <div className="flex justify-center items-center">
+            <div className="flex items-center">
+              <p>
+              <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+                Export to Excel
+              </button>
+              </p>
+                  
+            </div>
+            <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+              <h2 className="text-2xl font-bold text-black-500 mb-4">CONCESSION</h2>
+              <div className="flex-grow flex justify-end">
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  className="input input-bordered max-w-xs text-black placeholder-black"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
+          </div>
+
+
           <div className="overflow-x-auto mt-3">
-            <h2 className="text-2xl font-bold text-black-500 mb-4">Add Concessions</h2>
             <table className="min-w-full border border-gray-800 border-collapse">
               <thead>
               <tr>

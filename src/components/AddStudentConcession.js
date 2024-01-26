@@ -187,6 +187,7 @@ function AddStudentConcession() {
     return (
         <div className="main-container">
             <Navbar />
+            
             {feeTypes.map((fee, index) => (
                 <div key={index}>
                     <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
