@@ -5,7 +5,6 @@ import { logout } from '../reducers/authReducer';
 
 function Navbar() {
   const user = useSelector((state) => state.auth.user);
-  console.log(user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
