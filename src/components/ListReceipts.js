@@ -246,42 +246,42 @@ function ListReceipts() {
 
                 <tbody>
                     {currentReceipts.map((receipt, index)  => (
-                        <tr className="hover:bg-[#00A0E3]" key={index}>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">
-                                <button onClick={() => handleDownload(receipt)} className="btn btn-blue">
+                        <tr className="hover:bg-[#00A0E3] hover:text-white" key={index}>
+                          <td className="border-2 border-gray-800 px-4 py-2">
+                                <button onClick={() => handleDownload(receipt)} className="btn btn-blue text-color-[#2D5990]">
                                     Download
                                 </button>
                           </td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.receiptNumber}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.dateOfPayment}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.studentName}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.parentName}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.applicationNumber}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.registeredMobileNumber}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.batch}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.dateOfJoining}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.stream}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.gender}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.branch}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.residenceType}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTuitionFeePayable}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTuitionFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearHostelFeePayable}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearHostelFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTuitionFeePayable}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTuitionFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearHostelFeePayable}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearHostelFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTotalTuitionFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTotalTuitionFeePending}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTotalHostelFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.firstYearTotalHostelFeePending}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTotalTuitionFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTotalTuitionFeePending}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTotalHostelFeePaid}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.secondYearTotalHostelFeePending}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.modeOfPayment}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2 text-black">{receipt.chequeNumber}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.dateOfPayment}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.studentName}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.parentName}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.applicationNumber}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.registeredMobileNumber}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.batch}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.dateOfJoining}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.stream}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.gender}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.branch}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.residenceType}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTuitionFeePayable}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTuitionFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearHostelFeePayable}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearHostelFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTuitionFeePayable}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTuitionFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearHostelFeePayable}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearHostelFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTotalTuitionFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTotalTuitionFeePending}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTotalHostelFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.firstYearTotalHostelFeePending}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTotalTuitionFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTotalTuitionFeePending}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTotalHostelFeePaid}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTotalHostelFeePending}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
                         </tr>
                     ))}
                     </tbody>
