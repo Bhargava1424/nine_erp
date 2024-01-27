@@ -55,6 +55,26 @@
           done();
         });
       });
+      describe('sendMail', function() {
+        it('should call sendMail successfully', function(done) {
+          // TODO: uncomment, update parameter values for sendMail call and complete the assertions
+          /*
+
+          instance.sendMail(body, function(error, data, response) {
+            if (error) {
+              done(error);
+              return;
+            }
+            // TODO: update response assertions
+            expect(data).to.be.a(SchoolManagementSystemApi.Response);
+
+            done();
+          });
+          */
+          // TODO: uncomment and complete method invocation above, then delete this line and the next:
+          done();
+        });
+      });
       describe('sendPassword', function() {
         it('should call sendPassword successfully', function(done) {
           // TODO: uncomment, update parameter values for sendPassword call and complete the assertions

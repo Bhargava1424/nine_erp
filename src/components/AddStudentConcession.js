@@ -109,15 +109,18 @@ function AddStudentConcession() {
                 }
             } else if(selectedFeeType === 'secondYearHostelFee') {
                 update = {
-                    'secondYearHostelFee': Math.max(0, studentData.secondYearHostelFee - amountWaived)
+                    'secondYearHostelFee': Math.max(0, studentData.secondYearHostelFee - amountWaived),
+                    'pendingSecondYearHostelFee': Math.max(0, studentData.pendingSecondYearHostelFee - amountWaived)
                 };
             } else if(selectedFeeType === 'secondYearTuitionFee') {
                 update = {
-                    'secondYearTuitionFee': Math.max(0, studentData.secondYearTuitionFee - amountWaived)
+                    'secondYearTuitionFee': Math.max(0, studentData.secondYearTuitionFee - amountWaived),
+                    'pendingSecondYearTuitionFee': Math.max(0, studentData.pendingSecondYearTuitionFee - amountWaived)
                 };
             } else if(selectedFeeType === 'firstYearHostelFee') {
                 update = {
-                    'firstYearHostelFee': Math.max(0, studentData.firstYearHostelFee - amountWaived)
+                    'firstYearHostelFee': Math.max(0, studentData.firstYearHostelFee - amountWaived),
+                    'pendingFirstYearHostelFee': Math.max(0, studentData.pendingFirstYearHostelFee - amountWaived)
                 };
             }
             const opts = {
@@ -139,18 +142,39 @@ function AddStudentConcession() {
                 try {
                   const responseBody = response.body; // Assuming response.body is already in JSON format
                   console.log(responseBody);
-        
                   // Reload the page
-                  window.location.reload();
+                //   window.location.reload();
                 } catch (parseError) {
                   console.error('Error parsing response:', parseError);
                 }
               }
             });
-          } catch (error) {
-            console.error("Error updating student: ", error);
-          }
+
+            const authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
+            let body = {
+                "subject": "Concession Added",
+                "message": "Concession :" + amountWaived + "\n" + 
+                    "Name :" + studentData.firstName + " " + studentData.surName + "\n"  +
+                    "Fee Type :" + selectedFeeType + "\n" +
+                    "for the following reason :" + reason + "\n",
             };
+            authorizationApi.sendMail(body, function(error, response) {
+                if (error) {
+                    console.error('API Error:', error);
+                } else {
+                    try {
+                        const responseBody = response.body; // Assuming response.body is already in JSON format
+                        console.log(responseBody);
+                        window.location.reload();
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Error updating student: ", error);
+        }
+    };
 
     if (loading) {
         return <div>Loading...</div>;
