@@ -4,6 +4,13 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const AddStudent = () => {
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = date.getFullYear();
+    return day + '-' + month + '-' + year;
+};
+
   const [studentData, setStudentData] = useState({
     firstName: '',
     surName: '',
@@ -13,7 +20,7 @@ const AddStudent = () => {
     secondaryContact: '',
     gender: '',
     batch: '',
-    dateOfJoining: new Date().toISOString().split('T')[0],
+    dateOfJoining: formatDate(new Date()),
     yearOfJoining: '',
     course: '',
     modeOfResidence: '',
@@ -476,7 +483,7 @@ const handleInputChange = (e) => {
                     <span className="label-text">Date of Joining</span>
                   </div>
                   <div className="rounded border border-gray-400 p-2 w-3/4">
-                    <span className="text-gray-700">{new Date().toISOString().split('T')[0]}</span>
+                    <span className="text-gray-700">{formatDate(new Date())}</span>
                   </div>
                 </label>
 
