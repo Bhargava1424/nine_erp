@@ -153,10 +153,10 @@ function AddStudentConcession() {
             const authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
             let body = {
                 "subject": "Concession Added",
-                "message": "Concession :" + amountWaived + "\n" + 
-                    "Name :" + studentData.firstName + " " + studentData.surName + "\n"  +
-                    "Fee Type :" + selectedFeeType + "\n" +
-                    "for the following reason :" + reason + "\n",
+                "message": "Concession : " + amountWaived + "\n" + 
+                    "Name : " + studentData.firstName + " " + studentData.surName + "\n"  +
+                    "Fee Type : " + selectedFeeType + "\n" +
+                    "for the following reason : " + reason + "\n",
             };
             authorizationApi.sendMail(body, function(error, response) {
                 if (error) {
