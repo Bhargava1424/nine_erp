@@ -219,15 +219,15 @@ function AddStudentReceipt() {
                     <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
                     <table className="table border border-black">
                         <thead>
-                            <tr>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
+                            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                                <th className="px-4 py-2 text-lg border border-black text-white">Applied Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-white">Paid Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-white">Pending Fee</th>
+                                <th className="px-4 py-2 text-lg border border-black text-white">Add Receipt</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="hover:bg-[#00A0E3]">
+                            <tr className="bg-[#F2F2F2]">
                                 <td className="text-lg text-black font-bold border border-black">{fee.fee}</td>
                                 <td className="text-lg text-black font-bold border border-black">{fee.paidFee}</td>
                                 <td className="text-lg text-black font-bold border border-black">{fee.pendingFee}</td>

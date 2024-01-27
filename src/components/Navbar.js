@@ -12,10 +12,11 @@ function Navbar() {
   const isAddStudentReceiptPage = location.pathname.startsWith('/AddStudentReceipt'); 
   const handleLogoClick = (e) => {
     if (isAddStudentReceiptPage) {
-      e.preventDefault();
-      window.location.reload();
+        e.preventDefault();
+        window.history.back();
     }
-  };
+};
+
 
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
@@ -76,7 +77,7 @@ function Navbar() {
               </div>
               {isProfileDropdownOpen && (
                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                  <li onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</li>
+                  <li onClick={handleLogout} className="btn btn-outline text-white" style={{ backgroundColor: '#00A0E3' }}>Logout</li>
                 </ul>
               )}
             </div>

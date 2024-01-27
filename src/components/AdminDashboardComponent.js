@@ -314,7 +314,7 @@ function AdminComponent() {
   <div className="flex justify-center items-center">
     <div className="flex items-center">
       <p>
-      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
         Export to Excel
       </button>
       </p>

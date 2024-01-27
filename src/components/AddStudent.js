@@ -185,7 +185,7 @@ const handleInputChange = (e) => {
         studentData.secondYearTuitionFee == null ||
         studentData.secondYearHostelFee == null) {
       alert('Please fill in all required fields.');
-      // console.log('Form Data:', studentData);
+       console.log('Form Data:', studentData);
       return false;
     }
   
@@ -298,7 +298,15 @@ const handleInputChange = (e) => {
   const branch = useSelector((state) => state.auth.branch);
     const role = useSelector((state) => state.auth.role);
 
-
+    useEffect(() => {
+      if (role === 'Executive' || role === 'Accountant') {
+          setStudentData(prevState => ({
+              ...prevState,
+              branch: branch // assuming 'branch' is the value fetched from your global state or prop
+          }));
+      }
+  }, [branch, role]);
+  
     return (
       <>
           <Navbar/>
