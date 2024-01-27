@@ -24,6 +24,7 @@ import {LoginRequest} from './model/LoginRequest';
 import {Receipt} from './model/Receipt';
 import {ReceiptCreateRequest} from './model/ReceiptCreateRequest';
 import {Response} from './model/Response';
+import {SendEmailRequest} from './model/SendEmailRequest';
 import {SendPasswordRequest} from './model/SendPasswordRequest';
 import {Student} from './model/Student';
 import {AuthorizationApi} from './api/AuthorizationApi';
@@ -130,6 +131,12 @@ export {
      * @property {module:model/Response}
      */
     Response,
+
+    /**
+     * The SendEmailRequest model constructor.
+     * @property {module:model/SendEmailRequest}
+     */
+    SendEmailRequest,
 
     /**
      * The SendPasswordRequest model constructor.
