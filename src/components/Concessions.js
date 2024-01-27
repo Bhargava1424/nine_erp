@@ -64,19 +64,7 @@ function Concessions() {
       return searchTerms.every(term =>
         student.firstName.toLowerCase().includes(term) ||
         student.surName.toLowerCase().includes(term) ||
-        student.parentName.toLowerCase().includes(term) ||
-        student.branch.toLowerCase().includes(term) ||
-        student.primaryContact.includes(term) ||
-        student.secondaryContact.includes(term) ||
-        student.gender.toLowerCase().includes(term) ||
-        student.batch.includes(term) ||
-        student.course.toLowerCase().includes(term) ||
-        student.modeOfResidence.toLowerCase().includes(term) ||
-        // Excluding fields related to Tuition and hostel fees
-        student.pendingFirstYearTuitionFee.toString().includes(term) ||
-        student.pendingFirstYearHostelFee.toString().includes(term) ||
-        student.pendingSecondYearTuitionFee.toString().includes(term) ||
-        student.pendingSecondYearHostelFee.toString().includes(term)
+        student.batch.includes(term) 
       );
     });
   };
@@ -101,28 +89,7 @@ function Concessions() {
   const mapDataToSchema = (data) => {
     return data.map(student => ({
       'Name': `${student.firstName} ${student.surName}`,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
       'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
-      // Add other fields if necessary
     }));
   };
     return (
@@ -151,28 +118,12 @@ function Concessions() {
           </div>
 
 
-          <div className="overflow-x-auto mt-3">
-            <table className="min-w-full border border-gray-800 border-collapse">
+          <div className="flex flex-col items-start">
+            <table className="border border-gray-800 border-collapse">
               <thead>
               <tr>
                 <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Secondary Contact</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,22 +134,15 @@ function Concessions() {
                         {`${student.firstName} ${student.surName}`.trim()}
                       </a>
                     </td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondaryContact}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearHostelFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearHostelFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
+                    <button style={{backgroundColor: '#2D5990', margin: '2px'}}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={() => window.location.href = `/AddStudentConcession?applicationNumber=${student.applicationNumber}`}
+                    >
+                      Add Concession
+                  </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

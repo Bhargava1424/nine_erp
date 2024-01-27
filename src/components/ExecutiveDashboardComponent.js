@@ -9,7 +9,7 @@ function ExecutiveComponent() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage] = useState(100);
 
   useEffect(() => {
     // Function to fetch students data from the backend

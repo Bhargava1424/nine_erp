@@ -113,28 +113,7 @@ function AddReceipts() {
   const mapDataToSchema = (data) => {
     return data.map(student => ({
       'Name': `${student.firstName} ${student.surName}`,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
       'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
-      // Add other fields if necessary
     }));
   };
     return (

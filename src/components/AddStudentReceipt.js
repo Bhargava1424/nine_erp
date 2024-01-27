@@ -10,6 +10,8 @@ function AddStudentReceipt() {
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
 
 
 
@@ -96,6 +98,12 @@ function AddStudentReceipt() {
             }
         };
 
+        if (isSubmitted) {
+            // Reset the form or fetch the latest data as required
+            // Reset the submission status
+            setIsSubmitted(false);
+        }
+
         if (applicationNumber) {
             fetchStudentData();
         }
@@ -107,6 +115,14 @@ function AddStudentReceipt() {
             alert("Please enter a valid amount.");
             return;
         }
+        if (modeOfPayment === '') {
+            alert("Please select a mode of payment.");
+            return;
+        }
+        if (modeOfPayment === 'CHEQUE' && !chequeNumber) {
+            alert("Please enter a cheque number.");
+            return;
+        }
 
         try {
             // Assuming the backend expects an object with the payment details
@@ -116,10 +132,10 @@ function AddStudentReceipt() {
                 chequeNumber: modeOfPayment === 'CHEQUE' ? chequeNumber : undefined,
             };
 
-            const updatedFees = {
-                paidFirstYearTuitionFee: studentData.paidFirstYearTuitionFee + paymentDetails.amountPaid,
-                pendingFirstYearTuitionFee: studentData.pendingFirstYearTuitionFee - paymentDetails.amountPaid,
-            };
+            // const updatedFees = {
+            //     paidFirstYearTuitionFee: studentData.paidFirstYearTuitionFee + paymentDetails.amountPaid,
+            //     pendingFirstYearTuitionFee: studentData.pendingFirstYearTuitionFee - paymentDetails.amountPaid,
+            // };
 
             // Replace with the correct URL and adjust according to your API and data structure
             // const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
@@ -146,7 +162,7 @@ function AddStudentReceipt() {
                                     console.log('Message:', response.message); // Logging the message from the response
                                     setStudentData(prevState => ({
                                         ...prevState,
-                                        ...updatedFees,
+                                        // ...updatedFees,
                                     }));
                                     setAmountPaid(''); // Reset the amount
                                     setModeOfPayment(''); // Reset the mode of payment
@@ -168,6 +184,8 @@ function AddStudentReceipt() {
                 } catch (err) {
                     console.error('Error:', err);
                 }
+
+                setIsSubmitted(true);
             };
 
     if (loading) {

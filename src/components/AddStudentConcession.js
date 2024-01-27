@@ -6,33 +6,23 @@ function AddStudentConcession() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [amountPaid, setAmountPaid] = useState('');
-    const [modeOfPayment, setModeOfPayment] = useState('');
-    const [chequeNumber, setChequeNumber] = useState('');
-    const [ConcessionNumber, setConcessionNumber] = useState(''); // Add Concession number to the state
+    const [amountWaived, setamountWaived] = useState('');
+    const [ConcessionNumber, setConcessionNumber] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
+    const [reason, setReason] = useState(''); 
+
 
 
 
     const handleAddConcessionClick = (feeTypeKey) => {
-        setSelectedFeeType(feeTypeKey); // Set the selected fee type
+        setSelectedFeeType(feeTypeKey); 
     };
 
 
     const handleAmountChange = (e) => {
-        setAmountPaid(e.target.value);
+        setamountWaived(e.target.value);
     };
 
-    const handleModeOfPaymentChange = (e) => {
-        setModeOfPayment(e.target.value);
-        if (e.target.value !== 'CHEQUE') {
-            setChequeNumber('');
-        }
-    };
-
-    const handleChequeNumberChange = (e) => {
-        setChequeNumber(e.target.value);
-    };
 
     
 
@@ -97,70 +87,69 @@ function AddStudentConcession() {
 
 
     const handleSubmit = async (feeTypeKey) => {
-        if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
+        if (!amountWaived || isNaN(amountWaived) || amountWaived <= 0) {
             alert("Please enter a valid amount.");
             return;
         }
 
+        if (!reason) {
+            alert("Please provide a reason for the concession.");
+            return;
+        }
+    
         try {
-            // Assuming the backend expects an object with the payment details
-            const paymentDetails = {
-                amountPaid: parseFloat(amountPaid),
-                modeOfPayment: modeOfPayment,
-                chequeNumber: modeOfPayment === 'CHEQUE' ? chequeNumber : undefined,
-            };
-
-            const updatedFees = {
-                paidFirstYearTuitionFee: studentData.paidFirstYearTuitionFee + paymentDetails.amountPaid,
-                pendingFirstYearTuitionFee: studentData.pendingFirstYearTuitionFee - paymentDetails.amountPaid,
-            };
-
-            // Replace with the correct URL and adjust according to your API and data structure
-            // const response = await axios.post(`http://localhost:5000/api/students/update-fees/${studentData._id}`, updatedFees);
             var SchoolManagementSystemApi = require('school_management_system_api');
-            var api = new SchoolManagementSystemApi.ConcessionsApi();
-            var body = new SchoolManagementSystemApi.ConcessionCreateRequest();
-            
-            body.applicationNumber = applicationNumber;
-            body.feeTypeKey = feeTypeKey;
-            body.amount = paymentDetails.amountPaid;
-            body.modeOfPayment = paymentDetails.modeOfPayment;
-            body.chequeNumber = paymentDetails.chequeNumber;
-
-            console.log(body);
-            
-                    api.ConcessionPost(body, function(error, response) {
-                        if (error) {
-                            console.error('API Error:', error);
-                        } else {
-                            // console.log('API Response:', response); // Log the full HTTP response
-                            try {
-                                var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
-                                if (responseBody && responseBody.message) {
-                                    console.log('Message:', responseBody.message); // Logging the message from the response
-                                    setStudentData(prevState => ({
-                                        ...prevState,
-                                        ...updatedFees,
-                                    }));
-                                    setConcessionNumber(responseBody.data.ConcessionNumber); // Set the Concession number
-                                    setAmountPaid(''); // Reset the amount
-                                    setModeOfPayment(''); // Reset the mode of payment
-                                    setChequeNumber(''); // Reset the cheque number
-                                }
-                            } catch (parseError) {
-                                console.error('Error parsing response:', parseError);
-                            }
-                        }
-                        if (response.status === 200) {
-                            // Include the amountPaid in the URL
-                            const ConcessionUrl = `/DownloadConcession?amountPaid=${amountPaid}&ConcessionNumber=${ConcessionNumber}`;
-                            window.open(ConcessionUrl, '_blank');
-
-                        }
-                    });
-                } catch (err) {
-                    console.error('Error:', err);
+            var api = new SchoolManagementSystemApi.DbApi();
+            let update={}
+            if(selectedFeeType === 'firstYearTuitionFee')
+            {
+                update={
+                    'firstYearTuitionFee': studentData.firstYearTuitionFee - amountWaived,
+                    'pendingFirstYearTuitionFee': studentData.pendingFirstYearTuitionFee - amountWaived
                 }
+            } else if(selectedFeeType === 'secondYearHostelFee') {
+                update = {
+                    'secondYearHostelFee': Math.max(0, studentData.secondYearHostelFee - amountWaived)
+                };
+            } else if(selectedFeeType === 'secondYearTuitionFee') {
+                update = {
+                    'secondYearTuitionFee': Math.max(0, studentData.secondYearTuitionFee - amountWaived)
+                };
+            } else if(selectedFeeType === 'firstYearHostelFee') {
+                update = {
+                    'firstYearHostelFee': Math.max(0, studentData.firstYearHostelFee - amountWaived)
+                };
+            }
+            const opts = {
+                
+              body: {
+                "collectionName": "students",
+                "query": {
+                  'applicationNumber': studentData.applicationNumber
+                },
+                "type": 'updateOne',
+                "update": update
+              }
+            };
+        
+            api.dbUpdate(opts, function(error, data, response) {
+              if (error) {
+                console.error('API Error:', error);
+              } else {
+                try {
+                  const responseBody = response.body; // Assuming response.body is already in JSON format
+                  console.log(responseBody);
+        
+                  // Reload the page
+                  window.location.reload();
+                } catch (parseError) {
+                  console.error('Error parsing response:', parseError);
+                }
+              }
+            });
+          } catch (error) {
+            console.error("Error updating student: ", error);
+          }
             };
 
     if (loading) {
@@ -183,6 +172,10 @@ function AddStudentConcession() {
     ];
 
     
+
+    const handleReasonChange = (e) => { // Add this function
+        setReason(e.target.value);
+    };
 
     return (
         <div className="main-container">
@@ -214,35 +207,23 @@ function AddStudentConcession() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Paid:
-                                            <input type="number" value={amountPaid} onChange={handleAmountChange} />
+                                            <input type="number" value={amountWaived} onChange={handleAmountChange} />
                                         </label>
-                                        <div>
-                                            <p>Mode of Payment:</p>
-                                            <label>
-                                                <input type="radio" value="BANK TRANSFER/UPI" checked={modeOfPayment === 'BANK TRANSFER/UPI'} onChange={handleModeOfPaymentChange} />
-                                                Bank Transfer/UPI
-                                            </label><p></p>
-                                            <label>
-                                                <input type="radio" value="CARD" checked={modeOfPayment === 'CARD'} onChange={handleModeOfPaymentChange} />
-                                                Card
-                                            </label><p></p>
-                                            <label>
-                                                <input type="radio" value="CASH" checked={modeOfPayment === 'CASH'} onChange={handleModeOfPaymentChange} />
-                                                Cash
-                                            </label><p></p>
-                                            <label>
-                                                <input type="radio" value="CHEQUE" checked={modeOfPayment === 'CHEQUE'} onChange={handleModeOfPaymentChange} />
-                                                Cheque
-                                            </label><p></p>
-                                            {modeOfPayment === 'CHEQUE' && (
-                                                <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
-                                            )}
-                                            <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
+                                        <label className="block mt-4">
+                                            <span className="text-gray-700">Reason:</span>
+                                            <textarea
+                                                className="form-textarea mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                rows="3"
+                                                placeholder="Enter reason here"
+                                                value={reason} // Add a state variable 'reason' to handle this
+                                                onChange={handleReasonChange} // Implement handleReasonChange to update 'reason'
+                                            ></textarea>
+                                        </label>
+                                        
+                                        
+                                        <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
                                                 Submit Payment
-                                            </button>                    
-
-                                            
-                                        </div>
+                                            </button>  
                                         {/* Add submission button or form handlers as needed */}
                                     </div>
                                 )} 
