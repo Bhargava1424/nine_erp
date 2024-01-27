@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
 import { useSelector } from 'react-redux';
-
+import { useNavigate } from 'react-router-dom';
 
 const AddStudent = () => {
   const [studentData, setStudentData] = useState({
@@ -190,55 +190,51 @@ const handleInputChange = (e) => {
   
   
   
-  
+  const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
+    e.preventDefault();    
 
-    e.preventDefault();
     if (validateForm()) {
-    const updatedStudentData = {
-          ...studentData,
-          pendingFirstYearHostelFee: studentData.firstYearHostelFee,
-          pendingSecondYearTuitionFee: studentData.secondYearTuitionFee,
-          pendingSecondYearHostelFee: studentData.secondYearHostelFee
-    };
-      console.log('Form Data:', studentData);
-      try {
-        var SchoolManagementSystemApi = require('school_management_system_api')
+        const updatedStudentData = {
+            ...studentData,
+            pendingFirstYearHostelFee: studentData.firstYearHostelFee,
+            pendingSecondYearTuitionFee: studentData.secondYearTuitionFee,
+            pendingSecondYearHostelFee: studentData.secondYearHostelFee
+        };
+        console.log('Form Data:', studentData);
+        try {
+            var SchoolManagementSystemApi = require('school_management_system_api')
+            var api = new SchoolManagementSystemApi.StudentsApi()
+            var body = new SchoolManagementSystemApi.Student(updatedStudentData);
+            SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
 
-        var api = new SchoolManagementSystemApi.StudentsApi()
-        var body = new SchoolManagementSystemApi.Student(updatedStudentData); // Pass the updatedStudentData object to the Student model
-        SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
+            api.studentsPost(body, function(error, data, response) {
+                if (error) {
+                    console.error('API Error:', error);
+                } else {
+                    try {
+                        var responseBody = JSON.parse(response.text);
+                        if (responseBody && responseBody.message) {
+                            setServerResponse(responseBody.message);
+                            if (responseBody.message.includes("Student created successfully")) { // **Check if message indicates success**
+                                navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                            }
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                    }
 
-        // console.log(body);
-
-        api.studentsPost(body, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-        } else {
-            // console.log('API Response:', response); // Log the full HTTP response
-            try {
-              var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
-              if (responseBody && responseBody.message) {
-                  // console.log('Message:', responseBody.message); // Logging the message from the response
-              }
-              setServerResponse(responseBody.message)
-              // console.log(responseBody.data)
-          } catch (parseError) {
-              // console.error('Error parsing response:', parseError);
-          }
-
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-              setShowSuccessMessage(false);
-          }, 3000);
-            }
-        });
-    } catch (error) {
-        console.error('Error:', error);
+                    setShowSuccessMessage(true);
+                    setTimeout(() => {
+                        setShowSuccessMessage(false);
+                    }, 3000);
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
-    }
-
-  };
+};
   const generateBatchOptions = () => {
     const startYear = 2022;
     const endYear = 2048;
