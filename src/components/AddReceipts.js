@@ -143,14 +143,15 @@ function AddReceipts() {
           <div className="flex flex-col items-start"> {/* Aligns children to the start of the flex container, effectively pushing the table to the left */}
             <table className="border border-gray-800 border-collapse">
               <thead>
-                <tr>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
+                <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                  <th className="px-4 py-2 text-white border-r-2 border-gray-800">Student Name</th>
+                  <th className="px-4 py-2 text-white border-r-2 border-gray-800">Batch</th>
+                  <th className="px-4 py-2 text-white border-r-2 border-gray-800">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.map((student, index) => (
-                  <tr className="hover:bg-[#00A0E3]" key={index}>
+                  <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
                         {`${student.firstName} ${student.surName}`.trim()}

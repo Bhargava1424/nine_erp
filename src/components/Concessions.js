@@ -121,9 +121,10 @@ function Concessions() {
           <div className="flex flex-col items-start">
             <table className="border border-gray-800 border-collapse">
               <thead>
-              <tr>
-                <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
+              <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Student Name</th>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Batch</th>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Action</th>
                 </tr>
               </thead>
               <tbody>

@@ -275,39 +275,39 @@ const handleEditSubmit = () => {
 
             <table className="min-w-full border border-gray-800 border-collapse">
             <thead>
-                <tr >
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Download</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Receipt Number</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Payment</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Registered Mobile Number</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Stream</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Residence Type</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee Payable</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee Payable</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee Payable</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee Payable</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Total Tuition Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Total Tuition Fee Pending</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Total Hostel Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Total Hostel Fee Pending</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Total Tuition Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Total Tuition Fee Pending</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Total Hostel Fee Paid</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Total Hostel Fee Pending</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Payment</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Cheque Number</th>
-                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Action</th>
+                <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Receipt Number</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Date of Payment</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Student Name</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Parent Name</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Application Number</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Registered Mobile Number</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Batch</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Date of Joining</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Stream</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Gender</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Branch</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Residence Type</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Tuition Fee Payable</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Tuition Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Hostel Fee Payable</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Hostel Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Tuition Fee Payable</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Tuition Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Hostel Fee Payable</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Hostel Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Total Tuition Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Total Tuition Fee Pending</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Total Hostel Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">1st Year Total Hostel Fee Pending</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Total Tuition Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Total Tuition Fee Pending</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Total Hostel Fee Paid</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">2nd Year Total Hostel Fee Pending</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Mode of Payment</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Cheque Number</th>
+                    <th className="px-4 py-2 text-white border-r-2 border-gray-800">Action</th>
                 </tr>
                 </thead>
 

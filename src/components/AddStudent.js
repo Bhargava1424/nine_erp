@@ -299,13 +299,12 @@ const handleInputChange = (e) => {
     const role = useSelector((state) => state.auth.role);
 
 
-  return (
-    <>
-    <Navbar/>
-    
-      <div className="container mx-auto p-4">   
-          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW STUDENT</h2>
-      </div>
+    return (
+      <>
+          <Navbar/>
+          <div className="container mx-auto p-4 text-center">   
+              <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW STUDENT</h2>
+          </div>
       <div className="AddStudent">
 
 
