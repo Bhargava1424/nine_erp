@@ -75,18 +75,10 @@ function ExecutiveComponent() {
             student.batch.includes(term) ||
             student.course.toLowerCase().includes(term) ||
             student.modeOfResidence.toLowerCase().includes(term) ||
-            student.firstYearTuitionFee.toString().includes(term) ||
-            student.firstYearHostelFee.toString().includes(term) ||
-            student.secondYearTuitionFee.toString().includes(term) ||
-            student.secondYearHostelFee.toString().includes(term) ||
             student.pendingFirstYearTuitionFee.toString().includes(term) ||
             student.pendingFirstYearHostelFee.toString().includes(term) ||
             student.pendingSecondYearTuitionFee.toString().includes(term) ||
-            student.pendingSecondYearHostelFee.toString().includes(term) ||
-            student.paidFirstYearTuitionFee.toString().includes(term) ||
-            student.paidFirstYearHostelFee.toString().includes(term) ||
-            student.paidSecondYearTuitionFee.toString().includes(term) ||
-            student.paidSecondYearHostelFee.toString().includes(term)
+            student.pendingSecondYearHostelFee.toString().includes(term)
             // Add any additional fields that you might have in your data structure
           );
     });
@@ -278,14 +270,6 @@ function ExecutiveComponent() {
       'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
       'Course': student.course,
       'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
       'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
       'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
       'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
@@ -312,72 +296,71 @@ function ExecutiveComponent() {
 
 <div className="overflow-x-auto mt-3">
   <div className="flex justify-center items-center">
-    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-    <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
-    <div className="flex-grow flex justify-end">
-      <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
+    <div className="flex items-center">
+      <p>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+        Export to Excel
+      </button>
+      </p>
+           
     </div>
+    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+      <div className="flex-grow flex justify-end">
+        <input
+          type="text"
+          placeholder="Search students..."
+          className="input input-bordered max-w-xs text-black placeholder-black"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+      </div>
   </div>
 
 
 
-  <div className="flex items-center">
-                <p>
-                <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
-                  Export to Excel
-                </button>
-                </p>
-                
-            </div>
+  
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>      
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Action</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Parent Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>     
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Action</th>
       </tr>
     </thead>
     <tbody>
       {currentStudents.map((student, index) => (
-        <tr className="hover:bg-[#00A0E3]" key={index}>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
-                      {`${student.firstName} ${student.surName}`.trim()}
-                    </td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">
-                  <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+    <td className="border-2 border-gray-800 px-4 py-2">{`${student.firstName} ${student.surName}`.trim()}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">
+        <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
             <i className="fas fa-edit"></i>
-          </button>
+        </button>
+    </td>
+</tr>
 
-          </td>
-        </tr>
       ))}
     </tbody>
   </table>

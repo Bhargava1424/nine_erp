@@ -150,14 +150,14 @@ function AddReceipts() {
               </thead>
               <tbody>
                 {filteredStudents.map((student, index) => (
-                  <tr className="hover:bg-[#00A0E3] hover:text-white" key={index}>
-                    <td className="border-2 border-gray-800 px-4 py-2">
+                  <tr className="hover:bg-[#00A0E3]" key={index}>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
                       <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
                         {`${student.firstName} ${student.surName}`.trim()}
                       </a>
                     </td>
-                    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2">
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
                     <button style={{backgroundColor: '#2D5990', margin: '2px'}}
                       className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded"
                       onClick={() => window.location.href = `/AddStudentReceipt?applicationNumber=${student.applicationNumber}`}

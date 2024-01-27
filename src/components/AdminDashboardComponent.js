@@ -365,36 +365,34 @@ function AdminComponent() {
     </thead>
     <tbody>
       {currentStudents.map((student, index) => (
-        <tr className="hover:bg-[#00A0E3] hover:text-white"  key={index}>
-                    <td className="border-2 border-gray-800 px-4 py-2">
-                      {`${student.firstName} ${student.surName}`.trim()}
-                    </td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2">
-                  <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+    <td className="border-2 border-gray-800 px-4 py-2">{`${student.firstName} ${student.surName}`.trim()}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
+    <td className="border-2 border-gray-800 px-4 py-2">
+        <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
             <i className="fas fa-edit"></i>
-          </button>
+        </button>
+    </td>
+</tr>
 
-          </td>
-        </tr>
       ))}
     </tbody>
   </table>

@@ -319,7 +319,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Student's Surname/Initial"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="surName"
               value={studentData.surName}
               onChange={(e) => {
@@ -337,7 +337,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Student's First Name"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="firstName"
               value={studentData.firstName}
               onChange={(e) => {
@@ -351,15 +351,15 @@ const handleInputChange = (e) => {
 
 
         </div>
-        <div className="flex justify-between space-x-1">        {/* parent Name and branch Field */}
-          <label className="form-control w-1/2 pr-2">
-            <div className="label">
-              <span className="label-text">Parent's Name</span>
+        <div className="flex justify-between space-x-1 ">        {/* parent Name and branch Field */}
+          <label className="form-control w-1/2 pr-2 ">
+            <div className="label ">
+              <span className="label-text ">Parent's Name</span>
             </div>
             <input
               type="text"
               placeholder="Parent's Name"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="parentName"
               value={studentData.parentName}
               onChange={(e) => {
@@ -380,7 +380,7 @@ const handleInputChange = (e) => {
               (role === 'Executive' || role === 'Accountant') ? (
                 <input
                   type="text"
-                  className="input input-bordered w-full max-w-xs"
+                  className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                   value={branch}
                   readOnly
                 />
@@ -409,7 +409,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Primary Contact"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="primaryContact"
               value={studentData.primaryContact}
               onChange={(e) => {
@@ -428,7 +428,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Secondary Contact"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="secondaryContact"
               value={studentData.secondaryContact}
               onChange={(e) => {
@@ -493,7 +493,7 @@ const handleInputChange = (e) => {
                     </div>
                     <input
                         type="text"
-                        className="input input-bordered w-full max-w-xs"
+                        className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                         name="yearOfJoining"
                         value={studentData.yearOfJoining}
                         readOnly // This makes the field read-only
@@ -553,7 +553,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="1st Year Tuition Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearTuitionFee"
                     value={studentData.firstYearTuitionFee}
                     onChange={handleInputChange}
@@ -567,7 +567,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="1st Year Hostel Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearHostelFee"
                     value={studentData.firstYearHostelFee}
                     onChange={handleInputChange}
@@ -583,7 +583,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="2nd Year Tuition Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearTuitionFee"
                     value={studentData.secondYearTuitionFee}
                     onChange={handleInputChange}
@@ -596,7 +596,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="2nd Year Hostel Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearHostelFee"
                     value={studentData.secondYearHostelFee}
                     onChange={handleInputChange}
@@ -609,8 +609,8 @@ const handleInputChange = (e) => {
           <div className="label">
             <span className="label-text">Student Status</span>
           </div>
-          <div className="rounded border border-gray-400 p-2 w-3/4">
-                    <span className="text-gray-700">{studentData.studentStatus}</span>
+          <div className="rounded border border-gray-400 p-2 w-3/4 ">
+                    <span className="text-gray-700 ">{studentData.studentStatus}</span>
                   </div>
         </label>
 

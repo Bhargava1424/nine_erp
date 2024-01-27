@@ -128,7 +128,7 @@ function Concessions() {
               </thead>
               <tbody>
                 {filteredStudents.map((student, index) => (
-                  <tr className="hover:bg-[#00A0E3] hover:text-white" key={index}>
+                  <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
                     <td className="border-2 border-gray-800 px-4 py-2">
                       <a href={`/AddStudentConcession?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
                         {`${student.firstName} ${student.surName}`.trim()}

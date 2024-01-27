@@ -10,7 +10,8 @@ function ListReceipts() {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage] = useState(100);
-    
+    const [editingReceipt, setEditingReceipt] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const currentDate = new Date();
     const fourDaysAgo = new Date(currentDate);
     fourDaysAgo.setDate(currentDate.getDate() - 4);
@@ -80,7 +81,72 @@ function ListReceipts() {
             );
         });
     };
+    const openEditModal = (receipt) => {
+      setEditingReceipt({ ...receipt });
+      setIsEditModalOpen(true);
+  };
 
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'modeOfPayment' && value !== 'Cheque') {
+        // If mode of payment is changed from 'Cheque' to something else, set chequeNumber to null
+        setEditingReceipt({ ...editingReceipt, [name]: value, chequeNumber: null });
+    } else {
+        setEditingReceipt({ ...editingReceipt, [name]: value });
+    }
+};
+const handleEditSubmit = () => {
+  // Include logic to ensure that chequeNumber is null if modeOfPayment is not 'Cheque'
+  const updatedReceipt = {
+      ...editingReceipt,
+      chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber
+  };
+  if (editingReceipt.modeOfPayment === 'Cheque' && !editingReceipt.chequeNumber) {
+    alert("Please enter the Cheque Number.");
+    return; // Do not proceed with submission
+}
+      try {
+          var SchoolManagementSystemApi = require('school_management_system_api');
+          var api = new SchoolManagementSystemApi.DbApi();
+          const opts = {
+              body: {
+                  "collectionName": "receipts",
+                  "query": {
+                      'receiptNumber': updatedReceipt.receiptNumber
+                  },
+                  "type": 'updateOne',
+                  "update": {
+                      "modeOfPayment": updatedReceipt.modeOfPayment,
+                      "amountPaid":updatedReceipt.amountPaid,
+                      "chequeNumber":updatedReceipt.chequeNumber
+                  }
+              }
+          };
+
+          api.dbUpdate(opts, function (error, data, response) {
+              if (error) {
+                  console.error('API Error:', error);
+              } else {
+                  try {
+                      const responseBody = response.body; // Assuming response.body is already in JSON format
+                      console.log(responseBody);
+
+                      // Close the modal and reset editingReceipt
+                      setIsEditModalOpen(false);
+                      setEditingReceipt(null);
+
+                      // Fetch updated receipts
+                      fetchReceipts();
+                      window.location.reload();
+                  } catch (parseError) {
+                      console.error('Error parsing response:', parseError);
+                  }
+              }
+          });
+      } catch (error) {
+          console.error("Error updating receipt: ", error);
+      }
+  };
     const filteredReceipts = handleSearch(searchTerm);
 
     // Calculate the pagination
@@ -241,14 +307,15 @@ function ListReceipts() {
                     <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Total Hostel Fee Pending</th>
                     <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Payment</th>
                     <th className="px-4 py-2 text-black border-r-2 border-gray-800">Cheque Number</th>
+                    <th className="px-4 py-2 text-black border-r-2 border-gray-800">Action</th>
                 </tr>
                 </thead>
 
                 <tbody>
                     {currentReceipts.map((receipt, index)  => (
-                        <tr className="hover:bg-[#00A0E3] hover:text-white" key={index}>
+                        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
                           <td className="border-2 border-gray-800 px-4 py-2">
-                                <button onClick={() => handleDownload(receipt)} className="btn btn-blue text-color-[#2D5990]">
+                                <button style={{backgroundColor: '#2D5990'}} onClick={() => handleDownload(receipt)} className="btn btn-blue text-white">
                                     Download
                                 </button>
                           </td>
@@ -282,6 +349,11 @@ function ListReceipts() {
                           <td className="border-2 border-gray-800 px-4 py-2">{receipt.secondYearTotalHostelFeePending}</td>
                           <td className="border-2 border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
+                          <td className="border-2 border-gray-800 px-4 py-2">
+                                <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
+                                <i className="fas fa-edit"></i>
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
@@ -290,7 +362,37 @@ function ListReceipts() {
                 {renderPageNumbers}
             </div>
         </div>
-        
+        {isEditModalOpen && (
+    <div className="edit-modal">
+        <h3 className="text-lg font-semibold mb-4">Edit Receipt</h3>
+        <p><strong>Student Name:</strong> {editingReceipt.studentName}</p>
+        <p><strong>Receipt Number:</strong> {editingReceipt.receiptNumber}</p>
+        <p><strong>Type of Payment:</strong> {editingReceipt.typeOfPayment}</p>
+        <label className="form-control">
+            <span className="label-text">Mode of Payment</span>
+            <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
+                <option value="">Select Mode of Payment</option>
+                <option value="Bank Transfer/UPI">Bank Transfer/UPI</option>
+                <option value="Card">Card</option>
+                <option value="Cash">Cash</option>
+                <option value="Cheque">Cheque</option>
+            </select>
+        </label>
+        {editingReceipt.modeOfPayment === 'Cheque' && (
+            <label className="form-control">
+                <span className="label-text">Cheque Number</span>
+                <input type="text" name="chequeNumber" value={editingReceipt.chequeNumber || ''} onChange={handleEditChange} required />
+            </label>
+        )}
+        <label className="form-control">
+            <span className="label-text">Amount Paid</span>
+            <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
+        </label>
+        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
+        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+    </div>
+)}
+      
       </div>
     );
   }
