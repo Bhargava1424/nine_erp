@@ -303,13 +303,12 @@ const handleInputChange = (e) => {
     <>
     <Navbar/>
     
-    <div className="container mx-auto p-4">      
-      <h2 className="text-2xl font-bold mb-4">ADD NEW STUDENT</h2>
+      <div className="container mx-auto p-4">   
+          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW STUDENT</h2>
+      </div>
       <div className="AddStudent">
 
 
-        {/* Rest of your form code */}
-    </div> 
       <form onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-4">
         <div className="flex justify-between space-x-1">  {/* First Name and last name Field */}
                   {/* surName Name Field */}
