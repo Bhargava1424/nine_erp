@@ -11,7 +11,9 @@ function HeroSection2() {
   localStorage.setItem('userRole', userRole);
   
   return (
-    <div className="hero-section">
+    <div className="hero-section">   
+
+
       {!userRole && <LoginComponent />}
       {userRole === 'Manager' && <AdminComponent/>}
       {userRole === 'Executive' && <ExecutiveComponent />}

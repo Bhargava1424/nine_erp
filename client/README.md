@@ -90,6 +90,7 @@ All URIs are relative to *http://34.125.142.249:5000/v1*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *SchoolManagementSystemApi.AuthorizationApi* | [**login**](docs/AuthorizationApi.md#login) | **POST** /login | Login
+*SchoolManagementSystemApi.AuthorizationApi* | [**sendMail**](docs/AuthorizationApi.md#sendMail) | **POST** /send_mail | Send mail
 *SchoolManagementSystemApi.AuthorizationApi* | [**sendPassword**](docs/AuthorizationApi.md#sendPassword) | **POST** /send_password | Send password
 *SchoolManagementSystemApi.BranchesApi* | [**branchesPost**](docs/BranchesApi.md#branchesPost) | **POST** /branches | Create a new branch
 *SchoolManagementSystemApi.DbApi* | [**dbGet**](docs/DbApi.md#dbGet) | **POST** /db/get | Retrieve all data from database
@@ -111,6 +112,7 @@ Class | Method | HTTP request | Description
  - [SchoolManagementSystemApi.Receipt](docs/Receipt.md)
  - [SchoolManagementSystemApi.ReceiptCreateRequest](docs/ReceiptCreateRequest.md)
  - [SchoolManagementSystemApi.Response](docs/Response.md)
+ - [SchoolManagementSystemApi.SendEmailRequest](docs/SendEmailRequest.md)
  - [SchoolManagementSystemApi.SendPasswordRequest](docs/SendPasswordRequest.md)
  - [SchoolManagementSystemApi.Student](docs/Student.md)
 

@@ -1,6 +1,8 @@
 // AddReceipts.js
 import Navbar from './Navbar';
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 import { useSelector } from 'react-redux';  
 
@@ -80,6 +82,8 @@ function AddReceipts() {
     });
   };
 
+  
+
   const user = useSelector((state) => state.auth.user);
   const userRole = user?.role; // Assuming your user object has a role property
 
@@ -88,62 +92,86 @@ function AddReceipts() {
     return <div />;
   }
   const filteredStudents = handleSearch(searchQuery);
+
+
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, 'students_data.xlsx');
+  };
+
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Batch': student.batch,
+    }));
+  };
     return (
         <div className="main-container">
           <Navbar />
-          <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered w-full max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
-          <div className="overflow-x-auto mt-3">
-            <h2 className="text-2xl font-bold text-black-500 mb-4">Add Receipts</h2>
-            <table className="min-w-full border border-gray-800 border-collapse">
+          <div className="flex justify-center items-center">
+            <div className="flex items-center">
+              <p>
+              <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+                Export to Excel
+              </button>
+              </p>
+                  
+            </div>
+            <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+              <h2 className="text-2xl font-bold text-black-500 mb-4">ADD RECEIPTS</h2>
+              <div className="flex-grow flex justify-end">
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  className="input input-bordered max-w-xs text-black placeholder-black"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
+          </div>
+          <div className="flex flex-col items-start"> {/* Aligns children to the start of the flex container, effectively pushing the table to the left */}
+            <table className="border border-gray-800 border-collapse">
               <thead>
-              <tr>  
-                <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent's Name</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Secondary Contact</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
+                <tr>
+                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
                   <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-                  <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.map((student, index) => (
-                  <tr className="hover:bg-[#00A0E3]" key={index}>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
+                  <tr className="hover:bg-[#00A0E3] hover:text-white" key={index}>
+                    <td className="border-2 border-gray-800 px-4 py-2">
                       <a href={`/AddStudentReceipt?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
                         {`${student.firstName} ${student.surName}`.trim()}
                       </a>
                     </td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondaryContact}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2">
+                    <button style={{backgroundColor: '#2D5990', margin: '2px'}}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={() => window.location.href = `/AddStudentReceipt?applicationNumber=${student.applicationNumber}`}
+                    >
+                      Add Receipt
+                  </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+
       
         </div>
       );

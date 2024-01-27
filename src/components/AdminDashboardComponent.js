@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
-function AccountantComponent() {
+function AdminComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage] = useState(100);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -94,22 +94,20 @@ function AccountantComponent() {
 
   const filteredStudents = handleSearch(searchQuery);
 
+  let totalPages = 0;
+  let currentStudents = []; 
+  if (filteredStudents) {
+    totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+    const indexOfLastStudent = currentPage * rowsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+    currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
-  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
-
-  // Get current page students
-  const indexOfLastStudent = currentPage * rowsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Handle change in rows per page
-  const handleRowsPerPageChange = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setCurrentPage(1); // Reset to first page
-  };
 
   // Render pagination
   const renderPageNumbers = () => {
@@ -185,28 +183,57 @@ function AccountantComponent() {
     }
   
     try {
-
-      // Placeholder for Edit student
-      // Update the students array with the edited student locally
-      const updatedStudents = students.map(student => {
-        return student ;
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "students",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber
+          },
+          "type": 'updateOne',
+          "update": {
+            "firstName": editingStudent.firstName,
+            "surName": editingStudent.surName,
+            "parentName": editingStudent.parentName,
+            "primaryContact": editingStudent.primaryContact,
+            "secondaryContact": editingStudent.secondaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "course": editingStudent.course,
+            "modeOfResidence": editingStudent.modeOfResidence,
+            "studentStatus": editingStudent.studentStatus,
+          }
+        }
+      };
+  
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
+  
+            // Close the modal and reset editingStudent
+            setIsEditModalOpen(false);
+            setEditingStudent(null);
+  
+            // Display success message with changes
+            console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
+  
+            // Reload the page
+            window.location.reload();
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
       });
-  
-      setStudents(updatedStudents);
-      console.log("Updated Students:", updatedStudents); // Debugging
-  
-      // Close the modal and reset editingStudent
-      setIsEditModalOpen(false);
-      
-      // Display success message with changes
-      alert(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
-  
-      setEditingStudent(null);
-      window.location.reload();
     } catch (error) {
       console.error("Error updating student: ", error);
     }
-  };
+  }; 
   
   
   
@@ -271,94 +298,103 @@ function AccountantComponent() {
 
 
   return (
+
+    
     <div className="main-container">
-      <input
-        type="text"
-        placeholder="Search students..."
-        className="input input-bordered w-full max-w-xs text-black placeholder-black"
-        value={searchQuery}
-        onChange={handleSearchChange}
-      />
+
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
+          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
+          <p className="text-red-600 text-lg font-semibold">
+            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
+          </p>
+        </div>
+        
       
 
 <div className="overflow-x-auto mt-3">
-  <h2 className="text-2xl font-bold text-black-500 mb-4">Student Data</h2>
-  <div className="flex items-center">
-                <label htmlFor="rowsPerPage" className="mr-2 text-lg">Rows per page:</label>
-                <select 
-                    id="rowsPerPage"
-                    value={rowsPerPage} 
-                    onChange={handleRowsPerPageChange}
-                    className="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                >
-                    {[5, 10, 20, 30, 40, 50, 100, 200].map(num => (
-                        <option key={num} value={num}>{num}</option>
-                    ))}
-                </select>
-            </div>
+  <div className="flex justify-center items-center">
+    <div className="flex items-center">
+      <p>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#2D5990', margin: '20px'}}>
+        Export to Excel
+      </button>
+      </p>
+           
+    </div>
+    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+      <div className="flex-grow flex justify-end">
+        <input
+          type="text"
+          placeholder="Search students..."
+          className="input input-bordered max-w-xs text-black placeholder-black"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+      </div>
+  </div>
+
+
+
+  
   
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
-      <tr>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Edit</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Branch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Date of Joining</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Mode of Residence</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">2nd Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Paid 2nd Year Hostel Fee</th>        
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2 text-black border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+      <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Parent Name</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Hostel Fee</th>        
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
+        <th className="px-4 py-2  border-r-2 border-gray-800">Action</th>
       </tr>
     </thead>
     <tbody>
       {currentStudents.map((student, index) => (
-        <tr className="hover:bg-[#00A0E3]" key={index}>
-         <td className="border-2 border-gray-800 px-4 py-2 text-black">
-         <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-  <i className="fas fa-edit"></i>
-</button>
-
-</td>
-
-                    <td className="border-2 border-gray-800 px-4 py-2 text-black">
+        <tr className="hover:bg-[#00A0E3] hover:text-white"  key={index}>
+                    <td className="border-2 border-gray-800 px-4 py-2">
                       {`${student.firstName} ${student.surName}`.trim()}
                     </td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.applicationNumber}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.branch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.primaryContact}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.gender}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.batch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : ''}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.course}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.modeOfResidence}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.firstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.secondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.paidFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.paidFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.paidSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.paidSecondYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-black">{student.pendingSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2">
+                  <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+            <i className="fas fa-edit"></i>
+          </button>
+
+          </td>
         </tr>
       ))}
     </tbody>
@@ -431,6 +467,14 @@ function AccountantComponent() {
           </select>
         </label>
 
+        <label className="form-control">
+          <span className="label-text">Student Status</span>
+          <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
+            <option value="Active">ACTIVE</option>
+            <option value="Cancelled">CANCELLED</option>
+          </select>
+        </label>
+
         <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
         <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
@@ -439,12 +483,10 @@ function AccountantComponent() {
         {renderPageNumbers()}
       </div>
 
-      <button onClick={exportToExcel} className="btn btn-primary">
-        Export to Excel
-      </button>
+      
 
 </div>
   );
 }
 
-export default AccountantComponent;
+export default AdminComponent;

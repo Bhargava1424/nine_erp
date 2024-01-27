@@ -268,6 +268,10 @@ function AddEmployee() {
   return (
     <>
       <Navbar />
+
+      <div className="flex justify-center items-center">
+          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD EMPLOYEE</h2>
+      </div>
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-bold mb-4">Add New Employee</h2>
         <div className="flex items-center mb-4">

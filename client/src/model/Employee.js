@@ -50,7 +50,7 @@ export class Employee {
       if (data.hasOwnProperty('password'))
         obj.password = ApiClient.convertToType(data['password'], 'String');
       if (data.hasOwnProperty('phoneNumber'))
-        obj.employeeId = ApiClient.convertToType(data['phoneNumber'], 'String');
+        obj.phoneNumber = ApiClient.convertToType(data['phoneNumber'], 'String');
     }
     return obj;
   }

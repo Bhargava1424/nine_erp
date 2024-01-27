@@ -17,6 +17,7 @@ import {ApiClient} from "../ApiClient";
 import {Error} from '../model/Error';
 import {LoginRequest} from '../model/LoginRequest';
 import {Response} from '../model/Response';
+import {SendEmailRequest} from '../model/SendEmailRequest';
 import {SendPasswordRequest} from '../model/SendPasswordRequest';
 
 /**
@@ -81,6 +82,53 @@ export class AuthorizationApi {
 
       return this.apiClient.callApi(
         '/login', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+    /**
+     * Callback function to receive the result of the sendMail operation.
+     * @callback moduleapi/AuthorizationApi~sendMailCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Response{ data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Send mail
+     * Send mail.
+     * @param {module:model/SendEmailRequest} body 
+     * @param {module:api/AuthorizationApi~sendMailCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
+     */
+    sendMail(body, callback) {
+      
+      let postBody = body;
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling sendMail");
+      }
+
+      let pathParams = {
+        
+      };
+      let queryParams = {
+        
+      };
+      let headerParams = {
+        
+      };
+      let formParams = {
+        
+      };
+
+      let authNames = [];
+      let contentTypes = ['application/json'];
+      let accepts = ['application/json'];
+      let returnType = Response;
+
+      return this.apiClient.callApi(
+        '/send_mail', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

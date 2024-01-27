@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **branch** | **String** |  | [optional] 
 **username** | **String** |  | [optional] 
 **password** | **String** |  | [optional] 
+**phoneNumber** | **String** |  | [optional] 
 
 <a name="RoleEnum"></a>
 ## Enum: RoleEnum

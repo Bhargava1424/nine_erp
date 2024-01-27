@@ -1,9 +1,16 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
 import { useSelector } from 'react-redux';
-
+import { useNavigate } from 'react-router-dom';
 
 const AddStudent = () => {
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = date.getFullYear();
+    return day + '-' + month + '-' + year;
+};
+
   const [studentData, setStudentData] = useState({
     firstName: '',
     surName: '',
@@ -13,7 +20,7 @@ const AddStudent = () => {
     secondaryContact: '',
     gender: '',
     batch: '',
-    dateOfJoining: new Date().toISOString().split('T')[0],
+    dateOfJoining: formatDate(new Date()),
     yearOfJoining: '',
     course: '',
     modeOfResidence: '',
@@ -29,8 +36,37 @@ const AddStudent = () => {
     paidFirstYearHostelFee: 0,
     paidSecondYearTuitionFee: 0,
     paidSecondYearHostelFee: 0,
-    studentStatus: '',
+    studentStatus: 'Active',
   });
+  const [isOnTC, setIsOnTC] = useState(false);
+  const [isDayScholar, setIsDayScholar] = useState(false);
+
+  // useEffect hook for handling changes in isOnTC state
+  useEffect(() => {
+    if (isOnTC) {
+      setStudentData(prevState => ({
+        ...prevState,
+        firstYearTuitionFee: 0,
+        pendingFirstYearTuitionFee: 0,
+        firstYearHostelFee: 0,
+        pendingFirstYearHostelFee: 0
+      }));
+    }
+  }, [isOnTC]);
+
+  // useEffect hook for handling changes in isDayScholar state
+  useEffect(() => {
+    if (isDayScholar) {
+      setStudentData(prevState => ({
+        ...prevState,
+        firstYearHostelFee: 0,
+        pendingFirstYearHostelFee: 0,
+        secondYearHostelFee: 0,
+        pendingSecondYearHostelFee: 0
+      }));
+    }
+  }, [isDayScholar]);
+
   const initializeFees = () => {
     setStudentData((prevData) => ({
       ...prevData,
@@ -44,7 +80,6 @@ const AddStudent = () => {
   useEffect(() => {
     initializeFees();
   }, []);
-  const [showInstructions, setShowInstructions] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [serverResponse, setServerResponse] = useState('None')
   const [errors, setErrors] = useState({
@@ -52,11 +87,15 @@ const AddStudent = () => {
     secondaryContactError: '',
 });
 
-
 const handleInputChange = (e) => {
   const { name, value } = e.target;
   let newErrors = { ...errors };
   let updatedValue = value;
+
+  // Additional logic for modeOfResidence
+  if (name === 'modeOfResidence') {
+    setIsDayScholar(value === 'Day Scholar');
+  }
 
   // Convert firstName, surName, and parentName to uppercase and allow only alphabets
   if (name === 'firstName' || name === 'surName' || name === 'parentName') {
@@ -79,31 +118,32 @@ const handleInputChange = (e) => {
       }
   }
 
-  // Update student data with new values
   setStudentData(prevState => {
-      let newState = { ...prevState, [name]: updatedValue };
+    let newState = { ...prevState, [name]: updatedValue };
 
-      // Copy first-year fees to second-year fields and pending fees
-      if (name === 'firstYearTuitionFee') {
-          newState = { ...newState, secondYearTuitionFee: updatedValue, pendingFirstYearTuitionFee: updatedValue };
-      } else if (name === 'firstYearHostelFee') {
-          newState = { ...newState, secondYearHostelFee: updatedValue, pendingFirstYearHostelFee: updatedValue };
-      }
+    // Copy first-year fees to second-year fields and pending fees
+    if (name === 'firstYearTuitionFee') {
+      newState.secondYearTuitionFee = updatedValue;
+      newState.pendingFirstYearTuitionFee = updatedValue;
+    } else if (name === 'firstYearHostelFee') {
+      newState.secondYearHostelFee = updatedValue;
+      newState.pendingFirstYearHostelFee = updatedValue;
+    }
 
-      // Update pending fees for second-year fields
-      if (name === 'secondYearTuitionFee') {
-          newState = { ...newState, pendingSecondYearTuitionFee: updatedValue };
-      } else if (name === 'secondYearHostelFee') {
-          newState = { ...newState, pendingSecondYearHostelFee: updatedValue };
-      }
+    // Update pending fees for second-year fields
+    if (name === 'secondYearTuitionFee') {
+      newState.pendingSecondYearTuitionFee = updatedValue;
+    } else if (name === 'secondYearHostelFee') {
+      newState.pendingSecondYearHostelFee = updatedValue;
+    }
 
-      // Extract the year of joining from batch if batch is changed
-      if (name === 'batch') {
-          const yearOfJoining = value.substring(0, 4); // Extracting the first four characters
-          newState = { ...newState, yearOfJoining: yearOfJoining };
-      }
+    // Extract the year of joining from batch if batch is changed
+    if (name === 'batch') {
+      const yearOfJoining = value.substring(0, 4); // Extracting the first four characters
+      newState.yearOfJoining = yearOfJoining;
+    }
 
-      return newState;
+    return newState;
   });
 
   // Update errors
@@ -122,19 +162,12 @@ const handleInputChange = (e) => {
     return true;
   };
 
-  const [isOnTC, setIsOnTC] = useState(false);
+
+  
 
 
   const validateForm = () => {
-    // Skip validation for 1st year fees if batch is 'On TC'
-    if (!isOnTC) {
-      if (!studentData.firstYearTuitionFee || !studentData.firstYearHostelFee) {
-          alert('Please fill in all required fields.');
-          return false;
-      }
-    }
-
-    // Validate other fields as normal
+    // Validate all fields including fees
     if (!studentData.firstName.trim() ||
         !studentData.surName.trim() ||
         !studentData.parentName.trim() || 
@@ -146,70 +179,69 @@ const handleInputChange = (e) => {
         !studentData.branch || 
         !studentData.dateOfJoining ||   
         !studentData.course || 
-        !studentData.modeOfResidence || 
-        !studentData.secondYearTuitionFee || 
-        !studentData.secondYearHostelFee || 
-        !studentData.studentStatus) {
-        alert('Please fill in all required fields.');
-        return false;
+        !studentData.modeOfResidence ||
+        studentData.firstYearTuitionFee == null ||
+        studentData.firstYearHostelFee == null ||
+        studentData.secondYearTuitionFee == null ||
+        studentData.secondYearHostelFee == null) {
+      alert('Please fill in all required fields.');
+      // console.log('Form Data:', studentData);
+      return false;
     }
-
   
-    // Additional validation logic can be added here
-    // For example, checking if the contact fields contain only numbers
+    // Additional validation logic for other conditions
   
     // If all validations pass
     return true;
   };
   
+  
+  
+  const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
-    console.log('Form Data:', studentData);
-    e.preventDefault();
+    e.preventDefault();    
+
     if (validateForm()) {
-      const updatedStudentData = {
-          ...studentData,
-          pendingFirstYearTuitionFee: studentData.firstYearTuitionFee,
-          pendingFirstYearHostelFee: studentData.firstYearHostelFee,
-          pendingSecondYearTuitionFee: studentData.secondYearTuitionFee,
-          pendingSecondYearHostelFee: studentData.secondYearHostelFee
-      };
-      try {
-        var SchoolManagementSystemApi = require('school_management_system_api')
+        const updatedStudentData = {
+            ...studentData,
+            pendingFirstYearHostelFee: studentData.firstYearHostelFee,
+            pendingSecondYearTuitionFee: studentData.secondYearTuitionFee,
+            pendingSecondYearHostelFee: studentData.secondYearHostelFee
+        };
+        console.log('Form Data:', studentData);
+        try {
+            var SchoolManagementSystemApi = require('school_management_system_api')
+            var api = new SchoolManagementSystemApi.StudentsApi()
+            var body = new SchoolManagementSystemApi.Student(updatedStudentData);
+            SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
 
-        var api = new SchoolManagementSystemApi.StudentsApi()
-        var body = new SchoolManagementSystemApi.Student(updatedStudentData); // Pass the updatedStudentData object to the Student model
-        SchoolManagementSystemApi.Student.constructFromObject(updatedStudentData, body);
+            api.studentsPost(body, function(error, data, response) {
+                if (error) {
+                    console.error('API Error:', error);
+                } else {
+                    try {
+                        var responseBody = JSON.parse(response.text);
+                        if (responseBody && responseBody.message) {
+                            setServerResponse(responseBody.message);
+                            if (responseBody.message.includes("Student created successfully")) { // **Check if message indicates success**
+                                navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                            }
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                    }
 
-        // console.log(body);
-
-        api.studentsPost(body, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-        } else {
-            // console.log('API Response:', response); // Log the full HTTP response
-            try {
-              var responseBody = JSON.parse(response.text); // Parsing the response text to JSON
-              if (responseBody && responseBody.message) {
-                  console.log('Message:', responseBody.message); // Logging the message from the response
-              }
-              setServerResponse(responseBody.message)
-              console.log(responseBody.data)
-          } catch (parseError) {
-              console.error('Error parsing response:', parseError);
-          }
-
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-              setShowSuccessMessage(false);
-          }, 3000);
-            }
-        });
-    } catch (error) {
-        console.error('Error:', error);
+                    setShowSuccessMessage(true);
+                    setTimeout(() => {
+                        setShowSuccessMessage(false);
+                    }, 3000);
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
-    }
-
-  };
+};
   const generateBatchOptions = () => {
     const startYear = 2022;
     const endYear = 2048;
@@ -240,7 +272,7 @@ const handleInputChange = (e) => {
           }
         };
 
-        console.log(opts.body);
+        // console.log(opts.body);
 
         api.dbGet(opts, function(error, data, response) {
           if (error) {
@@ -248,7 +280,7 @@ const handleInputChange = (e) => {
           } else {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
-              console.log(responseBody);
+              // console.log(responseBody);
               setBranches(responseBody); // Assuming the actual data is in responseBody.data
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
@@ -270,40 +302,35 @@ const handleInputChange = (e) => {
   return (
     <>
     <Navbar/>
+    
     <div className="container mx-auto p-4">      
-      <h2 className="text-2xl font-bold mb-4">Add Student</h2>
+      <h2 className="text-2xl font-bold mb-4">ADD NEW STUDENT</h2>
       <div className="AddStudent">
 
 
         {/* Rest of your form code */}
     </div> 
-    
-      <input
-        type="checkbox"
-        className="toggle toggle-success"
-        checked={showInstructions}
-        onChange={() => setShowInstructions(!showInstructions)}
-      /><span className="ml-2">Toggle for instructions</span> 
-      {showInstructions && (
-        <div className="instructions bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
-          <p className="font-bold">Please Read Before Filling Out the Form</p>
-          <ul className="list-disc list-inside">
-            <li><strong>Student Name:</strong> Enter the student's name exactly as it appears on their 10th certificate.</li>
-            <li><strong>Parent's Name:</strong> Enter the parent's name as per the student's 10th certificate.</li>
-            <li><strong>Primary and Secondary Contact:</strong> Only numeric values are allowed. Do not include spaces or special characters.</li>
-            <li><strong>Gender:</strong> Select the appropriate gender from the dropdown menu.</li>
-            <li><strong>Batch:</strong> Choose the relevant batch. Note: If 'On TC' is selected, the fields for 1st year Tuition and hostel fees will be disabled.</li>
-            <li><strong>Date of Joining:</strong> Select the date from the calendar. The 'Year of Joining' will automatically update based on this date.</li>
-            <li><strong>Course:</strong> Select the course the student is enrolling in (MPC/BiPC).</li>
-            <li><strong>Mode of Residence:</strong> Choose between 'Day Scholar' and 'Hostel'.</li>
-            <li><strong>Tuition and Hostel Fees:</strong> Enter the fees for the 1st and 2nd years. Note: 2nd year fees initially mirror the 1st year's but can be modified.</li>
-            <li>All fields must be filled out and validated before submission. Ensure that all information is accurate and complete.</li>
-          </ul>
-      </div>
-      )}
-
       <form onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-4">
-        <div className="flex justify-between space-x-1">        {/* First Name and last name Field */}
+        <div className="flex justify-between space-x-1">  {/* First Name and last name Field */}
+                  {/* surName Name Field */}
+                  <label className="form-control w-1/2 pr-2">
+            <div className="label">
+              <span className="label-text">Student's Surname/Initial</span>
+            </div>
+            <input
+              type="text"
+              placeholder="Student's Surname/Initial"
+              className="input input-bordered w-full max-w-xs"
+              name="surName"
+              value={studentData.surName}
+              onChange={(e) => {
+                if (validateInput(e.target.name, e.target.value)) {
+                  handleInputChange(e);
+                }
+              }}
+            />
+            
+          </label>      
           <label className="form-control w-1/2 pr-2">
             <div className="label">
               <span className="label-text">Student's First Name</span>
@@ -320,28 +347,10 @@ const handleInputChange = (e) => {
                 }
               }}
             />
-            <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Name according to 10th certificate</span>
+           
           </label>
 
-          {/* surName Name Field */}
-          <label className="form-control w-1/2 pr-2">
-            <div className="label">
-              <span className="label-text">Student's Surname</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Student's Surname"
-              className="input input-bordered w-full max-w-xs"
-              name="surName"
-              value={studentData.surName}
-              onChange={(e) => {
-                if (validateInput(e.target.name, e.target.value)) {
-                  handleInputChange(e);
-                }
-              }}
-            />
-            <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Name according to 10th certificate</span>
-          </label>
+
         </div>
         <div className="flex justify-between space-x-1">        {/* parent Name and branch Field */}
           <label className="form-control w-1/2 pr-2">
@@ -360,7 +369,7 @@ const handleInputChange = (e) => {
                 }
               }}
             />
-            <span className="label-text-alt" style={{ fontSize: '15px' }}>⚠ Parent's name according to 10th certificate</span>
+            
           </label>
 
           {/* branch Name Field */}
@@ -474,7 +483,7 @@ const handleInputChange = (e) => {
                     <span className="label-text">Date of Joining</span>
                   </div>
                   <div className="rounded border border-gray-400 p-2 w-3/4">
-                    <span className="text-gray-700">{new Date().toISOString().split('T')[0]}</span>
+                    <span className="text-gray-700">{formatDate(new Date())}</span>
                   </div>
                 </label>
 
@@ -563,7 +572,7 @@ const handleInputChange = (e) => {
                     name="firstYearHostelFee"
                     value={studentData.firstYearHostelFee}
                     onChange={handleInputChange}
-                    disabled={isOnTC}
+                    disabled={isOnTC || isDayScholar}
                   />
                 </label>
         </div>
@@ -592,25 +601,20 @@ const handleInputChange = (e) => {
                     name="secondYearHostelFee"
                     value={studentData.secondYearHostelFee}
                     onChange={handleInputChange}
+                    disabled={isDayScholar}
                   />
                 </label>
         </div>
         <div className="flex justify-between space-x-1">        {/* active status Field */}
-          <label className="form-control w-1/2 pr-2">
-              <div className="label">
-                  <span className="label-text">Student Status</span>
-              </div>
-              <select
-                  className="select select-bordered w-full max-w-xs"
-                  name="studentStatus"
-                  value={studentData.studentStatus}
-                  onChange={handleInputChange}
-              >
-                  <option value="" disabled>Choose Student Status</option>
-                  <option value="Active">ACTIVE</option>
-                  <option value="Cancelled">CANCELLED</option>
-              </select>
-          </label>
+        <label className="form-control w-1/2 pr-2">
+          <div className="label">
+            <span className="label-text">Student Status</span>
+          </div>
+          <div className="rounded border border-gray-400 p-2 w-3/4">
+                    <span className="text-gray-700">{studentData.studentStatus}</span>
+                  </div>
+        </label>
+
         </div>
 
         

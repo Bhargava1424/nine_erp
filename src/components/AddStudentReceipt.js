@@ -9,8 +9,9 @@ function AddStudentReceipt() {
     const [amountPaid, setAmountPaid] = useState('');
     const [modeOfPayment, setModeOfPayment] = useState('');
     const [chequeNumber, setChequeNumber] = useState('');
-    const [receiptNumber, setReceiptNumber] = useState(''); // Add receipt number to the state
     const [selectedFeeType, setSelectedFeeType] = useState(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
 
 
 
@@ -19,9 +20,18 @@ function AddStudentReceipt() {
     };
 
 
-    const handleAmountChange = (e) => {
-        setAmountPaid(e.target.value);
+    
+    const handleAmountChange = (e, fee) => {
+        const amount = parseFloat(e.target.value);
+        if (amount > fee.pendingFee) {
+            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+            setAmountPaid(''); // Reset the amount field
+        } else {
+            setAmountPaid(amount);
+        }
     };
+    
+    
 
     const handleModeOfPaymentChange = (e) => {
         setModeOfPayment(e.target.value);
@@ -88,6 +98,12 @@ function AddStudentReceipt() {
             }
         };
 
+        if (isSubmitted) {
+            // Reset the form or fetch the latest data as required
+            // Reset the submission status
+            setIsSubmitted(false);
+        }
+
         if (applicationNumber) {
             fetchStudentData();
         }
@@ -99,6 +115,14 @@ function AddStudentReceipt() {
             alert("Please enter a valid amount.");
             return;
         }
+        if (modeOfPayment === '') {
+            alert("Please select a mode of payment.");
+            return;
+        }
+        if (modeOfPayment === 'CHEQUE' && !chequeNumber) {
+            alert("Please enter a cheque number.");
+            return;
+        }
 
         try {
             // Assuming the backend expects an object with the payment details
@@ -108,10 +132,10 @@ function AddStudentReceipt() {
                 chequeNumber: modeOfPayment === 'CHEQUE' ? chequeNumber : undefined,
             };
 
-            const updatedFees = {
-                paidFirstYearTuitionFee: studentData.paidFirstYearTuitionFee + paymentDetails.amountPaid,
-                pendingFirstYearTuitionFee: studentData.pendingFirstYearTuitionFee - paymentDetails.amountPaid,
-            };
+            // const updatedFees = {
+            //     paidFirstYearTuitionFee: studentData.paidFirstYearTuitionFee + paymentDetails.amountPaid,
+            //     pendingFirstYearTuitionFee: studentData.pendingFirstYearTuitionFee - paymentDetails.amountPaid,
+            // };
 
             // Replace with the correct URL and adjust according to your API and data structure
             // const response = await axios.post(`http://34.125.142.249:5000/api/students/update-fees/${studentData._id}`, updatedFees);
@@ -138,9 +162,8 @@ function AddStudentReceipt() {
                                     console.log('Message:', response.message); // Logging the message from the response
                                     setStudentData(prevState => ({
                                         ...prevState,
-                                        ...updatedFees,
+                                        // ...updatedFees,
                                     }));
-                                    setReceiptNumber(response.data.receiptNumber); // Set the receipt number
                                     setAmountPaid(''); // Reset the amount
                                     setModeOfPayment(''); // Reset the mode of payment
                                     setChequeNumber(''); // Reset the cheque number
@@ -161,6 +184,8 @@ function AddStudentReceipt() {
                 } catch (err) {
                     console.error('Error:', err);
                 }
+
+                setIsSubmitted(true);
             };
 
     if (loading) {
@@ -187,6 +212,8 @@ function AddStudentReceipt() {
     return (
         <div className="main-container">
             <Navbar />
+            
+            <h2 className="text-2xl font-bold text-black-500 mb-4">{studentData.firstName} {studentData.surName}</h2>
             {feeTypes.map((fee, index) => (
                 <div key={index}>
                     <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
@@ -213,7 +240,12 @@ function AddStudentReceipt() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Paid:
-                                            <input type="number" value={amountPaid} onChange={handleAmountChange} />
+                                            <input
+                                                type="number"
+                                                value={amountPaid}
+                                                onChange={(e) => handleAmountChange(e, fee)}
+                                                max={fee.pendingFee}
+                                            />
                                         </label>
                                         <div>
                                             <p>Mode of Payment:</p>
