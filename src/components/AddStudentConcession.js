@@ -7,7 +7,6 @@ function AddStudentConcession() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [amountWaived, setamountWaived] = useState('');
-    const [ConcessionNumber, setConcessionNumber] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
     const [reason, setReason] = useState(''); 
 

@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 function AdminComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
+
+
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -47,19 +49,64 @@ function AdminComponent() {
         console.error("Error fetching data: ", error);
       }
     };
-
     fetchStudents();
   }, []);
-
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
+  const sortedAndFilteredStudents = useMemo(() => {
+    let filtered = students;
+    if (searchQuery) {
+      const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
+      filtered = students.filter(student => searchTerms.every(term =>
+        student.firstName.toLowerCase().includes(term) ||
+            student.applicationNumber.toLowerCase().includes(term) ||
+            student.surName.toLowerCase().includes(term) ||
+            student.parentName.toLowerCase().includes(term) ||
+            student.branch.toLowerCase().includes(term) ||
+            student.primaryContact.includes(term) ||
+            student.gender.toLowerCase().includes(term) ||
+            student.batch.includes(term) ||
+            student.course.toLowerCase().includes(term) ||
+            student.modeOfResidence.toLowerCase().includes(term) ||
+            student.firstYearTuitionFee.toString().includes(term) ||
+            student.firstYearHostelFee.toString().includes(term) ||
+            student.secondYearTuitionFee.toString().includes(term) ||
+            student.secondYearHostelFee.toString().includes(term) ||
+            student.pendingFirstYearTuitionFee.toString().includes(term) ||
+            student.pendingFirstYearHostelFee.toString().includes(term) ||
+            student.pendingSecondYearTuitionFee.toString().includes(term) ||
+            student.pendingSecondYearHostelFee.toString().includes(term) ||
+            student.paidFirstYearTuitionFee.toString().includes(term) ||
+            student.paidFirstYearHostelFee.toString().includes(term) ||
+            student.paidSecondYearTuitionFee.toString().includes(term) ||
+            student.paidSecondYearHostelFee.toString().includes(term)
+        // include other fields as necessary
+      ));
+    }
+    
+    return filtered.sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [students, searchQuery, sortConfig]);
+  
+
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
       return students; // Return all students if the search query is empty
     }
+
+
+  
   
     const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
   
@@ -94,33 +141,8 @@ function AdminComponent() {
 
   const filteredStudents = handleSearch(searchQuery);
 
-  let totalPages = 0;
-  let currentStudents = []; 
-  if (filteredStudents) {
-    totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
-    const indexOfLastStudent = currentPage * rowsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-    currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
-  }
 
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Handle change in rows per page
-
-  // Render pagination
-  const renderPageNumbers = () => {
-    let pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-          {i}
-        </button>
-      );
-    }
-    return pages;
-  };
 
 
   // New function to open the edit modal
@@ -293,6 +315,46 @@ function AdminComponent() {
       // Add other fields if necessary
     }));
   };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  } 
+
+
+  const getSortDirection = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+    }
+    return '';
+  };
+
+
+  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
+  
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  
   
 
 
@@ -321,7 +383,11 @@ function AdminComponent() {
            
     </div>
     <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+    <div role="tablist" className="tabs tabs-boxed">
+      <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">DASHBOARD</h2>
+    </div>
+
+
       <div className="flex-grow flex justify-end">
         <input
           type="text"
@@ -340,62 +406,66 @@ function AdminComponent() {
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">1st Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">2nd Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 1st Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Paid 2nd Year Hostel Fee</th>        
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Action</th>
+        <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
+        <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
+        <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
+        <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
+        <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
+        <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
+        <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
+        <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+        <th  className="text-xs" onClick={() => requestSort('firstYearTuitionFee')}>1st Year Tuition Fee {getSortDirection('firstYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('firstYearHostelFee')}>1st Year Hostel Fee {getSortDirection('firstYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('secondYearTuitionFee')}>2nd Year Tuition Fee {getSortDirection('secondYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('secondYearHostelFee')}>2nd Year Hostel Fee {getSortDirection('secondYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('paidFirstYearTuitionFee')}>Paid 1st Year Tuition Fee {getSortDirection('paidFirstYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('paidFirstYearHostelFee')}>Paid 1st Year Hostel Fee {getSortDirection('paidFirstYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('paidSecondYearTuitionFee')}>Paid 2nd Year Tuition Fee {getSortDirection('paidSecondYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('paidSecondYearHostelFee')}>Paid 2nd Year Hostel Fee {getSortDirection('paidSecondYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+        <th  className="text-xs">Action</th> {/* Assuming no sorting for the action column */}
       </tr>
     </thead>
+
     <tbody>
       {currentStudents.map((student, index) => (
         <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
-    <td className="border-2 border-gray-800 px-4 py-2">{`${student.firstName} ${student.surName}`.trim()}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.firstYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.secondYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.paidFirstYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.paidSecondYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">
-        <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-            <i className="fas fa-edit"></i>
-        </button>
-    </td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.primaryContact}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.gender}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.batch}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.course}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.modeOfResidence}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.firstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.firstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.secondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.secondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidFirstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidFirstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidSecondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">
+              <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+                  <i className="fas fa-edit"></i>
+              </button>
+          </td>
 </tr>
 
       ))}
     </tbody>
   </table>
+
+
+
 </div>
 
     {isEditModalOpen && (
@@ -479,6 +549,7 @@ function AdminComponent() {
       <div className="pagination">
         {renderPageNumbers()}
       </div>
+
 
       
 

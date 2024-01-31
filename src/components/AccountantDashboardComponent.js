@@ -305,7 +305,9 @@ function AccountantComponent() {
            
     </div>
     <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+    <div role="tablist" className="tabs tabs-boxed">
+      <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">DASHBOARD</h2>
+    </div>
       <div className="flex-grow flex justify-end">
         <input
           type="text"
