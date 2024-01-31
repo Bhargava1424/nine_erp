@@ -146,7 +146,6 @@ function Navbar() {
           )}
         </div>
       )}
-      <div className="divider custom-divider"></div>
     </>
   );
 }
