@@ -9,9 +9,8 @@ function AdminComponent() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
-
-
+  const [rowsPerPage] = useState(100);
+  const [totalStudentCount, setTotalStudentCount] = useState(0);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -38,7 +37,9 @@ function AdminComponent() {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
-              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+              setStudents(responseBody)
+              setTotalStudentCount(responseBody.length);
+               // Assuming the actual data is in responseBody.data
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
@@ -54,6 +55,9 @@ function AdminComponent() {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
+    const filtered = handleSearch(e.target.value.toLowerCase());
+    setTotalStudentCount(filtered.length);
+
   };
 
   const sortedAndFilteredStudents = useMemo(() => {
@@ -373,31 +377,29 @@ function AdminComponent() {
       
 
 <div className="overflow-x-auto mt-3">
-  <div className="flex justify-center items-center">
-    <div className="flex items-center">
-      <p>
-      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
+<div className="flex justify-center items-center">
+  <div className="flex items-center">
+    <p>
+      <button onClick={exportToExcel} className="btn btn-primary" style={{ backgroundColor: '#00A0E3', margin: '20px' }}>
         Export to Excel
       </button>
-      </p>
-           
-    </div>
-    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-    <div role="tablist" className="tabs tabs-boxed">
-      <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">DASHBOARD</h2>
-    </div>
-
-
-      <div className="flex-grow flex justify-end">
-        <input
-          type="text"
-          placeholder="Search students..."
-          className="input input-bordered max-w-xs text-black placeholder-black"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
+    </p>
   </div>
+  <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+  </div>
+  <div className="flex items-center justify-end space-x-4">
+    <div className="text-l font-bold text-black-500 mb-4">Total Students: {totalStudentCount}</div>
+    <input
+      type="text"
+      placeholder="Search students..."
+      className="input input-bordered max-w-xs text-black placeholder-black"
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+  </div>
+</div>
+
 
 
 

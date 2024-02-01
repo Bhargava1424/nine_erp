@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { useSelector } from 'react-redux';
 
 function AccountantComponent() {
   const [students, setStudents] = useState([]);
@@ -10,6 +11,7 @@ function AccountantComponent() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
+  const branch = useSelector((state) => state.auth.branch);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -21,7 +23,8 @@ function AccountantComponent() {
           body: {
             "collectionName": "students",
             "query": {
-              "studentStatus": "Active"
+              "studentStatus": "Active",
+              "branch":branch
             },
             "type": "findMany"
           }
