@@ -247,7 +247,7 @@ function AddBranch() {
   };
 
   return (
-    <>
+    <div className='root-container'>
       
       <Navbar />
       <div className="container mx-auto p-4">
@@ -379,7 +379,7 @@ function AddBranch() {
           </form>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

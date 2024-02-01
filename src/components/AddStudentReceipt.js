@@ -210,7 +210,7 @@ function AddStudentReceipt() {
     
 
     return (
-        <div className="main-container">
+        <div className="main-container root-container">
             <Navbar />
             
             <h2 className="text-2xl font-bold text-black-500 mb-4">{studentData.firstName} {studentData.surName}</h2>

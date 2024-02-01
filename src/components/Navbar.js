@@ -84,7 +84,7 @@ function Navbar() {
           )}
         </div>
       </div>
-      <div className="warning-container" style={{ backgroundColor: '#F2F2F2' }}>
+      {user&&(<div className="warning-container" style={{ backgroundColor: '#F2F2F2' }}>
   <section className="content-header">
     <div className="header-icon">
       <i className="fa fa-dashboard"></i>
@@ -96,7 +96,7 @@ function Navbar() {
       </small>
     </div>
   </section>
-</div>
+</div>)}
 
             {user && (
         <div className="container mx-auto mt-5 flex justify-center flex-nowrap gap-4">

@@ -308,7 +308,7 @@ const handleInputChange = (e) => {
   }, [branch, role]);
   
     return (
-      <>
+      <div className='root-container'>
           <Navbar/>
           <div className="container mx-auto p-4 text-center">   
               <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW STUDENT</h2>
@@ -637,7 +637,7 @@ const handleInputChange = (e) => {
       </form>
     </div>
   
-    </>
+    </div>
   );
 };
 

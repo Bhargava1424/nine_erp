@@ -368,28 +368,27 @@ function AdminComponent() {
     <div >   
 
 <div className="overflow-x-auto mt-3">
-<div className="flex justify-center items-center">
-  <div className="flex items-center">
-    <p>
-      <button onClick={exportToExcel} className="btn btn-primary" style={{ backgroundColor: '#00A0E3', margin: '20px' }}>
-        Export to Excel
-      </button>
-    </p>
+<div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+  <div className="mb-4 md:mb-0">
+    <button onClick={exportToExcel} className="btn btn-primary bg-blue-500 hover:bg-blue-700">
+      Export to Excel
+    </button>
   </div>
-  <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}> {/* Center-align the dashboard heading */}
-    <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
+  <div className="flex-1 flex justify-center mb-4 md:mb-0"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-black">DASHBOARD</h2>
   </div>
-  <div className="flex flex-col items-end space-y-4">
+  <div className="flex flex-col items-center md:items-end w-full md:w-auto">
     <input
       type="text"
       placeholder="Search students..."
-      className="input input-bordered max-w-xs text-black placeholder-black"
+      className="input input-bordered w-full md:max-w-xs text-black placeholder-black mb-4 md:mb-0"
       value={searchQuery}
       onChange={handleSearchChange}
     />
-    <div className="text-l font-bold text-black-500">Total Students: {totalStudentCount}</div>
+    <div className="text-lg font-bold text-black w-full md:w-auto pr-20 md:pr-0">Total Students: {totalStudentCount}</div>
   </div>
 </div>
+
 
 
 

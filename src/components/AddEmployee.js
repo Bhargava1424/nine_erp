@@ -398,7 +398,7 @@ function AddEmployee() {
 
 
   return (
-    <>
+    <div className='root-container'>
       <Navbar />
 
       <div className="flex justify-center items-center">
@@ -548,7 +548,7 @@ function AddEmployee() {
           </form>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
