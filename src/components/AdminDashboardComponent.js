@@ -365,16 +365,7 @@ function AdminComponent() {
   return (
 
     
-    <div className="main-container">
-
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
-          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
-          <p className="text-red-600 text-lg font-semibold">
-            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
-          </p>
-        </div>
-        
-      
+    <div >   
 
 <div className="overflow-x-auto mt-3">
 <div className="flex justify-center items-center">
@@ -388,8 +379,7 @@ function AdminComponent() {
   <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}> {/* Center-align the dashboard heading */}
     <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
   </div>
-  <div className="flex items-center justify-end space-x-4">
-    <div className="text-l font-bold text-black-500 mb-4">Total Students: {totalStudentCount}</div>
+  <div className="flex flex-col items-end space-y-4">
     <input
       type="text"
       placeholder="Search students..."
@@ -397,8 +387,10 @@ function AdminComponent() {
       value={searchQuery}
       onChange={handleSearchChange}
     />
+    <div className="text-l font-bold text-black-500">Total Students: {totalStudentCount}</div>
   </div>
 </div>
+
 
 
 

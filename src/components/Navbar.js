@@ -48,7 +48,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="navbar bg-base-100 custom-navbar-padding">
+      <div className="navbar bg-base-100 custom-navbar-padding" style={{ backgroundColor: '#2D5990' }}>
       <div className="navbar-start"></div>
         {user ? (
           <div className="navbar-center logo-container">
@@ -68,10 +68,10 @@ function Navbar() {
               >
                 {user && (
                   <div
-                    className={`w-10 h-10 rounded-full ring ring-offset-base-100 ring-offset-2 flex items-center justify-center text-white`}
-                    style={{ backgroundColor: user.color }}
+                    className={`w-10 h-10 rounded-full ring flex items-center justify-center text-white`}
+                    style={{ backgroundColor: '#F2F2F2' }}
                   >
-                    <span className="text-3xl">{user.role.charAt(0)}</span>
+                    <span className="text-3xl"><img src="/user.png" width="45" height="45" alt="user"/></span>
                   </div>
                 )}
               </div>
@@ -84,9 +84,30 @@ function Navbar() {
           )}
         </div>
       </div>
-      <div className="divider custom-divider"></div>
+      <div className="warning-container" style={{ backgroundColor: '#F2F2F2' }}>
+  <section className="content-header">
+    <div className="header-icon">
+      <i className="fa fa-dashboard"></i>
+    </div>
+    <div className="header-title" style={{ backgroundColor: '#F2F2F2' }}>
+      <h1>NINE EDUCATION ERP SYSTEM,</h1>
+      <small style={{ color: 'red' }}>
+        <i className="fa fa-exclamation-triangle" aria-hidden="true"></i> The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
+      </small>
+    </div>
+  </section>
+</div>
+
             {user && (
         <div className="container mx-auto mt-5 flex justify-center flex-nowrap gap-4">
+          <div className="flex-1 min-w-max">
+              <Link to='/'>
+                  <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
+                      <i className="fa fa-home fa-3x"></i>
+                      <h3 className="mt-2">Dashboard</h3>
+                  </div>
+              </Link>
+          </div>
           <div className="flex-1 min-w-max">
             <Link to='/AddStudent'>
               <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
@@ -115,13 +136,14 @@ function Navbar() {
                 </Link>
               </div>
               <div className="flex-1 min-w-max">
-                <Link to='/AddBranch'>
-                  <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
-                    <i className="fa fa-home fa-3x"></i>
-                    <h3 className="mt-2">Add Branch</h3>
-                  </div>
-                </Link>
+                  <Link to='/AddBranch'>
+                      <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
+                          <i className="fa fa-building fa-3x"></i> {/* or use fa-university */}
+                          <h3 className="mt-2">Add Branch</h3>
+                      </div>
+                  </Link>
               </div>
+
             </>
           )}
 
