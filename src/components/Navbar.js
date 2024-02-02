@@ -41,7 +41,7 @@ function Navbar() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
+    navigate('/Login2');
     localStorage.removeItem('user');
     window.location.reload();
   };

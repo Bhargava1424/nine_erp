@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../services/authService';
 import { Link } from 'react-router-dom';  
-
+import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 function Login2() {
+  const navigate=useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
@@ -33,6 +35,7 @@ function Login2() {
               localStorage.setItem('userRole', userRole);
               localStorage.setItem('userBranch', userBranch);
               authServiceLogin({ role: userRole, branch: userBranch }); 
+              navigate('/');
             }
             else {
               alert(responseBody.message);
@@ -80,6 +83,8 @@ function Login2() {
   
 
   return (
+    <div>
+      <Navbar/>
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
       <img alt="logo" src="/9logo.webp" className="responsive-logo" />
@@ -115,6 +120,7 @@ function Login2() {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 
