@@ -10,11 +10,17 @@ function Navbar() {
   const location = useLocation();
 
   const isAddStudentReceiptPage = location.pathname.startsWith('/AddStudentReceipt'); 
+  const isAddStudentConcessionPage = location.pathname.startsWith('/AddStudentConcession'); 
   const handleLogoClick = (e) => {
     if (isAddStudentReceiptPage) {
         e.preventDefault();
         window.history.back();
-    }
+    }else if(isAddStudentConcessionPage){
+      e.preventDefault();
+      window.history.back();
+    }else{
+    window.location.href = '/';
+  }
 };
 
 
@@ -100,15 +106,16 @@ function Navbar() {
 
             {user && (
         <div className="container mx-auto mt-5 flex justify-center flex-nowrap gap-4">
-          <div className="flex-1 min-w-max">
-              <Link to='/'>
-                  <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col">
-                      <i className="fa fa-home fa-3x"></i>
-                      <h3 className="mt-2">Dashboard</h3>
-                      <h4>Student Count:{user.totalStudentCount}</h4>
-                  </div>
-              </Link>
-          </div>
+<div className="flex-1 min-w-max">
+    <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col" onClick={() => {
+        window.location.href = '/';
+    }}>
+        <i className="fa fa-home fa-3x"></i>
+        <h3 className="mt-2">Dashboard</h3>
+        <h4>Student Count: {user.totalStudentCount}</h4>
+    </div>
+</div>
+
           <div className="flex-1 min-w-max">
             <Link to='/AddStudent'>
               <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col">

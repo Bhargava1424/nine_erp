@@ -224,7 +224,13 @@ const handleInputChange = (e) => {
                         if (responseBody && responseBody.message) {
                             setServerResponse(responseBody.message);
                             if (responseBody.message.includes("Student created successfully")) { // **Check if message indicates success**
-                                navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                                // navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                                window.location.href = '/AddReceipts';
+                                const user = JSON.parse(localStorage.getItem('user'));
+                                if (user) {
+                                  user.totalStudentCount = (user.totalStudentCount || 0) + 1;
+                                  localStorage.setItem('user', JSON.stringify(user));
+                                }
                             }
                         }
                     } catch (parseError) {
