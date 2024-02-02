@@ -130,9 +130,11 @@ function AddBranch() {
       
       <Navbar />
       <div className="container mx-auto p-4">
-      <div className="flex justify-center items-center">
-          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD BRANCH</h2>
-      </div>
+          <div className="container mx-auto p-4 text-center">   
+            <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+              <h2 className="text-2xl font-bold text-white">ADD BRANCH</h2>
+            </div>
+          </div>
         {showSuccessMessage && (
           <div role="alert" className="alert alert-success">
             <div className="flex items-center">
@@ -153,43 +155,40 @@ function AddBranch() {
             </div>
           </div>
         )}
-        <form
-          onSubmit={handleSubmit}
-          
-        >
-          <InputField
-            label="Branch Name"
-            name="branchName"
-            value={branchData.branchName}
-            handleChange={handleChange}
-            error={errors.branchName}
-            className='b'
-          />
-          <InputField
-            label="Branch Code"
-            name="branchCode"
-            value={branchData.branchCode}
-            handleChange={handleChange}
-            error={errors.branchCode}
-          />
-          <InputField
-            label="Branch Address"
-            name="branchAddress"
-            value={branchData.branchAddress}
-            handleChange={handleChange}
-            error={errors.branchAddress}
-          />
+        <div className="flex justify-center whitespace-nowrap p-7 bg-slate-200 mt-4 rounded-3xl" style={{ marginLeft: '450px', marginRight: '450px' }}>
+          <form onSubmit={handleSubmit} className="text-center whitespace-nowrap"> {/* Centers form content */}
+            <InputField
+              label="Branch Name"
+              name="branchName"
+              value={branchData.branchName}
+              handleChange={handleChange}
+              error={errors.branchName}
+            />
+            <InputField
+              label="Branch Code"
+              name="branchCode"
+              value={branchData.branchCode}
+              handleChange={handleChange}
+              error={errors.branchCode}
+            />
+            <InputField
+              labelClass="whitespace-nowrap" // This will prevent the label from wrapping
+              label="Branch Address"
+              name="branchAddress"
+              value={branchData.branchAddress}
+              handleChange={handleChange}
+              error={errors.branchAddress}
+            />
 
-          <div className="mt-4">
-                <button
-                  className="btn btn-outline text-white"
-                  style={{ backgroundColor: '#2D5990' }}
-                >
-                  Add Branch
-                </button>
-              </div>
+            <button
+              className="btn btn-outline text-white mt-4"
+              style={{ backgroundColor: '#2D5990' }}
+            >
+              Add Branch
+            </button>
+          </form>
+        </div>
 
-        </form>
         <div className="container mx-auto p-4 relative mt-6"> {/* Add relative positioning */}
     <h2 className="text-2xl font-bold text-center mb-4">Branches List</h2>
         {/* Search Bar */}

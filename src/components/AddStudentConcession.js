@@ -6,7 +6,7 @@ function AddStudentConcession() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [amountWaived, setamountWaived] = useState('');
+    const [amountWaived, setAmountWaived] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
     const [reason, setReason] = useState(''); 
 
@@ -18,8 +18,15 @@ function AddStudentConcession() {
     };
 
 
-    const handleAmountChange = (e) => {
-        setamountWaived(e.target.value);
+    const handleAmountChange = (e, fee) => {
+        const amount = parseFloat(e.target.value);
+        if (amount > fee.pendingFee) {
+            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+            setAmountWaived(''); // Reset the amount field
+        } else {
+            setAmountWaived(amount);
+        }
+
     };
 
 
@@ -95,6 +102,7 @@ function AddStudentConcession() {
             alert("Please provide a reason for the concession.");
             return;
         }
+
     
         try {
             var SchoolManagementSystemApi = require('school_management_system_api');
@@ -176,7 +184,11 @@ function AddStudentConcession() {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+            <span className="loading loading-bars loading-lg"></span>
+            </div>
+            )
     }
 
     if (error) {
@@ -210,18 +222,18 @@ function AddStudentConcession() {
                     <table className="table border border-black">
                         <thead>
                             <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-                                <th className="px-4 py-2 text-lg border border-black text-white">Applied Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-white">Paid Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-white">Pending Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-white">Add Concession</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Add Concession</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr className="bg-[#F2F2F2]">
-                                <td className="text-lg text-black font-bold border border-black">{fee.fee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.paidFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.pendingFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">
+                                <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
+                                <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                                <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
+                                <td className="text-sm text-black font-bold border border-black">
                                     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddConcessionClick(fee.key)}>
                                         Add Concession
                                     </button>
@@ -229,8 +241,8 @@ function AddStudentConcession() {
                                     <div>
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
-                                            Amount Paid:
-                                            <input type="number" value={amountWaived} onChange={handleAmountChange} />
+                                            Amount Waived:
+                                            <input type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>
@@ -245,7 +257,7 @@ function AddStudentConcession() {
                                         
                                         
                                         <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
-                                                Submit Payment
+                                                Submit Concession 
                                             </button>  
                                         {/* Add submission button or form handlers as needed */}
                                     </div>

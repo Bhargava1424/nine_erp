@@ -103,23 +103,41 @@ function AccountantComponent() {
 
   // Render pagination
   const renderPageNumbers = () => {
-    let pages = [];
+    let pageNumbers = [];
+    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+    const pageBuffer = 3; // Number of pages to show before and after current page
+  
     for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-          {i}
-        </button>
-      );
+      // Always add the first and last few pages
+      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
+        pageNumbers.push(
+          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+            {i}
+          </button>
+        );
+      }
     }
-    return pages;
+  
+    // Insert ellipses where there are gaps in the page numbers
+    const withEllipses = [];
+    let prevPage = null;
+    for (const page of pageNumbers) {
+      if (prevPage) {
+        // If there's a gap between this page and the previous page, insert ellipses
+        if (page.key - prevPage.key > 1) {
+          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
+        }
+      }
+      withEllipses.push(page);
+      prevPage = page;
+    }
+  
+    return withEllipses;
   };
 
 
   // New function to open the edit modal
-  const openEditModal = (student) => {
-    setEditingStudent({ ...student });
-    setIsEditModalOpen(true);
-  };
+  
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
 
@@ -305,9 +323,11 @@ function AccountantComponent() {
            
     </div>
     <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-    <div role="tablist" className="tabs tabs-boxed">
-      <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">DASHBOARD</h2>
-    </div>
+        <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+            <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
+          </div>
+
+    
       <div className="flex-grow flex justify-end">
         <input
           type="text"

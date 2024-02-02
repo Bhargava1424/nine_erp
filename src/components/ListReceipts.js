@@ -9,7 +9,7 @@ function ListReceipts() {
     const [receipts, setReceipts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(100);
+    const [rowsPerPage] = useState(10);
     const [editingReceipt, setEditingReceipt] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const currentDate = new Date();
@@ -157,21 +157,58 @@ const handleEditSubmit = () => {
 
     // Calculate page numbers
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredReceipts.length / rowsPerPage); i++) {
+    const totalPages = Math.ceil(filteredReceipts.length / rowsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
         pageNumbers.push(i);
+      }
     }
 
-    const renderPageNumbers = pageNumbers.map(number => {
-        return (
+    const renderPageNumbers = (
+      <div>
+        <button 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          className="btn"
+          disabled={currentPage === 1}
+        >
+          Prev
+        </button>
+    
+        {pageNumbers.map((number, index) => {
+          if (index > 0 && pageNumbers[index] - pageNumbers[index - 1] > 1) {
+            return <React.Fragment key={number}>
+                     <span>...</span>
+                     <button 
+                       onClick={() => setCurrentPage(number)}
+                       className={`btn ${currentPage === number ? 'btn-active' : ''}`}
+                     >
+                       {number}
+                     </button>
+                   </React.Fragment>;
+          }
+    
+          return (
             <button 
-                key={number} 
-                onClick={() => setCurrentPage(number)}
-                className={`btn ${currentPage === number ? 'btn-active' : ''}`}
+              key={number} 
+              onClick={() => setCurrentPage(number)}
+              className={`btn ${currentPage === number ? 'btn-active' : ''}`}
             >
-                {number}
+              {number}
             </button>
-        );
-    });
+          );
+        })}
+    
+        <button 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          className="btn"
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    );
+    
 
 
     const handleDownload = (receipt) => {
@@ -208,11 +245,15 @@ const handleEditSubmit = () => {
     // Generate buffer
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
+    const now = new Date();
+    const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+
+    
     // Create a Blob
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
     
     // Use FileSaver to save the file
-    saveAs(data, 'students_data.xlsx');
+    saveAs(data, `Receipts ${formattedDate}.xlsx`);
   };
 
   const mapDataToSchema = (data) => {
@@ -318,7 +359,9 @@ const handleEditSubmit = () => {
                 
           </div>
           <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-            <h2 className="text-2xl font-bold text-black-500 mb-4">LIST RECEIPTS</h2>
+          <div className="card bg-slate-600 text-black px-4 py-2"> {/* Added padding here */}
+            <h2 className="text-2xl font-bold text-white">RECEIPTS LIST</h2>
+          </div>
             <div className="flex-grow flex justify-end">
             <input
                       type="text"
@@ -330,11 +373,15 @@ const handleEditSubmit = () => {
             </div>
         </div>
 
+        <div>
+                {renderPageNumbers}
+            </div>
+
 
             <table className="min-w-full border border-gray-800 border-collapse">
               
             <thead>
-              <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+              <tr className="text-sm" style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
                 <th onClick={() => requestSort('receiptNumber')}>
                   Receipt Number {getSortDirection('receiptNumber')}
                 </th>
@@ -366,16 +413,15 @@ const handleEditSubmit = () => {
 
                 <tbody>
                     {currentReceipts.map((receipt, index)  => (
-                        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
-                          
-                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.studentName}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.batch}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{determineAmountPaid(receipt)}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          <td className="border-2 border-gray-800 px-4 py-2">
+                        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2] " key={index}>                          
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.studentName}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.batch}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineAmountPaid(receipt)}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">
                                 <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
                                 <i className="fas fa-edit"></i>
                                 </button>
@@ -421,8 +467,8 @@ const handleEditSubmit = () => {
             <span className="label-text">Amount Paid</span>
             <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
         </label>
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+        <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
+        <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
     </div>
 )}
       

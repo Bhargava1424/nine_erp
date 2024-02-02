@@ -268,9 +268,12 @@ function AddEmployee() {
     <>
       <Navbar />
 
-      <div className="flex justify-center items-center">
-          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD EMPLOYEE</h2>
+      <div className="container mx-auto p-4 text-center">   
+        <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+          <h2 className="text-2xl font-bold text-white">ADD EMPLOYEE</h2>
+        </div>
       </div>
+          
       <div className="container mx-auto p-4">
         {showSuccessMessage && (
         <div role="alert" className="alert alert-success">
@@ -282,35 +285,43 @@ function AddEmployee() {
             </div>
         </div>
     )}
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* ... existing input fields */}
-            <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
-            <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-            <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
-            <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
-            <SelectField
-              label="Branch"
-              name="branch"
-              options={branches.map(branch => branch.branchName)} // Assuming branchName is the field you want to display
-              value={employeeData.branch}
-              handleChange={handleChange}
-            />
-            <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
-            <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
 
-          </div>
-          <div className="mt-4">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
-          >
-            Add Employee
-          </button>
 
-          </div>
-        </form>
+      <div className="flex justify-center whitespace-nowrap p-7 bg-slate-200 mt-4 rounded-3xl" style={{ marginLeft: '350px', marginRight: '350px' }}>
+
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* ... existing input fields */}
+                  <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
+                  <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
+                  <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
+                  <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
+                  <SelectField
+                    label="Branch"
+                    name="branch"
+                    options={branches.map(branch => branch.branchName)} // Assuming branchName is the field you want to display
+                    value={employeeData.branch}
+                    handleChange={handleChange}
+                  />
+                  <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
+                  <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
+
+                </div>
+                <div className="mt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
+                >
+                  Add Employee
+                </button>
+
+                </div>
+              </form>
+
+
+      </div>
+        
         <div>
   <div className="container mx-auto p-4 relative mt-6"> {/* Add relative positioning */}
     <h2 className="text-2xl font-bold text-center mb-4">Employees List</h2>
@@ -321,7 +332,7 @@ function AddEmployee() {
       value={searchQuery}
       onChange={handleSearchChange}
     />
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-3xl p-4">
       <table className="table-auto w-full">
         <thead>
           <tr style={{ backgroundColor: '#2D5990', color: '#FFFFFF' }}>

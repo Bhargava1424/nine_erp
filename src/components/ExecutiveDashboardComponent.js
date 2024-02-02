@@ -103,15 +103,36 @@ function ExecutiveComponent() {
 
   // Render pagination
   const renderPageNumbers = () => {
-    let pages = [];
+    let pageNumbers = [];
+    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+    const pageBuffer = 3; // Number of pages to show before and after current page
+  
     for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-          {i}
-        </button>
-      );
+      // Always add the first and last few pages
+      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
+        pageNumbers.push(
+          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+            {i}
+          </button>
+        );
+      }
     }
-    return pages;
+  
+    // Insert ellipses where there are gaps in the page numbers
+    const withEllipses = [];
+    let prevPage = null;
+    for (const page of pageNumbers) {
+      if (prevPage) {
+        // If there's a gap between this page and the previous page, insert ellipses
+        if (page.key - prevPage.key > 1) {
+          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
+        }
+      }
+      withEllipses.push(page);
+      prevPage = page;
+    }
+  
+    return withEllipses;
   };
 
 

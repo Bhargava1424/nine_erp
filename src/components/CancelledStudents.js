@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import CancelledStudents from './CancelledStudents';
 
-function AdminComponent() {
+
+
+function CancelledStudents() {
+
+
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudent, setEditingStudent] = useState(null);
@@ -12,11 +15,8 @@ function AdminComponent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
 
-
-
   useEffect(() => {
-    // Function to fetch students data from the backend
-    const fetchStudents = async () => {
+    const fetchCancelledStudents = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
@@ -24,38 +24,32 @@ function AdminComponent() {
           body: {
             "collectionName": "students",
             "query": {
-              "studentStatus": "Active"
+              "studentStatus": "Cancelled"
             },
             "type": "findMany"
           }
         };
-
-        console.log(opts.body);
-
+  
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
           } else {
             try {
-              const responseBody = response.body; // Assuming response.body is already in JSON format
+              const responseBody = response.body; // Handle the response as per your API structure
               console.log(responseBody);
-              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+              setStudents(responseBody); // Assuming responseBody has the array of students
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
           }
         });
-
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
-    fetchStudents();
-  }, []);
+    fetchCancelledStudents();
+  }, []); // The dependency array is empty, so this will run once on component mount
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value.toLowerCase());
-  };
 
   const sortedAndFilteredStudents = useMemo(() => {
     let filtered = students;
@@ -99,51 +93,91 @@ function AdminComponent() {
       return 0;
     });
   }, [students, searchQuery, sortConfig]);
-  
 
-  const handleSearch = (searchQuery) => {
-    if (!searchQuery) {
-      return students;
-    }
-  
-    const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
-  
-    return students.filter(student => {
-      return searchTerms.every(term => {
-        if (term === "male") {
-          // Use regex to match 'male' as a whole word, not as part of other words like 'female'
-          return new RegExp('\\bmale\\b').test(student.gender.toLowerCase());
-        }
-        // Other conditions remain the same
-        return student.firstName.toLowerCase().includes(term) ||
-          student.applicationNumber.toLowerCase().includes(term) ||
-          student.surName.toLowerCase().includes(term) ||
-          student.parentName.toLowerCase().includes(term) ||
-          student.branch.toLowerCase().includes(term) ||
-          student.primaryContact.includes(term) ||
-          student.gender.toLowerCase().includes(term) ||
-          student.batch.includes(term) ||
-          student.course.toLowerCase().includes(term) ||
-          student.modeOfResidence.toLowerCase().includes(term) ||
-          student.firstYearTuitionFee.toString().includes(term) ||
-          student.firstYearHostelFee.toString().includes(term) ||
-          student.secondYearTuitionFee.toString().includes(term) ||
-          student.secondYearHostelFee.toString().includes(term) ||
-          student.pendingFirstYearTuitionFee.toString().includes(term) ||
-          student.pendingFirstYearHostelFee.toString().includes(term) ||
-          student.pendingSecondYearTuitionFee.toString().includes(term) ||
-          student.pendingSecondYearHostelFee.toString().includes(term) ||
-          student.paidFirstYearTuitionFee.toString().includes(term) ||
-          student.paidFirstYearHostelFee.toString().includes(term) ||
-          student.paidSecondYearTuitionFee.toString().includes(term) ||
-          student.paidSecondYearHostelFee.toString().includes(term);
-      });
-    });
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Application Number': student.applicationNumber,
+      'Parent Name': student.parentName,
+      'Branch': student.branch,
+      'Primary Contact': student.primaryContact,
+      'Gender': student.gender,
+      'Batch': student.batch,
+      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      'Course': student.course,
+      'Mode of Residence': student.modeOfResidence,
+      '1st Year Tuition Fee': student.firstYearTuitionFee,
+      '1st Year Hostel Fee': student.firstYearHostelFee,
+      '2nd Year Tuition Fee': student.secondYearTuitionFee,
+      '2nd Year Hostel Fee': student.secondYearHostelFee,
+      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
+      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
+      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
+      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
+      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
+      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
+      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
+      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+      // Add other fields if necessary
+    }));
   };
+
+
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, 'students_data.xlsx');
+  };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  } 
+
+
+  const getSortDirection = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+    }
+    return '';
+  };
+
+
+  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
   
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
 
-  // New function to open the edit modal
   const openEditModal = (student) => {
     setEditingStudent({ ...student });
     setIsEditModalOpen(true);
@@ -188,10 +222,52 @@ function AdminComponent() {
     setValidationErrors(newValidationErrors);
     setEditingStudent({ ...editingStudent, [name]: updatedValue });
   };
+
+
+  const handleSearch = (searchQuery) => {
+    if (!searchQuery) {
+      return students;
+    }
   
+    const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
   
-   
-  // New function to submit edited data without actual backend update
+    return students.filter(student => {
+      return searchTerms.every(term => {
+        if (term === "male") {
+          // Use regex to match 'male' as a whole word, not as part of other words like 'female'
+          return new RegExp('\\bmale\\b').test(student.gender.toLowerCase());
+        }
+        // Other conditions remain the same
+        return student.firstName.toLowerCase().includes(term) ||
+          student.applicationNumber.toLowerCase().includes(term) ||
+          student.surName.toLowerCase().includes(term) ||
+          student.parentName.toLowerCase().includes(term) ||
+          student.branch.toLowerCase().includes(term) ||
+          student.primaryContact.includes(term) ||
+          student.gender.toLowerCase().includes(term) ||
+          student.batch.includes(term) ||
+          student.course.toLowerCase().includes(term) ||
+          student.modeOfResidence.toLowerCase().includes(term) ||
+          student.firstYearTuitionFee.toString().includes(term) ||
+          student.firstYearHostelFee.toString().includes(term) ||
+          student.secondYearTuitionFee.toString().includes(term) ||
+          student.secondYearHostelFee.toString().includes(term) ||
+          student.pendingFirstYearTuitionFee.toString().includes(term) ||
+          student.pendingFirstYearHostelFee.toString().includes(term) ||
+          student.pendingSecondYearTuitionFee.toString().includes(term) ||
+          student.pendingSecondYearHostelFee.toString().includes(term) ||
+          student.paidFirstYearTuitionFee.toString().includes(term) ||
+          student.paidFirstYearHostelFee.toString().includes(term) ||
+          student.paidSecondYearTuitionFee.toString().includes(term) ||
+          student.paidSecondYearHostelFee.toString().includes(term);
+      });
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
@@ -253,9 +329,6 @@ function AdminComponent() {
       console.error("Error updating student: ", error);
     }
   }; 
-  
-  
-  
 
   const generateBatchOptions = () => {
     const startYear = 2022;
@@ -268,203 +341,71 @@ function AdminComponent() {
 
     return options;
   };  
-  
-  
-  const exportToExcel = () => {
-    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-
-    // Generate buffer
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-
-    const now = new Date();
-    const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
-
-    
-    // Create a Blob
-    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    
-    // Use FileSaver to save the file
-    saveAs(data, `Dashboard ${formattedDate}.xlsx`);
-  };
-
-  const mapDataToSchema = (data) => {
-    return data.map(student => ({
-      'Name': `${student.firstName} ${student.surName}`,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
-      'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
-      // Add other fields if necessary
-    }));
-  };
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  } 
-
-
-  const getSortDirection = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
-    }
-    return '';
-  };
-
-
-  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
-
-  const paginate = pageNumber => setCurrentPage(pageNumber);
-
-  const renderPageNumbers = () => {
-    let pageNumbers = [];
-    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
-    const pageBuffer = 3; // Number of pages to show before and after current page
-  
-    for (let i = 1; i <= totalPages; i++) {
-      // Always add the first and last few pages
-      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
-        pageNumbers.push(
-          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-            {i}
-          </button>
-        );
-      }
-    }
-  
-    // Insert ellipses where there are gaps in the page numbers
-    const withEllipses = [];
-    let prevPage = null;
-    for (const page of pageNumbers) {
-      if (prevPage) {
-        // If there's a gap between this page and the previous page, insert ellipses
-        if (page.key - prevPage.key > 1) {
-          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
-        }
-      }
-      withEllipses.push(page);
-      prevPage = page;
-    }
-  
-    return withEllipses;
-  };
-
-  
-  const indexOfLastStudent = currentPage * rowsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-
-  const [showCancelled, setShowCancelled] = useState(false);
-
-  // Function to toggle showCancelled state
-  const toggleShowCancelled = () => {
-    setShowCancelled(!showCancelled);
-  };
-  
 
 
   return (
-
-    
     <div className="main-container">
 
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
-          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
-          <p className="text-red-600 text-lg font-semibold">
-            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
-          </p>
-        </div>
-        
-      
-
-      <div className="overflow-x-auto mt-3">
-        <div className="flex justify-center items-center">
-          <div className="flex items-center">
-            <p>
-            <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
-              Export to Excel
-            </button>
-            </p>
-                
-          </div>
-          <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-          
-
-          <div className="card bg-slate-600 text-black px-4 py-2"> {/* Added padding here */}
-            <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
-          </div>
-
-
-
-            <div className="flex-grow flex justify-end">
-              <input
-                type="text"
-                placeholder="Search students..."
-                className="input input-bordered max-w-xs text-black placeholder-black"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </div>
-        </div>
-
-        <div className="pagination">
-          {renderPageNumbers()}
-        </div>       
+    <div className="flex justify-center items-center">
+        <div className="flex items-center">
+        <p>
+        <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
+            Export to Excel
+        </button>
+        </p>
             
-        <table className="min-w-full border border-gray-800 border-collapse">
-          <thead>
-            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-              <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
-              <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
-              <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
-              <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
-              <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
-              <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
-              <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
-              <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
-              <th  className="text-xs" onClick={() => requestSort('firstYearTuitionFee')}>1st Year Tuition Fee {getSortDirection('firstYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('firstYearHostelFee')}>1st Year Hostel Fee {getSortDirection('firstYearHostelFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('secondYearTuitionFee')}>2nd Year Tuition Fee {getSortDirection('secondYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('secondYearHostelFee')}>2nd Year Hostel Fee {getSortDirection('secondYearHostelFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('paidFirstYearTuitionFee')}>Paid 1st Year Tuition Fee {getSortDirection('paidFirstYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('paidFirstYearHostelFee')}>Paid 1st Year Hostel Fee {getSortDirection('paidFirstYearHostelFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('paidSecondYearTuitionFee')}>Paid 2nd Year Tuition Fee {getSortDirection('paidSecondYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('paidSecondYearHostelFee')}>Paid 2nd Year Hostel Fee {getSortDirection('paidSecondYearHostelFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
-              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
-              <th  className="text-xs">Action</th> {/* Assuming no sorting for the action column */}
-            </tr>
-          </thead>
+        </div>
+        <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
+        <div role="tablist" className="tabs tabs-boxed">
+        <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">CANCELLED STUDENTS</h2>
+        </div>
 
-          <tbody>
+
+        <div className="flex-grow flex justify-end">
+            <input
+            type="text"
+            placeholder="Search students..."
+            className="input input-bordered max-w-xs text-black placeholder-black"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            />
+        </div>
+    </div>
+
+      <div className="pagination">
+        {renderPageNumbers()}
+      </div>
+
+        <table className="min-w-full border border-gray-800 border-collapse">
+            <thead>
+            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
+                <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
+                <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
+                <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
+                <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
+                <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
+                <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
+                <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+                <th  className="text-xs" onClick={() => requestSort('firstYearTuitionFee')}>1st Year Tuition Fee {getSortDirection('firstYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('firstYearHostelFee')}>1st Year Hostel Fee {getSortDirection('firstYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('secondYearTuitionFee')}>2nd Year Tuition Fee {getSortDirection('secondYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('secondYearHostelFee')}>2nd Year Hostel Fee {getSortDirection('secondYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidFirstYearTuitionFee')}>Paid 1st Year Tuition Fee {getSortDirection('paidFirstYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidFirstYearHostelFee')}>Paid 1st Year Hostel Fee {getSortDirection('paidFirstYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidSecondYearTuitionFee')}>Paid 2nd Year Tuition Fee {getSortDirection('paidSecondYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidSecondYearHostelFee')}>Paid 2nd Year Hostel Fee {getSortDirection('paidSecondYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+                <th  className="text-xs">Action</th> {/* Assuming no sorting for the action column */}
+            </tr>
+            </thead>
+
+            <tbody>
             {currentStudents.map((student, index) => (
-              <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+                <tr className="bg-[#ff8989]" key={index}>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
@@ -490,18 +431,17 @@ function AdminComponent() {
                         <i className="fas fa-edit"></i>
                     </button>
                 </td>
-      </tr>
+                </tr>
 
             ))}
-          </tbody>
+            </tbody>
         </table>
-
-
-
+      <div className="pagination">
+        {renderPageNumbers()}
       </div>
 
 
-    {isEditModalOpen && (
+      {isEditModalOpen && (
       <div className="edit-modal">
         <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
         <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
@@ -579,32 +519,10 @@ function AdminComponent() {
         <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
     )}
-      <div className="pagination">
-        {renderPageNumbers()}
-      </div>
-
-      
-
-      <div className="my-4 ml-4">
-        <label className="flex items-center">
-          <span className="label-text mr-2">View Cancelled Students -</span>
-          <input 
-            type="checkbox" 
-            checked={showCancelled} 
-            onChange={toggleShowCancelled} 
-            className="checkbox checkbox-normal" 
-          />
-        </label>
-      </div>
 
 
-
-      {showCancelled && <CancelledStudents />}
-
-      
-
-</div>
+    </div>
   );
 }
 
-export default AdminComponent;
+export default CancelledStudents;

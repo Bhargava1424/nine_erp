@@ -311,7 +311,9 @@ const handleInputChange = (e) => {
       <>
           <Navbar/>
           <div className="container mx-auto p-4 text-center">   
-              <h2 className="text-2xl font-bold text-black-500 mb-4">ADD NEW STUDENT</h2>
+            <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+              <h2 className="text-2xl font-bold text-white">ADD NEW STUDENT</h2>
+            </div>
           </div>
       <div className="AddStudent">
 
@@ -459,8 +461,8 @@ const handleInputChange = (e) => {
                   onChange={handleInputChange}
               >
                   <option value="" disabled>Choose Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
+                  <option value="Male (Boy)">Male</option>
+                  <option value="Female (Girl)">Female</option>
               </select>
           </label>
 

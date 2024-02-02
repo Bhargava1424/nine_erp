@@ -129,7 +129,7 @@ function Navbar() {
             <Link to='/ListReceipts'>
               <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
                 <i className="fa fa-list-alt fa-3x"></i>
-                <h3 className="mt-2">List Receipts</h3>
+                <h3 className="mt-2">Receipts List</h3>
               </div>
             </Link>
           </div>

@@ -8,6 +8,11 @@ import { saveAs } from 'file-saver';
 function Concessions() {
     const [students, setStudents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const studentsPerPage = 100;
+
+    const indexOfLastStudent = currentPage * studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
     
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -67,8 +72,7 @@ function Concessions() {
         student.batch.includes(term) 
       );
     });
-  };
-  const filteredStudents = handleSearch(searchQuery);
+  }; 
 
   const exportToExcel = () => {
     const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
@@ -92,6 +96,52 @@ function Concessions() {
       'Batch': student.batch,
     }));
   };
+
+  const filteredStudents = handleSearch(searchQuery);
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  const renderPageNumbers = () => {
+    let pages = [];
+
+    // Always add the first page
+    pages.push(
+      <button key={1} className={`btn ${currentPage === 1 ? 'btn-active' : ''}`} onClick={() => setCurrentPage(1)}>1</button>
+    );
+
+    // Ellipsis for skipping pages between
+    if (currentPage > 3) {
+      pages.push(<span key="left-ellipsis">...</span>);
+    }
+
+    // Current page and its adjacent ones
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button key={i} className={`btn ${currentPage === i ? 'btn-active' : ''}`} onClick={() => setCurrentPage(i)}>{i}</button>
+      );
+    }
+
+    // Second ellipsis
+    if (currentPage < totalPages - 2) {
+      pages.push(<span key="right-ellipsis">...</span>);
+    }
+
+    // Always add the last page
+    if (totalPages > 1) {
+      pages.push(
+        <button key={totalPages} className={`btn ${currentPage === totalPages ? 'btn-active' : ''}`} onClick={() => setCurrentPage(totalPages)}>{totalPages}</button>
+      );
+    }
+
+    return (
+      <div className="pagination">{pages}</div>
+    );
+  };
+
+
     return (
         <div className="main-container">
           <Navbar />
@@ -105,7 +155,10 @@ function Concessions() {
                   
             </div>
             <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-              <h2 className="text-2xl font-bold text-black-500 mb-4">CONCESSION</h2>
+            
+            <div className="card bg-slate-600 text-black px-4 py-2"> {/* Added padding here */}
+              <h2 className="text-2xl font-bold text-white">CONCESSIONS</h2>
+            </div>
               <div className="flex-grow flex justify-end">
                 <input
                   type="text"
@@ -118,27 +171,30 @@ function Concessions() {
           </div>
 
 
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-center justify-center">
+          <div className="pagination">
+              {renderPageNumbers()}
+            </div>
             <table className="border border-gray-800 border-collapse">
               <thead>
               <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Student Name</th>
-                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Batch</th>
-                <th className="px-4 py-2 text-white border-r-2 border-gray-800">Action</th>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Student Name</th>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Batch</th>
+                <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredStudents.map((student, index) => (
+                {currentStudents.map((student, index) => (
                   <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
-                    <td className="border-2 border-gray-800 px-4 py-2">
+                    <td className="border-2 border-gray-800 px-4 py-2 text-sm">
                       <a href={`/AddStudentConcession?applicationNumber=${student.applicationNumber}`} target="_blank" rel="noopener noreferrer">
                         {`${student.firstName} ${student.surName}`.trim()}
                       </a>
                     </td>
-                    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
-                    <td className="border-2 border-gray-800 px-4 py-2">
+                    <td className="border-2 border-gray-800 px-4 py-2 text-sm">{student.batch}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-sm">
                     <button style={{backgroundColor: '#2D5990', margin: '2px'}}
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded"
                       onClick={() => window.location.href = `/AddStudentConcession?applicationNumber=${student.applicationNumber}`}
                     >
                       Add Concession
@@ -148,6 +204,10 @@ function Concessions() {
                 ))}
               </tbody>
             </table>
+
+            <div className="pagination">
+              {renderPageNumbers()}
+            </div>
           </div>
       
         </div>
