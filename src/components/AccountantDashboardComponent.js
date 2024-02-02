@@ -130,10 +130,8 @@ function ExecutiveComponent() {
 
   const filteredStudents = handleSearch(searchQuery);
 
-  let totalPages = 0;
   let currentStudents = []; 
   if (filteredStudents) {
-    totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
     const indexOfLastStudent = currentPage * rowsPerPage;
     const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
     currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
@@ -357,26 +355,7 @@ function ExecutiveComponent() {
   };
 
 
-  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
-
-  const paginate = pageNumber => setCurrentPage(pageNumber);
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(
-        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-          {i}
-        </button>
-      );
-    }
-    return pageNumbers;
-  };
-
   
-  const indexOfLastStudent = currentPage * rowsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
   
   

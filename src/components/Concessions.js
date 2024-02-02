@@ -11,7 +11,7 @@ function Concessions() {
     const [currentPage, setCurrentPage] = useState(1);
     const studentsPerPage = 100;
 
-    const indexOfLastStudent = currentPage * studentsPerPage;
+    const indexOfLastStudent = currentPage * studentsPerPage; 
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
     
   useEffect(() => {
