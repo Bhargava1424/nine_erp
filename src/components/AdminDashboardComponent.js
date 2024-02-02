@@ -29,6 +29,7 @@ function AdminComponent() {
           }
         };
 
+
         console.log(opts.body);
 
         api.dbGet(opts, function(error, data, response) {
@@ -208,6 +209,9 @@ function AdminComponent() {
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
+      if (editingStudent.studentStatus === "Cancelled") {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
+      }
       const opts = {
         body: {
           "collectionName": "students",
@@ -229,7 +233,7 @@ function AdminComponent() {
           }
         }
       };
-  
+
       api.dbUpdate(opts, function(error, data, response) {
         if (error) {
           console.error('API Error:', error);
@@ -246,19 +250,56 @@ function AdminComponent() {
             // Display success message with changes
             console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
   
-            // Reload the page
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+
+
+      const opts2 = {
+        body : {
+          "collectionName": "receipts",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber
+          },
+          "type": 'updateMany',
+          "update": {
+            "studentName": editingStudent.studentName,
+            "parentName": editingStudent.parentName,
+            "registeredMobileNumber": editingStudent.primaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "stream": editingStudent.course,
+            "residenceType": editingStudent.modeOfResidence,
+            "studentStatus": editingStudent.studentStatus,
+          }
+        }
+      }
+
+      api.dbUpdate(opts2, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+  
+            // Display success message with changes
+            console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
+            // relod the window
             window.location.reload();
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
           }
         }
       });
+
+
     } catch (error) {
       console.error("Error updating student: ", error);
     }
   }; 
-  
-  
   
 
   const generateBatchOptions = () => {
