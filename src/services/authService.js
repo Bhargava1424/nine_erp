@@ -25,7 +25,7 @@ export const useAuth = () => {
   const loginHandler = (userData) => {
         // Generate a random color for the user
         const userColor = getRandomColor();
-
+        console.log("Testing",userData);
         // Add color to the userData
         const updatedUserData = { ...userData, color: userColor };
     

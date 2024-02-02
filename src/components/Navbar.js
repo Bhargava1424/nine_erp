@@ -105,6 +105,7 @@ function Navbar() {
                   <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
                       <i className="fa fa-home fa-3x"></i>
                       <h3 className="mt-2">Dashboard</h3>
+                      <h4>Student Count:{user.totalStudentCount}</h4>
                   </div>
               </Link>
           </div>
