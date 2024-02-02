@@ -175,6 +175,7 @@ function AddStudentReceipt() {
                                         window.open(receiptUrl, '_blank');
                                     }
                                 }
+                                window.location.reload();
                             } catch (parseError) {
                                 console.error('Error parsing response:', parseError);
                             }
@@ -185,6 +186,7 @@ function AddStudentReceipt() {
                 }
 
                 setIsSubmitted(true);
+            
             };
 
     if (loading) {
@@ -217,33 +219,40 @@ function AddStudentReceipt() {
             <h2 className="font-bold text-2xl mt-8 mb-4">{studentData.firstName} {studentData.surName}</h2>
             <div className="flex flex-col space-y-8">
             {feeTypes.map((fee, index) => (
-                <div key={index} className="hover:bg-gray-400 p-4 transition duration-300 ease-in-out bg-gray-200">
-                    <h2 className='text-xl font-bold text-black mb-4 '>{fee.label}:</h2>
-                    <table className="table border border-black min-w-full divide-y divide-gray-300 shadow-lg">
-                        <thead className="bg-gray-200">
-                            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-                            {user.role === 'Manager'&&(
-                                <>
-                                <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
-                                <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
-                                </>
-                            )}
-                                <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
-                                <th className="px-4 py-2 text-sm border border-black text-white">Add Receipt</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-300">
-                            <tr className="bg-[#F2F2F2]">
-                                {user.role === 'Manager'&&(<>
-                                <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
-                                <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
-                                </>)}
-                                <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
-                                <td className="text-sm text-black font-bold border border-black">
-                                    <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick(fee.key)}>
-                                        Add Receipt
-                                    </button>
-                                    {selectedFeeType === fee.key && (
+    <div key={index} className="hover:bg-gray-400 p-4 transition duration-300 ease-in-out bg-gray-200">
+        <h2 className='text-xl font-bold text-black mb-4 '>{fee.label}:</h2>
+        <table className="table border border-black min-w-full divide-y divide-gray-300 shadow-lg">
+            <thead className="bg-gray-200">
+                <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                {user.role === 'Manager' && (
+                    <>
+                    <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
+                    <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                    </>
+                )}
+                    <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
+                    {/* Conditionally render Add Receipt header based on fee type and condition */}
+                    {!(fee.key.includes('secondYear') && (studentData.pendingFirstYearTuitionFee > 0 || studentData.pendingFirstYearHostelFee > 0)) && (
+                        <th className="px-4 py-2 text-sm border border-black text-white">Add Receipt</th>
+                    )}
+                </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-300">
+                <tr className="bg-[#F2F2F2]">
+                    {user.role === 'Manager' && (
+                        <>
+                        <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
+                        <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                        </>
+                    )}
+                    <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
+                    {/* Conditionally render Add Receipt button based on fee type and condition */}
+                    {!(fee.key.includes('secondYear') && (studentData.pendingFirstYearTuitionFee > 0 || studentData.pendingFirstYearHostelFee > 0)) && (
+                        <td className="text-sm text-black font-bold border border-black">
+                            <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick(fee.key)}>
+                                Add Receipt
+                            </button>
+                            {selectedFeeType === fee.key && (
                                     <div>
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
@@ -285,15 +294,14 @@ function AddStudentReceipt() {
                                         {/* Add submission button or form handlers as needed */}
                                     </div>
                                 )} 
-                                    {/* The form section should go here */}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className="divider divider-neutral ml-6 mr-6" ></div>
-                </div>
-                
-            ))}
+                        </td>
+                    )}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+))}
+
             </div>
             
             {/* Repeat the above block for each fee type */}
