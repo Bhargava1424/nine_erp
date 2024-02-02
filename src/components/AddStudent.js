@@ -308,7 +308,7 @@ const handleInputChange = (e) => {
   }, [branch, role]);
   
     return (
-      <>
+      <div className='root-container'>
           <Navbar/>
           <div className="container mx-auto p-4 text-center">   
             <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
@@ -639,7 +639,7 @@ const handleInputChange = (e) => {
       </form>
     </div>
   
-    </>
+    </div>
   );
 };
 

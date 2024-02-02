@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
+import { useSelector } from 'react-redux';
 function ExecutiveComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // New state for managing edit functionality
   const [editingStudent, setEditingStudent] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
-
+  const [totalStudentCount, setTotalStudentCount] = useState(0);
+  const branch = useSelector((state) => state.auth.branch);
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
@@ -21,7 +22,8 @@ function ExecutiveComponent() {
           body: {
             "collectionName": "students",
             "query": {
-              "studentStatus": "Active"
+              "studentStatus": "Active",
+              "branch":branch
             },
             "type": "findMany"
           }
@@ -36,7 +38,9 @@ function ExecutiveComponent() {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
-              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+              setStudents(responseBody)
+              setTotalStudentCount(responseBody.length);
+               // Assuming the actual data is in responseBody.data
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
@@ -47,19 +51,59 @@ function ExecutiveComponent() {
         console.error("Error fetching data: ", error);
       }
     };
-
     fetchStudents();
   }, []);
 
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
+    const filtered = handleSearch(e.target.value.toLowerCase());
+    setTotalStudentCount(filtered.length);
+
   };
+
+  const sortedAndFilteredStudents = useMemo(() => {
+    let filtered = students;
+    if (searchQuery) {
+      const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
+      filtered = students.filter(student => searchTerms.every(term =>
+        student.firstName.toLowerCase().includes(term) ||
+            student.applicationNumber.toLowerCase().includes(term) ||
+            student.surName.toLowerCase().includes(term) ||
+            student.parentName.toLowerCase().includes(term) ||
+            student.branch.toLowerCase().includes(term) ||
+            student.primaryContact.includes(term) ||
+            student.gender.toLowerCase().includes(term) ||
+            student.batch.includes(term) ||
+            student.course.toLowerCase().includes(term) ||
+            student.modeOfResidence.toLowerCase().includes(term) ||
+            student.pendingFirstYearTuitionFee.toString().includes(term) ||
+            student.pendingFirstYearHostelFee.toString().includes(term) ||
+            student.pendingSecondYearTuitionFee.toString().includes(term) ||
+            student.pendingSecondYearHostelFee.toString().includes(term)
+        // include other fields as necessary
+      ));
+    }
+    
+    return filtered.sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [students, searchQuery, sortConfig]);
+  
 
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
       return students; // Return all students if the search query is empty
     }
+
+
+  
   
     const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
   
@@ -298,45 +342,79 @@ function ExecutiveComponent() {
       // Add other fields if necessary
     }));
   };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  } 
+
+
+  const getSortDirection = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+    }
+    return '';
+  };
+
+
+  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
+  
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  
   
 
 
   return (
 
     
-    <div className="main-container">
-
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
-          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
-          <p className="text-red-600 text-lg font-semibold">
-            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
-          </p>
-        </div>
-        
-      
+    <div >   
 
 <div className="overflow-x-auto mt-3">
-  <div className="flex justify-center items-center">
-    <div className="flex items-center">
-      <p>
-      <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
-        Export to Excel
-      </button>
-      </p>
-           
-    </div>
-    <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-      <h2 className="text-2xl font-bold text-black-500 mb-4">DASHBOARD</h2>
-      <div className="flex-grow flex justify-end">
-        <input
-          type="text"
-          placeholder="Search students..."
-          className="input input-bordered max-w-xs text-black placeholder-black"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
+<div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+  <div className="mb-4 md:mb-0">
+    <button onClick={exportToExcel} className="btn btn-primary bg-blue-500 hover:bg-blue-700">
+      Export to Excel
+    </button>
   </div>
+  <div className="flex-1 flex justify-center mb-4 md:mb-0"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-black">DASHBOARD</h2>
+  </div>
+  <div className="flex flex-col items-center md:items-end w-full md:w-auto">
+    <input
+      type="text"
+      placeholder="Search students..."
+      className="input input-bordered w-full md:max-w-xs text-black placeholder-black mb-4 md:mb-0"
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+    <div className="text-lg font-bold text-black w-full md:w-auto md:pr-0" style={{ paddingRight: '5rem' }}>Total Students: {totalStudentCount}</div>
+
+  </div>
+</div>
+
+
+
 
 
 
@@ -345,46 +423,50 @@ function ExecutiveComponent() {
   <table className="min-w-full border border-gray-800 border-collapse">
     <thead>
       <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Student Name</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Application Number</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Parent Name</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Primary Contact</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Gender</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Batch</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Course</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Mode of Residence</th>     
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 1st Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Tuition Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Pending 2nd Year Hostel Fee</th>
-        <th className="px-4 py-2  border-r-2 border-gray-800">Action</th>
+        <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
+        <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
+        <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
+        <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
+        <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
+        <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
+        <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
+        <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
+        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+        <th  className="text-xs">Action</th> {/* Assuming no sorting for the action column */}
       </tr>
     </thead>
+
     <tbody>
       {currentStudents.map((student, index) => (
         <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
-    <td className="border-2 border-gray-800 px-4 py-2">{`${student.firstName} ${student.surName}`.trim()}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.applicationNumber}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.parentName}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.primaryContact}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.gender}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.batch}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.course}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.modeOfResidence}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingFirstYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearTuitionFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">{student.pendingSecondYearHostelFee}</td>
-    <td className="border-2 border-gray-800 px-4 py-2">
-        <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
-            <i className="fas fa-edit"></i>
-        </button>
-    </td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.primaryContact}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.gender}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.batch}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.course}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.modeOfResidence}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
+          <td className="border-2 border-gray-800 px-4 py-2 text-xs">
+              <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+                  <i className="fas fa-edit"></i>
+              </button>
+          </td>
 </tr>
 
       ))}
     </tbody>
   </table>
+
+
+
 </div>
 
     {isEditModalOpen && (
@@ -468,6 +550,7 @@ function ExecutiveComponent() {
       <div className="pagination">
         {renderPageNumbers()}
       </div>
+
 
       
 

@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux';
-import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminDashboardComponent';
 import ExecutiveComponent from './ExecutiveDashboardComponent';
 import AccountantComponent from './AccountantDashboardComponent';
@@ -12,9 +11,6 @@ function HeroSection2() {
   
   return (
     <div className="hero-section">   
-
-
-      {!userRole && <LoginComponent />}
       {userRole === 'Manager' && <AdminComponent/>}
       {userRole === 'Executive' && <ExecutiveComponent />}
       {userRole === 'Accountant' && <AccountantComponent />}

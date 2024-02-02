@@ -11,8 +11,7 @@ function AdminComponent() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
-
-
+  const [totalStudentCount, setTotalStudentCount] = useState(0);
 
   useEffect(() => {
     // Function to fetch students data from the backend
@@ -39,7 +38,9 @@ function AdminComponent() {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
-              setStudents(responseBody) // Assuming the actual data is in responseBody.data
+              setStudents(responseBody)
+              setTotalStudentCount(responseBody.length);
+               // Assuming the actual data is in responseBody.data
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
@@ -55,6 +56,9 @@ function AdminComponent() {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
+    const filtered = handleSearch(e.target.value.toLowerCase());
+    setTotalStudentCount(filtered.length);
+
   };
 
   const sortedAndFilteredStudents = useMemo(() => {
@@ -390,46 +394,33 @@ function AdminComponent() {
   return (
 
     
-    <div className="main-container">
+    <div >   
 
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-5 text-center my-5">
-          <h1 className="text-gray-800 text-2xl font-bold mb-3">NINE EDUCATION FEE MANAGEMENT SYSTEM</h1>
-          <p className="text-red-600 text-lg font-semibold">
-            ⚠️ The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
-          </p>
-        </div>
-        
-      
+<div className="overflow-x-auto mt-3">
+<div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+  <div className="mb-4 md:mb-0">
+    <button onClick={exportToExcel} className="btn btn-primary bg-blue-500 hover:bg-blue-700">
+      Export to Excel
+    </button>
+  </div>
+  <div className="flex-1 flex justify-center mb-4 md:mb-0 card bg-slate-600 text-black px-4 py-2"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
+  </div>
+  <div className="flex flex-col items-center md:items-end w-full md:w-auto">
+    <input
+      type="text"
+      placeholder="Search students..."
+      className="input input-bordered w-full md:max-w-xs text-black placeholder-black mb-4 md:mb-0"
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+    <div className="text-lg font-bold text-black w-full md:w-auto md:pr-0" style={{ paddingRight: '5rem' }}>Total Students: {totalStudentCount}</div>
 
-      <div className="overflow-x-auto mt-3">
-        <div className="flex justify-center items-center">
-          <div className="flex items-center">
-            <p>
-            <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
-              Export to Excel
-            </button>
-            </p>
-                
-          </div>
-          <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-          
-
-          <div className="card bg-slate-600 text-black px-4 py-2"> {/* Added padding here */}
-            <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
-          </div>
+  </div>
+</div>
 
 
 
-            <div className="flex-grow flex justify-end">
-              <input
-                type="text"
-                placeholder="Search students..."
-                className="input input-bordered max-w-xs text-black placeholder-black"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </div>
-        </div>
 
         <div className="pagination">
           {renderPageNumbers()}

@@ -175,7 +175,7 @@ function AddReceipts() {
 
 
     return (
-        <div className="main-container">
+        <div className="main-container root-container">
           <Navbar />
           <div className="flex justify-center items-center">
             <div className="flex items-center">

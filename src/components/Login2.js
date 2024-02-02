@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../services/authService';
 import { Link } from 'react-router-dom';  
-
+import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 function Login2() {
+  const navigate=useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
-  let userBranch = '';;
+  let userBranch = '';
 
   const handleLogin = (e) => {
     e.preventDefault();
-
+  
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.AuthorizationApi();
@@ -29,15 +31,48 @@ function Login2() {
             console.log(responseBody.data.employeeRole);
             if (responseBody.message === 'Login Successful') {
               userRole = responseBody.data.employeeRole;
-              userBranch = responseBody.data.employeeBranch
-              localStorage.setItem('userRole', userRole);
-              localStorage.setItem('userBranch', userBranch);
-              authServiceLogin({ role: userRole, branch: userBranch }); 
+              userBranch = responseBody.data.employeeBranch;
+              // Fetch students based on the branch here
+              const isManager = userRole==="Manager";
+              const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch};
+              try {
+                var SchoolManagementSystemApi = require('school_management_system_api');
+                var api = new SchoolManagementSystemApi.DbApi();
+                const opts = {
+                  body: {
+                    "collectionName": "students",
+                    "query": query,
+                    "type": "findMany"
+                  }
+                };
+        
+                console.log("In Login",opts.body);
+        
+                api.dbGet(opts, function(error, data, response) {
+                  if (error) {
+                    console.error('API Error:', error);
+                  } else {
+                    try {
+                      const responseBody = response.body; // Assuming response.body is already in JSON format
+                      console.log("In login",responseBody);
+                      
+                      const studentsCount = responseBody.length; // This is an example, adjust based on actual API response structure
+                      // Now call authServiceLogin with role, branch, and students count
+                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount }); 
+                      navigate('/');
+                    } catch (parseError) {
+                      console.error('Error parsing response:', parseError);
+                    }
+                  }
+                });
+        
+              } catch (error) {
+                console.error("Error fetching data: ", error);
+              }
             }
             else {
               alert(responseBody.message);
             }
-
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
           }
@@ -46,40 +81,14 @@ function Login2() {
     } catch (error) {
       console.error('Error:', error);
     }
-
-    // // Sample admin and accountant credentials
-    // const adminCredentials = { email: 'admin@example.com', password: '123' };
-    // const accountantCredentials = { email: 'accountant@example.com', password: '123' };
-    // const executiveCredentials = { email: 'executive@example.com', password: '123' };
-
-    // Validation using regular expressions
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email) || password.trim() === '') {
-      alert('Invalid email or password format.');
-      return;
-    }
-
-
-    // Check user credentials and set role
-    // if (email === adminCredentials.email && password === adminCredentials.password) {
-    //   userRole = 'Admin';
-    // } else if (email === accountantCredentials.email && password === accountantCredentials.password) {
-    //   userRole = 'Accountant';
-    // } else if (email === executiveCredentials.email && password === executiveCredentials.password) {
-    //   userRole = 'Executive';
-    // } else {
-    //   alert('Invalid credentials.');
-    //   return;
-    // }
-    // Log in logic (you may want to use authentication libraries or APIs here)
-
-    // Call the login function from authService
   };
+  
 
   
 
   return (
+    <div>
+      <Navbar/>
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
       <img alt="logo" src="/9logo.webp" className="responsive-logo" />
@@ -115,6 +124,7 @@ function Login2() {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 

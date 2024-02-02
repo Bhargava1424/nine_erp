@@ -344,7 +344,7 @@ const handleEditSubmit = () => {
     
   
     return (
-      <div className="main-container">
+      <div className="main-container root-container">
         <Navbar/>
 
         {/* Render your receipts table here */}
