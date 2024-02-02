@@ -88,6 +88,55 @@ function DownloadReceipt() {
     if (!receiptsData) {
         return <div>Student not found</div>;
     }
+
+    function numberToWordsIN(num) {
+        if (num === 0) return "zero";
+        if (num < 0) return "minus " + numberToWordsIN(-num);
+    
+        const words = [];
+    
+        const crore = Math.floor(num / 10000000);
+        num -= crore * 10000000;
+        const lakh = Math.floor(num / 100000);
+        num -= lakh * 100000;
+        const thousand = Math.floor(num / 1000);
+        num -= thousand * 1000;
+        const hundred = Math.floor(num / 100);
+        num -= hundred * 100;
+    
+        if (crore) words.push(numberToWordsIN(crore) + " crore");
+        if (lakh) words.push(numberToWordsIN(lakh) + " lakh");
+        if (thousand) words.push(numberToWordsIN(thousand) + " thousand");
+        if (hundred) words.push(numberToWordsIN(hundred) + " hundred");
+    
+        // Handling tens and ones together
+        if (num > 0) {
+            if (words.length !== 0) words.push("and"); // Add "and" before tens and ones if there are higher units
+    
+            const belowTwenty = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+            const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    
+            if (num < 20) {
+                words.push(belowTwenty[num]);
+            } else {
+                const ten = Math.floor(num / 10);
+                const one = num % 10;
+                let tenWord = tens[ten];
+                if (one > 0) {
+                    tenWord += "-" + belowTwenty[one];
+                }
+                words.push(tenWord);
+            }
+        }
+    
+        return words.join(" ");
+    }
+    
+
+    
+
+    const amountInWords = numberToWordsIN(parseInt(amountPaid, 10));
+    console.log(amountPaid);
     
     return (
         <div className="bg-white p-8" id="download-receipt-content">
