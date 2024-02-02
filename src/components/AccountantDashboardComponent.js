@@ -362,7 +362,8 @@ function ExecutiveComponent() {
       value={searchQuery}
       onChange={handleSearchChange}
     />
-    <div className="text-lg font-bold text-black w-full md:w-auto pr-20 md:pr-0">Total Students: {totalStudentCount}</div>
+    <div className="text-lg font-bold text-black w-full md:w-auto md:pr-0" style={{ paddingRight: '5rem' }}>Total Students: {totalStudentCount}</div>
+
   </div>
 </div>
 

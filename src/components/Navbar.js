@@ -90,9 +90,9 @@ function Navbar() {
       <i className="fa fa-dashboard"></i>
     </div>
     <div className="header-title" style={{ backgroundColor: '#F2F2F2' }}>
-      <h1>NINE EDUCATION ERP SYSTEM,</h1>
+      <h1><b>NINE EDUCATION FEE MANAGEMENT SYSTEM</b></h1>
       <small style={{ color: 'red' }}>
-        <i className="fa fa-exclamation-triangle" aria-hidden="true"></i> The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.
+        <i className="fa fa-exclamation-triangle" aria-hidden="true"></i><b> The activity on this page is being logged by the admin. Any fraudulent activity is liable for prosecution.</b>
       </small>
     </div>
   </section>
@@ -124,7 +124,25 @@ function Navbar() {
               </div>
             </Link>
           </div>
+          <div className="flex-1 min-w-max">
+            <Link to='/ListReceipts'>
+              <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
+                <i className="fa fa-list-alt fa-3x"></i>
+                <h3 className="mt-2">Receipts List</h3>
+              </div>
+            </Link>
+          </div>
 
+          {(user.role === 'Manager' || user.role === 'Executive') && (
+            <div className="flex-1 min-w-max">
+              <Link to='/Concessions'>
+                <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
+                  <i className="fa fa-tags fa-3x"></i>
+                  <h3 className="mt-2">Concessions</h3>
+                </div>
+              </Link>
+            </div>
+          )}
           {user.role === 'Manager' && (
             <>
               <div className="flex-1 min-w-max">
@@ -147,25 +165,7 @@ function Navbar() {
             </>
           )}
 
-          <div className="flex-1 min-w-max">
-            <Link to='/ListReceipts'>
-              <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
-                <i className="fa fa-list-alt fa-3x"></i>
-                <h3 className="mt-2">Receipts List</h3>
-              </div>
-            </Link>
-          </div>
 
-          {(user.role === 'Manager' || user.role === 'Executive') && (
-            <div className="flex-1 min-w-max">
-              <Link to='/Concessions'>
-                <div id="cardbox1" className="statistic-box flex items-center justify-center flex-col">
-                  <i className="fa fa-tags fa-3x"></i>
-                  <h3 className="mt-2">Concessions</h3>
-                </div>
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </>
