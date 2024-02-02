@@ -2,6 +2,10 @@ import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useSelector } from 'react-redux';
+import CancelledStudents from './CancelledStudents';
+
+
+
 function ExecutiveComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -360,6 +364,12 @@ function ExecutiveComponent() {
 
   
 
+  const [showCancelled, setShowCancelled] = useState(false);
+
+  // Function to toggle showCancelled state
+  const toggleShowCancelled = () => {
+    setShowCancelled(!showCancelled);
+  };
   
 
 
@@ -532,6 +542,24 @@ function ExecutiveComponent() {
       <div className="pagination">
         {renderPageNumbers()}
       </div>
+
+
+
+      <div className="my-4 ml-4">
+        <label className="flex items-center">
+          <span className="label-text mr-2">View Cancelled Students -</span>
+          <input 
+            type="checkbox" 
+            checked={showCancelled} 
+            onChange={toggleShowCancelled} 
+            className="checkbox checkbox-normal" 
+          />
+        </label>
+      </div>
+
+
+
+      {showCancelled && <CancelledStudents />}
 
 
       

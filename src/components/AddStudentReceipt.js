@@ -214,8 +214,6 @@ function AddStudentReceipt() {
     return (
         <div className="main-container root-container">
             <Navbar />
-
-            
             <h2 className="font-bold text-2xl mt-8 mb-4">{studentData.firstName} {studentData.surName}</h2>
             <div className="flex flex-col space-y-8">
             {feeTypes.map((fee, index) => (
