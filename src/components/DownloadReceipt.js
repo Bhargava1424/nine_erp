@@ -16,10 +16,11 @@ function DownloadReceipt() {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const amount = queryParams.get('amountPaid');
+        console.log("Query amountPaid:", amount); // Debug log
         const receiptNumber = queryParams.get('receiptNumber');
         const feeType = queryParams.get('feeType');
     
-        if (amount) setAmountPaid(amount);
+        if (amount) setAmountPaid(parseInt(amount, 10));
         if (receiptNumber) setReceiptNumber(receiptNumber);
         if (feeType) setFeeType(feeType);
     }, [location]);
@@ -88,6 +89,91 @@ function DownloadReceipt() {
     if (!receiptsData) {
         return <div>Student not found</div>;
     }
+
+    function numberToWordsIN(num) {
+        if (num === 0) return "zero";
+        if (num < 0) return "minus " + numberToWordsIN(-num);
+    
+        const words = [];
+    
+        const crore = Math.floor(num / 10000000);
+        num -= crore * 10000000;
+        const lakh = Math.floor(num / 100000);
+        num -= lakh * 100000;
+        const thousand = Math.floor(num / 1000);
+        num -= thousand * 1000;
+        const hundred = Math.floor(num / 100);
+        num -= hundred * 100;
+        const ten = Math.floor(num / 10);
+        const one = num % 10;
+    
+        if (crore) words.push(numberToWordsIN(crore) + " crore");
+        if (lakh) words.push(numberToWordsIN(lakh) + " lakh");
+        if (thousand) words.push(numberToWordsIN(thousand) + " thousand");
+        if (hundred) words.push(numberToWordsIN(hundred) + " hundred");
+    
+        const belowTwenty = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+        const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    
+        if (ten > 1) {
+            words.push(tens[ten]);
+            if (one > 0) words.push(belowTwenty[one]);
+        } else if (ten === 1 || one > 0) {
+            words.push(belowTwenty[ten * 10 + one]);
+        }
+    
+        if (words.length > 1) {
+            // Combine all but last word with commas
+            const lastWord = words.pop();
+            return words.join(", ") + " and " + lastWord;
+        }
+    
+        return words.join("");
+    }
+
+    function numberToWordsIN(num) {
+        if (num === 0) return "zero";
+        if (num < 0) return "minus " + numberToWordsIN(-num);
+    
+        const words = [];
+    
+        const crore = Math.floor(num / 10000000);
+        num -= crore * 10000000;
+        const lakh = Math.floor(num / 100000);
+        num -= lakh * 100000;
+        const thousand = Math.floor(num / 1000);
+        num -= thousand * 1000;
+        const hundred = Math.floor(num / 100);
+        num -= hundred * 100;
+        const ten = Math.floor(num / 10);
+        const one = num % 10;
+    
+        if (crore) words.push(numberToWordsIN(crore) + " crore");
+        if (lakh) words.push(numberToWordsIN(lakh) + " lakh");
+        if (thousand) words.push(numberToWordsIN(thousand) + " thousand");
+        if (hundred) words.push(numberToWordsIN(hundred) + " hundred");
+    
+        const belowTwenty = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+        const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    
+        if (ten > 1) {
+            words.push(tens[ten]);
+            if (one > 0) words.push(belowTwenty[one]);
+        } else if (ten === 1 || one > 0) {
+            words.push(belowTwenty[ten * 10 + one]);
+        }
+    
+        if (words.length > 1) {
+            // Combine all but last word with commas
+            const lastWord = words.pop();
+            return words.join(", ") + " and " + lastWord;
+        }
+    
+        return words.join("");
+    }
+
+    const amountInWords = numberToWordsIN(parseInt(amountPaid, 10));
+    console.log(amountPaid);
     
     return (
         <div className="bg-white p-8" id="download-receipt-content">
@@ -129,20 +215,27 @@ function DownloadReceipt() {
                     <p className="text-xs">Residence Type :  {receiptsData.residenceType}</p>
                 </div>
             </div>
-            <h1 className="text-2xl font-bold text-center">DETAILS OF THE CURRENT TRANSACTION</h1>
+            <h1 className="text-2xl font-bold text-center">FEE DETAILS OF THE STUDENT</h1>
             <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
                 
                 <div>
                     <p className="text-xs">Tuition Fee Payable (1st Year): <span className="font-bold">{receiptsData.firstYearTuitionFeePayable}</span></p>
-                    <p className="text-xs">Hostel Fee Payable (1st Year) : <span className="font-bold">{receiptsData.firstYearHostelFeePayable}</span></p>
-                    <p className="text-xs">Tuition Fee Payable (2nd Year) : <span className="font-bold">{receiptsData.secondYearTuitionFeePayable}</span></p>
-                    <p className="text-xs">Hostel Fee Payable (2nd Year) :  <span className="font-bold">{receiptsData.secondYearHostelFeePayable}</span></p>    
+                    <p className="text-xs">Hostel Fee Payable (1st Year) : <span className="font-bold">{receiptsData.firstYearHostelFeePayable}</span></p>  
                 </div>
                 <div className="text-right">
-                    <p className="text-xs">Amount Paid - {feeType}  :  <span className="font-bold">{amountPaid + '/-'}</span></p>
-                    {/* <p className="text-xs">Hostel Fee Paid (1st Year) :    <span className="font-bold">{receiptsData.firstYearHostelFeePaid}</span></p>
-                    <p className="text-xs">Tuition Fee Paid (2nd Year) :  <span className="font-bold">{receiptsData.secondYearTuitionFeePaid}</span></p>
-                    <p className="text-xs">Hostel Fee Paid (2nd Year) :  <span className="font-bold">{receiptsData.secondYearHostelFeePaid}</span></p> */}
+                    <p className="text-xs">Tuition Fee Payable (2nd Year) : <span className="font-bold">{receiptsData.secondYearTuitionFeePayable}</span></p>
+                    <p className="text-xs">Hostel Fee Payable (2nd Year) :  <span className="font-bold">{receiptsData.secondYearHostelFeePayable}</span></p>  
+                </div>
+            </div>
+            <h1 className="text-2xl font-bold text-center">DETAILS OF THE CURRENT TRANSACTION</h1>
+            <div className="grid grid-cols-2 gap-4 mb-4 border-b-2 border-black">
+                
+                <div>
+                    <p className="text-xs">Amount Paid in Current Transaction:<span className="font-bold">{amountPaid + '/-'}</span></p>
+                    <p className="text-xs">Amount Paid in Words: {amountInWords}{/*Placeholder 1 */}</p>
+                    <p className="text-xs">Amount Paid Towards: {feeType} {/*Placeholder 2 */}</p>
+                    <p className="text-xs">Mode of Payment: {/*Placeholder 3 */} </p>
+                    
                 </div>
             </div>
             <h1 className="text-2xl font-bold text-center">DETAILS OF ALL TRANSACTIONS</h1>

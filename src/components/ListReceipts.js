@@ -232,7 +232,9 @@ const handleEditSubmit = () => {
 
       // Redirect to DownloadReceipt component or specific URL
       // For example, using window.location:
+      
       const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receipt.receiptNumber}&feeType=${feeType}`;
+      console.log(amountPaid);{/*error here */}
       window.open(receiptUrl, '_blank');
   };
 

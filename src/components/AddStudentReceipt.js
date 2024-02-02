@@ -172,6 +172,7 @@ function AddStudentReceipt() {
                                         console.log('Receipt generated');
                                         // Include the amountPaid in the URL
                                         const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${response.data.receiptNumber}&feeType=${feeType}`;
+                                        console.log(amountPaid)
                                         window.open(receiptUrl, '_blank');
                                     }
                                 }
