@@ -220,8 +220,10 @@ function AddEmployee() {
             const responseBody = response.body; // Assuming response.body is already in JSON format
             console.log(responseBody);
             setShowSuccessMessage(true);
-            alert("Employee Added Successfully")
-            window.location.reload()
+            alert(responseBody.message);
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
             // setBranches(responseBody); // Assuming the actual data is in responseBody.data
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
