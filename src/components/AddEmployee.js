@@ -6,14 +6,14 @@ import React, { useState, useEffect } from 'react';
 function SelectField({ label, name, options, value, handleChange }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-lg font-medium text-gray-700 dark:text-gray-200">{label}</label>
+      <label htmlFor={name} className="form-control w-1/2 pr-2">{label}</label>
       <select
         required
         name={name}
         id={name}
         value={value}
         onChange={handleChange}
-        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 dark:text-white"
+        className="select select-bordered w-full max-w-xs"
       >
         <option value="">Select {label}</option>
         {options.map((option) => (
@@ -37,10 +37,100 @@ function AddEmployee() {
     password: '',
   });
 
-  const [showInstructions, setShowInstructions] = useState(true);
   const [errors, setErrors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+    // State for managing edit functionality
+    const [editingEmployee, setEditingEmployee] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [filteredBranches, setFilteredBranches] = useState([]);
+    // Function to open the edit modal with the selected employee's data
+    const openEditModal = (employee) => {
+      setEditingEmployee({ ...employee });
+      setIsEditModalOpen(true);
+    };
+  
+    // Function to handle field changes in the edit modal
+    const handleEditChange = (e) => {
+      const { name, value } = e.target;
+      let updatedValue = value;
+      let newErrors = { ...errors };   
+      // Allow only alphabets in name fields and automatically capitalize them
+      if (name === "employeeName") {
+        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+      }
+    
+      // Allow only numbers in the phone number field
+      if (name === "phoneNumber") {
+        updatedValue = value.replace(/[^0-9]/g, '');
+        if (updatedValue.length !== 10) {
+          newErrors.phoneNumber = 'Phone number must be 10 digits.';
+        } else {
+          newErrors.phoneNumber = '';
+        }
+      }
+    
+      // Update state with validated and transformed values
+      setEditingEmployee({ ...editingEmployee, [name]: updatedValue });
+    
+      // Additional validation for phone number length on submit
+      if (name === "phoneNumber" && updatedValue.length !== 10) {
+        setErrors({ ...errors, phoneNumber: 'Phone number must be 10 digits.' });
+      } else {
+        setErrors({ ...errors, phoneNumber: '' });
+      }
+    };
+    
+  
+    // Function to submit the edited employee data
+    const handleEditSubmit = async (e) => {
+      e.preventDefault();
+      // Check for errors before submitting
+      if (errors.phoneNumber) {
+        alert("Please correct the errors before submitting.");
+        return;
+      }
+    
+      try {
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "employees",
+            "query": {
+              "employeeId": editingEmployee.employeeId // Use the employee's _id to identify the document to update
+            },
+            "type": 'updateOne',
+            "update": {
+              "employeeName": editingEmployee.employeeName,
+              "role": editingEmployee.role,
+              "phoneNumber": editingEmployee.phoneNumber,
+              "branch": editingEmployee.branch,
+              "username": editingEmployee.username,
+              "password": editingEmployee.password,
+              // Include other fields that need to be updated
+            }
+          }
+        };
+    
+        api.dbUpdate(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            // Handle successful update here
+            // For example, you can close the edit modal and clear the editing state
+            setIsEditModalOpen(false);
+            setEditingEmployee(null);
+            // Reload the employee list or use another method to update the UI
+            alert("Employees Updated Successfully")
+            window.location.reload()
+          }
+        });
+      } catch (error) {
+        console.error('There was an error updating the employee!', error);
+      }
+    };
+    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,10 +185,14 @@ function AddEmployee() {
         }
       }
     });
+    if(employeeData.phoneNumber.length!==10){
+      isValid=false;
+    }
   
     // If form is not valid, set errors and return early
     if (!isValid) {
       setErrors(newErrors);
+      alert("Enter The fields in Proper Format")
       return;
     }
   
@@ -126,6 +220,10 @@ function AddEmployee() {
             const responseBody = response.body; // Assuming response.body is already in JSON format
             console.log(responseBody);
             setShowSuccessMessage(true);
+            alert(responseBody.message);
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
             // setBranches(responseBody); // Assuming the actual data is in responseBody.data
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
@@ -139,6 +237,7 @@ function AddEmployee() {
       // Set submitting state to false
       setIsSubmitting(false);
     }
+    
   };
   
   
@@ -153,7 +252,7 @@ function AddEmployee() {
 
   // Handler to restrict name input to alphabets only
   const handleNameInput = (e) => {
-    const validName = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+    const validName = e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
     setEmployeeData({ ...employeeData, [e.target.name]: validName });
   };
   const [branches, setBranches] = useState([]);
@@ -260,36 +359,57 @@ function AddEmployee() {
   };
 
   const filteredEmployees = filterEmployees(employees);
+  const fetchBranches = async () => {
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          collectionName: 'branches',
+          query: {},
+          type: 'findMany',
+        },
+      };
 
+      console.log(opts.body);
+
+      api.dbGet(opts, function (error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setBranches(responseBody); // Assuming the actual data is in responseBody.data
+            setFilteredBranches(responseBody); // Initialize filteredBranches with the initial data
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBranches();
+  }, []);
   
   
 
 
   return (
-    <>
+    <div className='root-container'>
       <Navbar />
 
-      <div className="flex justify-center items-center">
-          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD EMPLOYEE</h2>
-      </div>
-      <div className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Add New Employee</h2>
-        <div className="flex items-center mb-4">
-          <input type="checkbox" className="toggle" checked={showInstructions} onChange={() => setShowInstructions(!showInstructions)} />
-          <span className="ml-2">Show Instructions</span>
+      <div className="container mx-auto p-4 text-center">   
+        <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+          <h2 className="text-2xl font-bold text-white">ADD EMPLOYEE</h2>
         </div>
-        {showInstructions && (
-          <div role="alert" className="alert alert-info mb-4">
-            <div className="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <ul className="list-disc list-inside ml-4">
-                <li>Fill in all the details to add a new employee.</li>
-                <li>Username should be in email format (e.g., john.doe@example.com).</li>
-                <li>Phone number must be 10 digits long.</li>
-              </ul>
-            </div>
-          </div>
-        )}
+      </div>
+          
+      <div className="container mx-auto p-4">
         {showSuccessMessage && (
         <div role="alert" className="alert alert-success">
             <div className="flex items-center">
@@ -300,88 +420,168 @@ function AddEmployee() {
             </div>
         </div>
     )}
-        <form onSubmit={handleSubmit} className="space-y-6 bg-dark-blue p-6 rounded-lg shadow-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* ... existing input fields */}
-            <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
-            <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-            <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
-            <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
-            <SelectField
-              label="Branch"
-              name="branch"
-              options={branches.map(branch => branch.branchName)} // Assuming branchName is the field you want to display
-              value={employeeData.branch}
-              handleChange={handleChange}
-            />
-            <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
-            <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
-          </div>
-          <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
-          >
-            Add Employee
-          </button>
 
-          </div>
-        </form>
 
-        <div>
-          <div className="container mx-auto p-4">
-          <input
-            type="text"
-            placeholder="Search employees..."
-            className="input input-bordered w-full max-w-xs"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          <h2 className="text-2xl font-bold mb-4">Employees List</h2>
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2">Employee Name</th>
-                  <th className="px-4 py-2">Role</th>
-                  <th className="px-4 py-2">Phone</th>
-                  <th className="px-4 py-2">Branch</th>
-                  {/* Add other headers as needed */}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEmployees.map((employee, index) => (
-                  <tr key={index}>
-                    <td className="border px-4 py-2">{employee.employeeName}</td>
-                    <td className="border px-4 py-2">{employee.role}</td>
-                    <td className="border px-4 py-2">{employee.phoneNumber}</td>
-                    <td className="border px-4 py-2">{employee.branch}</td>
-                    {/* Add other columns as needed */}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        </div>
+      <div className="flex justify-center whitespace-nowrap p-7 bg-slate-200 mt-4 rounded-3xl" style={{ marginLeft: '350px', marginRight: '350px' }}>
+
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* ... existing input fields */}
+                  <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
+                  <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
+                  <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
+                  <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
+                  <SelectField
+                    label="Branch"
+                    name="branch"
+                    options={branches.map(branch => branch.branchCode)} // Assuming branchName is the field you want to display
+                    value={employeeData.branch}
+                    handleChange={handleChange}
+                  />
+                  <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
+                  <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
+
+                </div>
+                <div className="mt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
+                >
+                  Add Employee
+                </button>
+
+                </div>
+              </form>
+
+
       </div>
-    </>
+        
+        <div>
+  <div className="container mx-auto p-4 relative mt-6"> {/* Add relative positioning */}
+    <h2 className="text-2xl font-bold text-center mb-4">Employees List</h2>
+    <input
+      type="text"
+      placeholder="Search employees..."
+      className="input input-bordered max-w-xs absolute right-4 top-4" 
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+    <div className="overflow-x-auto rounded-3xl p-4">
+      <table className="table-auto w-full">
+        <thead>
+          <tr style={{ backgroundColor: '#2D5990', color: '#FFFFFF' }}>
+            <th className="px-4 py-2">Employee Name</th>
+            <th className="px-4 py-2">Role</th>            
+            <th className="px-4 py-2">Branch</th>
+            <th className="px-4 py-2">Username</th>
+            <th className="px-4 py-2">Password</th>
+            <th className="px-4 py-2">Action</th>
+            {/* Add other headers as needed */}
+          </tr>
+        </thead>
+        <tbody>
+  {filteredEmployees.map((employee, index) => (
+    <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+      <td className="border px-4 py-2">{employee.employeeName}</td>
+      <td className="border px-4 py-2">{employee.role}</td>      
+      <td className="border px-4 py-2">{employee.branch}</td>
+      <td className="border px-4 py-2">{employee.username}</td>
+      <td className="border px-4 py-2">{employee.password}</td>
+      <td className="border px-4 py-2">
+        <button onClick={() => openEditModal(employee)} style={{ color: "#2D5990" }}>
+            <i className="fas fa-edit"></i>
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+      </div>
+      {isEditModalOpen && (
+        <div className="edit-modal">
+                    <h3 className="text-lg font-semibold mb-4">Editing Employee Details</h3>
+        <h3 className="text-lg font-semibold mb-4">Employee Id:{editingEmployee.employeeId}</h3>
+          {/* Edit form layout */}
+          <form onSubmit={handleEditSubmit}>
+            {/* Include InputField components for each editable field */}
+              <label className="form-control">
+                <span className="label-text">Employee Name</span>
+                <input type="text" name="employeeName" value={editingEmployee.employeeName} onChange={handleEditChange} />
+              </label>
+              <label className="form-control">
+                <span className="label-text">Role</span>
+                <select 
+                  name="role" 
+                  value={editingEmployee.role || ''} // Ensure this matches the value in editingEmployee
+                  onChange={handleEditChange}
+                  className="select select-bordered w-full max-w-xs"
+                >
+                  <option value="" disabled>Select Role</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Executive">Executive</option>
+                  <option value="Accountant">Accountant</option>
+                </select>
+              </label>
+
+              <label className="form-control">
+                <span className="label-text">Phone Number</span>
+                <input type="text" name="phoneNumber" value={editingEmployee.phoneNumber} onChange={handleEditChange} />
+                {errors.phoneNumber && <h className="text-red-500 text-xs italic">{errors.phoneNumber}</h>}
+              </label>
+              <label className="form-control">
+                <span className="label-text">Branch</span>
+                <select 
+                  name="branch" 
+                  value={editingEmployee.branch || ''} // Ensure this matches the value in editingEmployee
+                  onChange={handleEditChange}
+                  className="select select-bordered w-full max-w-xs"
+                >
+                  <option value="" disabled>Select Branch</option>
+                  {filteredBranches.map(branch => (
+                    <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="form-control">
+                <span className="label-text">Username</span>
+                <input type="text" name="username" value={editingEmployee.username} onChange={handleEditChange} />
+              </label>
+              <label className="form-control">
+                <span className="label-text">Password</span>
+                <input type="text" name="password" value={editingEmployee.password} onChange={handleEditChange} />
+              </label>
+            {/* ...other input fields as needed */}
+            <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+            <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+          </form>
+        </div>
+      )}
+    </div>
   );
 }
 
 function InputField({ label, name, type = 'text', value, handleChange, error }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-lg font-medium text-gray-700 dark:text-gray-200">{label}</label>
-      <input 
+      <label
+        htmlFor={name}
+        className="form-control w-1/2 pr-2"
+      >
+        {label}
+      </label>
+      <input
         required
         type={type}
         name={name}
         id={name}
         value={value}
         onChange={handleChange}
-        className={`mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-lg h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark-bg dark:text-white ${error ? 'border-red-500' : ''}`}
+        className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
       />
       {error && <p className="text-red-500 text-sm italic">{error}</p>}
     </div>

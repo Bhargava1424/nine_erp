@@ -14,7 +14,6 @@ function AddStudentReceipt() {
 
 
 
-
     const handleAddReceiptClick = (feeType) => {
         setSelectedFeeType(feeType); // Set the selected fee type
     };
@@ -189,7 +188,11 @@ function AddStudentReceipt() {
             };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+            <span className="loading loading-bars loading-lg"></span>
+            </div>
+            )
     }
 
     if (error) {
@@ -207,31 +210,36 @@ function AddStudentReceipt() {
         { label: '2nd Year Hostel Fee', key: 'secondYearHostelFee', fee: studentData.secondYearHostelFee , pendingFee: studentData.pendingSecondYearHostelFee , paidFee: studentData.paidSecondYearHostelFee }
     ];
 
-    
-
+    const user = JSON.parse(localStorage.getItem('user'));
     return (
-        <div className="main-container">
+        <div className="main-container root-container">
             <Navbar />
-            
-            <h2 className="text-2xl font-bold text-black-500 mb-4">{studentData.firstName} {studentData.surName}</h2>
+            <h2 className="font-bold text-2xl mt-8 mb-4">{studentData.firstName} {studentData.surName}</h2>
+            <div className="flex flex-col space-y-8">
             {feeTypes.map((fee, index) => (
-                <div key={index}>
-                    <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
-                    <table className="table border border-black">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Add Receipt</th>
+                <div key={index} className="hover:bg-gray-400 p-4 transition duration-300 ease-in-out bg-gray-200">
+                    <h2 className='text-xl font-bold text-black mb-4 '>{fee.label}:</h2>
+                    <table className="table border border-black min-w-full divide-y divide-gray-300 shadow-lg">
+                        <thead className="bg-gray-200">
+                            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                            {user.role === 'Manager'&&(
+                                <>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                                </>
+                            )}
+                                <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Add Receipt</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr className="hover:bg-[#00A0E3]">
-                                <td className="text-lg text-black font-bold border border-black">{fee.fee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.paidFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.pendingFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">
+                        <tbody className="bg-white divide-y divide-gray-300">
+                            <tr className="bg-[#F2F2F2]">
+                                {user.role === 'Manager'&&(<>
+                                <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
+                                <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                                </>)}
+                                <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
+                                <td className="text-sm text-black font-bold border border-black">
                                     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick(fee.key)}>
                                         Add Receipt
                                     </button>
@@ -282,8 +290,12 @@ function AddStudentReceipt() {
                             </tr>
                         </tbody>
                     </table>
+                    <div className="divider divider-neutral ml-6 mr-6" ></div>
                 </div>
+                
             ))}
+            </div>
+            
             {/* Repeat the above block for each fee type */}
         </div>
     );

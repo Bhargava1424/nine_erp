@@ -8,16 +8,127 @@ function AddBranch() {
     branchAddress: '',
   });
 
-  const [showInstructions, setShowInstructions] = useState(true);
   const [errors, setErrors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [branches, setBranches] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredBranches, setFilteredBranches] = useState([]);
+    // State for managing edit functionality
+    const [editingBranch, setEditingBranch] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
+    // Function to open the edit modal with the selected Branch's data
+    const openEditModal = (Branch) => {
+      setEditingBranch({ ...Branch });
+      setIsEditModalOpen(true);
+    };
+  
+    // Function to handle field changes in the edit modal
+    const handleEditChange = (e) => {
+      const { name, value } = e.target;
+      let updatedValue = value;
+      let newErrors = { ...errors };   
+      // Allow only alphabets in name fields and automatically capitalize them
+      if (name === "branchName") {
+        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+      }
+    
+      // Allow only numbers in the phone number field
+      if (name === "branchCode") {
+        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+        if (updatedValue.length !== 3) {
+          newErrors.branchCode = 'Branch Code must be 3 digits.';
+        } else {
+          newErrors.branchCode = '';
+        }
+      }
+    
+      // Update state with validated and transformed values
+      setEditingBranch({ ...editingBranch, [name]: updatedValue });
+    
+      // Additional validation for phone number length on submit
+      if (name === "branchCode" && updatedValue.length !== 3) {
+        setErrors({ ...errors, branchCode: 'Branch Code must be 3 digits.' });
+      } else {
+        setErrors({ ...errors, branchCode: '' });
+      }
+    };
+    
+  
+    // Function to submit the edited Branch data
+    const handleEditSubmit = async (e) => {
+      e.preventDefault();
+      // Check for errors before submitting
+      if (errors.branchCode) {
+        alert("Please correct the errors before submitting.");
+        return;
+      }
+    
+      try {
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        const opts = {
+          body: {
+            "collectionName": "branches",
+            "query": {
+              "branchId": editingBranch.branchId // Use the Branch's _id to identify the document to update
+            },
+            "type": 'updateOne',
+            "update": {
+              "branchName": editingBranch.branchName,
+              "branchCode": editingBranch.branchCode,
+              "branchAddress": editingBranch.branchAddress,
+              // Include other fields that need to be updated
+            }
+          }
+        };
+    
+        api.dbUpdate(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            // Handle successful update here
+            // For example, you can close the edit modal and clear the editing state
+            setIsEditModalOpen(false);
+            setEditingBranch(null);
+            // Reload the Branch list or use another method to update the UI
+            alert("Branches Updated Successfully")
+            window.location.reload()
+          }
+        });
+      } catch (error) {
+        console.error('There was an error updating the Branch!', error);
+      }
+    };
+    
 
-  const handleChange = (e) => {
-    setBranchData({ ...branchData, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      let updatedValue = value;
+      let newErrors = { ...errors };
+    
+      // Allow only alphabets in name fields and automatically capitalize them
+      if (name === "branchName") {
+        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+      }
+    
+      // Allow only numbers in the branch code field and automatically capitalize them
+      if (name === "branchCode") {
+        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+        if (updatedValue.length !== 3) {
+          newErrors.branchCode = 'Branch Code must be 3 digits.';
+        } else {
+          newErrors.branchCode = '';
+        }
+      }
+    
+      // Update state with validated and transformed values
+      setBranchData({ ...branchData, [name]: updatedValue });
+    
+      // Update errors
+      setErrors(newErrors);
+    };
+    
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +142,11 @@ function AddBranch() {
         newErrors[key] = 'This field is required';
       }
     });
+      // Additional check for branch code length
+  if (branchData.branchCode.length !== 3) {
+    isValid = false;
+    newErrors.branchCode = 'Branch Code must be 3 digits.';
+  }
 
     setErrors(newErrors);
 
@@ -65,11 +181,15 @@ function AddBranch() {
             setTimeout(() => {
               setShowSuccessMessage(false);
             }, 3000);
+            alert("Branch Added Successfully")
+            window.location.reload()
           }
         });
       } catch (error) {
         console.error('Error:', error);
       }
+    }else{
+      alert("Enter The fields in Proper Format")
     }
   };
 
@@ -127,46 +247,15 @@ function AddBranch() {
   };
 
   return (
-    <>
+    <div className='root-container'>
       
       <Navbar />
       <div className="container mx-auto p-4">
-      <div className="flex justify-center items-center">
-          <h2 className="text-2xl font-bold text-black-500 mb-4">ADD BRANCH</h2>
-      </div>
-        <div className="flex items-center mb-4">
-          <input
-            type="checkbox"
-            className="toggle"
-            checked={showInstructions}
-            onChange={() => setShowInstructions(!showInstructions)}
-          />
-          <span className="ml-2">Show Instructions</span>
-        </div>
-        {showInstructions && (
-          <div role="alert" className="alert alert-info mb-4">
-            <div className="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-current shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <ul className="list-disc list-inside ml-4">
-                <li>Enter all the necessary details for the new branch.</li>
-                <li>Branch code should be unique and identifiable.</li>
-                <li>Ensure the address is accurate for proper location mapping.</li>
-              </ul>
+          <div className="container mx-auto p-4 text-center">   
+            <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+              <h2 className="text-2xl font-bold text-white">ADD BRANCH</h2>
             </div>
           </div>
-        )}
         {showSuccessMessage && (
           <div role="alert" className="alert alert-success">
             <div className="flex items-center">
@@ -187,46 +276,46 @@ function AddBranch() {
             </div>
           </div>
         )}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-dark-blue p-6 rounded-lg shadow-lg"
-        >
-          <InputField
-            label="Branch Name"
-            name="branchName"
-            value={branchData.branchName}
-            handleChange={handleChange}
-            error={errors.branchName}
-          />
-          <InputField
-            label="Branch Code"
-            name="branchCode"
-            value={branchData.branchCode}
-            handleChange={handleChange}
-            error={errors.branchCode}
-          />
-          <InputField
-            label="Branch Address"
-            name="branchAddress"
-            value={branchData.branchAddress}
-            handleChange={handleChange}
-            error={errors.branchAddress}
-          />
+        <div className="flex justify-center whitespace-nowrap p-7 bg-slate-200 mt-4 rounded-3xl" style={{ marginLeft: '450px', marginRight: '450px' }}>
+          <form onSubmit={handleSubmit} className="text-center whitespace-nowrap"> {/* Centers form content */}
+            <InputField
+              label="Branch Name"
+              name="branchName"
+              value={branchData.branchName}
+              handleChange={handleChange}
+              error={errors.branchName}
+            />
+            <InputField
+              label="Branch Code"
+              name="branchCode"
+              value={branchData.branchCode}
+              handleChange={handleChange}
+              error={errors.branchCode}
+            />
+            <InputField
+              labelClass="whitespace-nowrap" // This will prevent the label from wrapping
+              label="Branch Address"
+              name="branchAddress"
+              value={branchData.branchAddress}
+              handleChange={handleChange}
+              error={errors.branchAddress}
+            />
 
-          <div className="flex justify-end">
             <button
-              className="btn btn-outline text-white"
+              className="btn btn-outline text-white mt-4"
               style={{ backgroundColor: '#2D5990' }}
             >
               Add Branch
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
 
+        <div className="container mx-auto p-4 relative mt-6"> {/* Add relative positioning */}
+    <h2 className="text-2xl font-bold text-center mb-4">Branches List</h2>
         {/* Search Bar */}
         <input
           type="text"
-          className="input input-bordered w-full max-w-xs mt-4"
+          className="input input-bordered max-w-xs absolute right-4 top-4" 
           placeholder="Search branches..."
           value={searchQuery}
           onChange={handleSearchChange}
@@ -236,25 +325,60 @@ function AddBranch() {
         <div className="overflow-x-auto mt-4">
           <table className="table w-full">
             <thead>
-              <tr>
-                <th>Branch Name</th>
-                <th>Branch Code</th>
-                <th>Branch Address</th>
+              <tr style={{ backgroundColor: '#2D5990', color: '#FFFFFF' }}>
+                <th className="px-4 py-2">Branch Address</th>
+                <th className="px-4 py-2">Branch Name</th>
+                <th className="px-4 py-2">Branch Code</th>
+                <th className="px-4 py-2">Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredBranches.map((branch, index) => (
-                <tr key={index}>
-                  <td>{branch.branchName}</td>
-                  <td>{branch.branchCode}</td>
-                  <td>{branch.branchAddress}</td>
+                <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+                  <td className="border px-4 py-2">{branch.branchAddress}</td>
+                  <td className="border px-4 py-2">{branch.branchName}</td>
+                  <td className="border px-4 py-2">{branch.branchCode}</td>
+                  <td className="border px-4 py-2">
+                    <button onClick={() => openEditModal(branch)} style={{ color: "#2D5990" }}>
+                        <i className="fas fa-edit"></i>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-    </>
+      </div>
+      {isEditModalOpen && (
+        <div className="edit-modal">
+          {/* Edit form layout */}
+          <h3 className="text-lg font-semibold mb-4">Editing Branch Details</h3>
+        <h3 className="text-lg font-semibold mb-4">Branch Id:{editingBranch.branchId}</h3>
+
+          <form onSubmit={handleEditSubmit}>
+            {/* Include InputField components for each editable field */}
+
+              <label className="form-control">
+                <span className="label-text">Branch Name</span>
+                <input type="text" name="branchName" value={editingBranch.branchName} onChange={handleEditChange} />
+              </label>
+              <label className="form-control">
+                <span className="label-text">Branch Number</span>
+                <input type="text" name="branchCode" value={editingBranch.branchCode} onChange={handleEditChange} />
+                {errors.branchCode && <h className="text-red-500 text-xs italic">{errors.branchCode}</h>}
+              </label>
+              <label className="form-control">
+                <span className="label-text">Branch Address</span>
+                <input type="text" name="branchAddress" value={editingBranch.branchAddress} onChange={handleEditChange} />
+              </label>
+            {/* ...other input fields as needed */}
+            <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+            <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+          </form>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -263,7 +387,7 @@ function InputField({ label, name, type = 'text', value, handleChange, error }) 
     <div>
       <label
         htmlFor={name}
-        className="block text-lg font-medium text-gray-700 dark:text-gray-200"
+        className="form-control w-1/2 pr-2"
       >
         {label}
       </label>
@@ -274,7 +398,7 @@ function InputField({ label, name, type = 'text', value, handleChange, error }) 
         id={name}
         value={value}
         onChange={handleChange}
-        className={`mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-lg h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark-bg dark:text-white ${error ? 'border-red-500' : ''}`}
+        className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
       />
       {error && <p className="text-red-500 text-sm italic">{error}</p>}
     </div>

@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [resetCode, setResetCode] = useState('');
-  const [generatedCode, setGeneratedCode] = useState('');
+  const [generatedCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [currentStage, setCurrentStage] = useState('emailSubmission');

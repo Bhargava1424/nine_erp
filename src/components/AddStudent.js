@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const AddStudent = () => {
   const formatDate = (date) => {
@@ -185,7 +185,7 @@ const handleInputChange = (e) => {
         studentData.secondYearTuitionFee == null ||
         studentData.secondYearHostelFee == null) {
       alert('Please fill in all required fields.');
-      // console.log('Form Data:', studentData);
+       console.log('Form Data:', studentData);
       return false;
     }
   
@@ -197,7 +197,7 @@ const handleInputChange = (e) => {
   
   
   
-  const navigate = useNavigate(); // **Create an instance of navigate** 
+  // const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
     e.preventDefault();    
 
@@ -224,7 +224,13 @@ const handleInputChange = (e) => {
                         if (responseBody && responseBody.message) {
                             setServerResponse(responseBody.message);
                             if (responseBody.message.includes("Student created successfully")) { // **Check if message indicates success**
-                                navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                                // navigate('/AddReceipts'); // **Redirect to AddReceipts**
+                                window.location.href = '/AddReceipts';
+                                const user = JSON.parse(localStorage.getItem('user'));
+                                if (user) {
+                                  user.totalStudentCount = (user.totalStudentCount || 0) + 1;
+                                  localStorage.setItem('user', JSON.stringify(user));
+                                }
                             }
                         }
                     } catch (parseError) {
@@ -298,18 +304,26 @@ const handleInputChange = (e) => {
   const branch = useSelector((state) => state.auth.branch);
     const role = useSelector((state) => state.auth.role);
 
-
-  return (
-    <>
-    <Navbar/>
-    
-    <div className="container mx-auto p-4">      
-      <h2 className="text-2xl font-bold mb-4">ADD NEW STUDENT</h2>
+    useEffect(() => {
+      if (role === 'Executive' || role === 'Accountant') {
+          setStudentData(prevState => ({
+              ...prevState,
+              branch: branch // assuming 'branch' is the value fetched from your global state or prop
+          }));
+      }
+  }, [branch, role]);
+  
+    return (
+      <div className='root-container'>
+          <Navbar/>
+          <div className="container mx-auto p-4 text-center">   
+            <div className="card bg-slate-600 text-black p-2"> {/* Added padding here */}
+              <h2 className="text-2xl font-bold text-white">ADD NEW STUDENT</h2>
+            </div>
+          </div>
       <div className="AddStudent">
 
 
-        {/* Rest of your form code */}
-    </div> 
       <form onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-4">
         <div className="flex justify-between space-x-1">  {/* First Name and last name Field */}
                   {/* surName Name Field */}
@@ -320,7 +334,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Student's Surname/Initial"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="surName"
               value={studentData.surName}
               onChange={(e) => {
@@ -338,7 +352,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Student's First Name"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="firstName"
               value={studentData.firstName}
               onChange={(e) => {
@@ -352,15 +366,15 @@ const handleInputChange = (e) => {
 
 
         </div>
-        <div className="flex justify-between space-x-1">        {/* parent Name and branch Field */}
-          <label className="form-control w-1/2 pr-2">
-            <div className="label">
-              <span className="label-text">Parent's Name</span>
+        <div className="flex justify-between space-x-1 ">        {/* parent Name and branch Field */}
+          <label className="form-control w-1/2 pr-2 ">
+            <div className="label ">
+              <span className="label-text ">Parent's Name</span>
             </div>
             <input
               type="text"
               placeholder="Parent's Name"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="parentName"
               value={studentData.parentName}
               onChange={(e) => {
@@ -381,7 +395,7 @@ const handleInputChange = (e) => {
               (role === 'Executive' || role === 'Accountant') ? (
                 <input
                   type="text"
-                  className="input input-bordered w-full max-w-xs"
+                  className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                   value={branch}
                   readOnly
                 />
@@ -410,7 +424,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Primary Contact"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="primaryContact"
               value={studentData.primaryContact}
               onChange={(e) => {
@@ -429,7 +443,7 @@ const handleInputChange = (e) => {
             <input
               type="text"
               placeholder="Secondary Contact"
-              className="input input-bordered w-full max-w-xs"
+              className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
               name="secondaryContact"
               value={studentData.secondaryContact}
               onChange={(e) => {
@@ -494,7 +508,7 @@ const handleInputChange = (e) => {
                     </div>
                     <input
                         type="text"
-                        className="input input-bordered w-full max-w-xs"
+                        className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                         name="yearOfJoining"
                         value={studentData.yearOfJoining}
                         readOnly // This makes the field read-only
@@ -554,7 +568,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="1st Year Tuition Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearTuitionFee"
                     value={studentData.firstYearTuitionFee}
                     onChange={handleInputChange}
@@ -568,7 +582,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="1st Year Hostel Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearHostelFee"
                     value={studentData.firstYearHostelFee}
                     onChange={handleInputChange}
@@ -584,7 +598,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="2nd Year Tuition Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearTuitionFee"
                     value={studentData.secondYearTuitionFee}
                     onChange={handleInputChange}
@@ -597,7 +611,7 @@ const handleInputChange = (e) => {
                   <input
                     type="number"
                     placeholder="2nd Year Hostel Fee"
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearHostelFee"
                     value={studentData.secondYearHostelFee}
                     onChange={handleInputChange}
@@ -610,8 +624,8 @@ const handleInputChange = (e) => {
           <div className="label">
             <span className="label-text">Student Status</span>
           </div>
-          <div className="rounded border border-gray-400 p-2 w-3/4">
-                    <span className="text-gray-700">{studentData.studentStatus}</span>
+          <div className="rounded border border-gray-400 p-2 w-3/4 ">
+                    <span className="text-gray-700 ">{studentData.studentStatus}</span>
                   </div>
         </label>
 
@@ -631,7 +645,7 @@ const handleInputChange = (e) => {
       </form>
     </div>
   
-    </>
+    </div>
   );
 };
 

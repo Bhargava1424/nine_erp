@@ -6,8 +6,7 @@ function AddStudentConcession() {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [amountWaived, setamountWaived] = useState('');
-    const [ConcessionNumber, setConcessionNumber] = useState('');
+    const [amountWaived, setAmountWaived] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
     const [reason, setReason] = useState(''); 
 
@@ -19,8 +18,15 @@ function AddStudentConcession() {
     };
 
 
-    const handleAmountChange = (e) => {
-        setamountWaived(e.target.value);
+    const handleAmountChange = (e, fee) => {
+        const amount = parseFloat(e.target.value);
+        if (amount > fee.pendingFee) {
+            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+            setAmountWaived(''); // Reset the amount field
+        } else {
+            setAmountWaived(amount);
+        }
+
     };
 
 
@@ -96,6 +102,7 @@ function AddStudentConcession() {
             alert("Please provide a reason for the concession.");
             return;
         }
+
     
         try {
             var SchoolManagementSystemApi = require('school_management_system_api');
@@ -153,10 +160,10 @@ function AddStudentConcession() {
             const authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
             let body = {
                 "subject": "Concession Added",
-                "message": "Concession : " + amountWaived + "\n" + 
-                    "Name : " + studentData.firstName + " " + studentData.surName + "\n"  +
-                    "Fee Type : " + selectedFeeType + "\n" +
-                    "for the following reason : " + reason + "\n",
+                "message": "Concession :" + amountWaived + "\n" + 
+                    "Name :" + studentData.firstName + " " + studentData.surName + "\n"  +
+                    "Fee Type :" + selectedFeeType + "\n" +
+                    "for the following reason :" + reason + "\n",
             };
             authorizationApi.sendMail(body, function(error, response) {
                 if (error) {
@@ -177,7 +184,11 @@ function AddStudentConcession() {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+            <span className="loading loading-bars loading-lg"></span>
+            </div>
+            )
     }
 
     if (error) {
@@ -200,29 +211,34 @@ function AddStudentConcession() {
     const handleReasonChange = (e) => { // Add this function
         setReason(e.target.value);
     };
-
+    const user = JSON.parse(localStorage.getItem('user'));
     return (
-        <div className="main-container">
+        <div className="main-container root-container">
             <Navbar />
-            
+            <h2 className="font-bold text-2xl mt-8 mb-4">{studentData.firstName} {studentData.surName}</h2>
+            <div className="flex flex-col space-y-8">
             {feeTypes.map((fee, index) => (
-                <div key={index}>
-                    <h2 className='text-xl font-bold text-black mb-4'>{fee.label}:</h2>
-                    <table className="table border border-black">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Applied Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Paid Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Pending Fee</th>
-                                <th className="px-4 py-2 text-lg border border-black text-black">Add Concession</th>
+                <div key={index} className="hover:bg-gray-400 p-4 transition duration-300 ease-in-out bg-gray-200">
+                    <h2 className='text-xl font-bold text-black mb-4 '>{fee.label}:</h2>
+                    <table className="table border border-black min-w-full divide-y divide-gray-300 shadow-lg">
+                        <thead className="bg-gray-200">
+                            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                                {user.role==='Manager'&&(<>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                                </>)}
+                                <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
+                                <th className="px-4 py-2 text-sm border border-black text-white">Add Concession</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="hover:bg-[#00A0E3]">
-                                <td className="text-lg text-black font-bold border border-black">{fee.fee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.paidFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">{fee.pendingFee}</td>
-                                <td className="text-lg text-black font-bold border border-black">
+                            <tr className="bg-[#F2F2F2]">
+                                {user.role==='Manager'&&(<>
+                                <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
+                                <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                                </>)}
+                                <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
+                                <td className="text-sm text-black font-bold border border-black">
                                     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddConcessionClick(fee.key)}>
                                         Add Concession
                                     </button>
@@ -230,8 +246,8 @@ function AddStudentConcession() {
                                     <div>
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
-                                            Amount Paid:
-                                            <input type="number" value={amountWaived} onChange={handleAmountChange} />
+                                            Amount Waived:
+                                            <input type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>
@@ -246,7 +262,7 @@ function AddStudentConcession() {
                                         
                                         
                                         <button onClick={() => handleSubmit(fee.feeTypeKey)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
-                                                Submit Payment
+                                                Submit Concession 
                                             </button>  
                                         {/* Add submission button or form handlers as needed */}
                                     </div>
@@ -256,8 +272,12 @@ function AddStudentConcession() {
                             </tr>
                         </tbody>
                     </table>
+                    <div className="divider divider-neutral ml-6 mr-6" ></div>
                 </div>
             ))}
+            </div>
+            
+            
             {/* Repeat the above block for each fee type */}
         </div>
     );

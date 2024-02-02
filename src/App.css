@@ -36,3 +36,6 @@
     transform: rotate(360deg);
   }
 }
+.root-container {
+  padding-right: 100px; /* or any other value you prefer */
+}
