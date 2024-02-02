@@ -14,7 +14,6 @@ function AddStudentReceipt() {
 
 
 
-
     const handleAddReceiptClick = (feeType) => {
         setSelectedFeeType(feeType); // Set the selected fee type
     };
@@ -211,8 +210,7 @@ function AddStudentReceipt() {
         { label: '2nd Year Hostel Fee', key: 'secondYearHostelFee', fee: studentData.secondYearHostelFee , pendingFee: studentData.pendingSecondYearHostelFee , paidFee: studentData.paidSecondYearHostelFee }
     ];
 
-    
-
+    const user = JSON.parse(localStorage.getItem('user'));
     return (
         <div className="main-container root-container">
             <Navbar />
@@ -226,16 +224,22 @@ function AddStudentReceipt() {
                     <table className="table border border-black min-w-full divide-y divide-gray-300 shadow-lg">
                         <thead className="bg-gray-200">
                             <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                            {user.role === 'Manager'&&(
+                                <>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                                </>
+                            )}
                                 <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Add Receipt</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-300">
                             <tr className="bg-[#F2F2F2]">
+                                {user.role === 'Manager'&&(<>
                                 <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
                                 <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                                </>)}
                                 <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
                                 <td className="text-sm text-black font-bold border border-black">
                                     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddReceiptClick(fee.key)}>

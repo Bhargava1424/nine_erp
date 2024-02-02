@@ -211,7 +211,7 @@ function AddStudentConcession() {
     const handleReasonChange = (e) => { // Add this function
         setReason(e.target.value);
     };
-
+    const user = JSON.parse(localStorage.getItem('user'));
     return (
         <div className="main-container">
             <Navbar />
@@ -222,16 +222,20 @@ function AddStudentConcession() {
                     <table className="table border border-black">
                         <thead>
                             <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                                {user.role==='Manager'&&(<>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Applied Fee</th>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Paid Fee</th>
+                                </>)}
                                 <th className="px-4 py-2 text-sm border border-black text-white">Pending Fee</th>
                                 <th className="px-4 py-2 text-sm border border-black text-white">Add Concession</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr className="bg-[#F2F2F2]">
+                                {user.role==='Manager'&&(<>
                                 <td className="text-sm text-black font-bold border border-black">{fee.fee}</td>
                                 <td className="text-sm text-black font-bold border border-black">{fee.paidFee}</td>
+                                </>)}
                                 <td className="text-sm text-black font-bold border border-black">{fee.pendingFee}</td>
                                 <td className="text-sm text-black font-bold border border-black">
                                     <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => handleAddConcessionClick(fee.key)}>

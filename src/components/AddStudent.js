@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import Navbar from './Navbar';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const AddStudent = () => {
   const formatDate = (date) => {
@@ -197,7 +197,7 @@ const handleInputChange = (e) => {
   
   
   
-  const navigate = useNavigate(); // **Create an instance of navigate** 
+  // const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
     e.preventDefault();    
 
