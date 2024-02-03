@@ -318,11 +318,15 @@ function ExecutiveComponent() {
     // Generate buffer
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
+    const now = new Date();
+    const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+
+    
     // Create a Blob
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
     
     // Use FileSaver to save the file
-    saveAs(data, 'students_data.xlsx');
+    saveAs(data, `Dashboard ${formattedDate}.xlsx`);
   };
 
   const mapDataToSchema = (data) => {

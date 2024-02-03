@@ -14,6 +14,7 @@ function AddReceipts() {
 
     const indexOfLastStudent = currentPage * studentsPerPage;
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+    const user = JSON.parse(localStorage.getItem('user'));
 
       
     
@@ -23,12 +24,13 @@ function AddReceipts() {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
+        const isManager = user.role==="Manager";
+        console.log("Testing concession:",user.branch);
+        const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": user.branch};        
         const opts = {
           body: {
             "collectionName": "students",
-            "query": {
-              "studentStatus": "Active"
-            },
+            "query": query,
             "type": "findMany"
           }
         };
@@ -91,7 +93,6 @@ function AddReceipts() {
 
   
 
-  const user = useSelector((state) => state.auth.user);
   const userRole = user?.role; // Assuming your user object has a role property
 
   // If user role is undefined, return an empty div or redirect logic

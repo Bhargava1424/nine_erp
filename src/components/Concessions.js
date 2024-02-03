@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { useSelector } from 'react-redux';
 
 function Concessions() {
     const [students, setStudents] = useState([]);
@@ -13,19 +14,20 @@ function Concessions() {
 
     const indexOfLastStudent = currentPage * studentsPerPage; 
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-    
+    const user = JSON.parse(localStorage.getItem('user'));
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
+        const isManager = user.role==="Manager";
+        console.log("Testing concession:",user.branch);
+        const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": user.branch};
         const opts = {
           body: {
             "collectionName": "students",
-            "query": {
-              "studentStatus": "Active"
-            },
+            "query": query,
             "type": "findMany"
           }
         };
