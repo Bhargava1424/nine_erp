@@ -69,6 +69,7 @@ function AddEmployee() {
           newErrors.phoneNumber = '';
         }
       }
+      
     
       // Update state with validated and transformed values
       setEditingEmployee({ ...editingEmployee, [name]: updatedValue });
@@ -155,6 +156,11 @@ function AddEmployee() {
           errMsg = 'Username must be in email format';
         }
         break;
+        case 'branch':
+          if (employeeData.role !== 'Manager' && !value) {
+            errMsg = 'Branch is required';
+          }
+          break;
       // Add additional cases for other field validations
       default:
         break;
@@ -170,11 +176,15 @@ function AddEmployee() {
       return;
     }
   
+    let formData = { ...employeeData };
+    if (formData.role === 'Manager') {
+      formData.branch = 'ALL';
+    }
     // Validate form data
     let isValid = true;
     let newErrors = {};
     Object.keys(employeeData).forEach(key => {
-      if (!employeeData[key]) {
+      if (!employeeData[key] && !(key === 'branch' && employeeData.role === 'Manager')) {
         isValid = false;
         newErrors[key] = 'This field is required';
       } else {
@@ -185,10 +195,13 @@ function AddEmployee() {
         }
       }
     });
+    if(employeeData.role === 'Manager') {
+      employeeData.branch = 'ALL';
+    }
     if(employeeData.phoneNumber.length!==10){
       isValid=false;
     }
-  
+
     // If form is not valid, set errors and return early
     if (!isValid) {
       setErrors(newErrors);
@@ -204,7 +217,7 @@ function AddEmployee() {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.EmployeesApi();
       var body = new SchoolManagementSystemApi.Employee();
-      body.employeeName = employeeData.firstName +''+  employeeData.lastName;
+      body.employeeName = employeeData.firstName +' '+  employeeData.lastName;
       body.role = employeeData.role;
       body.branch = employeeData.branch;
       body.username = employeeData.username;
@@ -431,13 +444,23 @@ function AddEmployee() {
                   <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
                   <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
                   <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
-                  <SelectField
-                    label="Branch"
-                    name="branch"
-                    options={branches.map(branch => branch.branchCode)} // Assuming branchName is the field you want to display
-                    value={employeeData.branch}
-                    handleChange={handleChange}
-                  />
+                   {employeeData.role === "Manager" ? (
+                      <InputField
+                        label="Branch"
+                        name="branch"
+                        value="ALL"
+                        handleChange={() => {}}
+                        readOnly
+                      />
+                    ) : (
+                      <SelectField
+                        label="Branch"
+                        name="branch"
+                        options={branches.map(branch => ({ label: branch.branchCode, value: branch.branchCode }))}
+                        value={employeeData.branch}
+                        handleChange={handleChange}
+                      />
+                    )}
                   <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
                   <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
 
@@ -544,7 +567,9 @@ function AddEmployee() {
                   <option value="" disabled>Select Branch</option>
                   {filteredBranches.map(branch => (
                     <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
+                    
                   ))}
+                  <option>ALL</option>
                 </select>
               </label>
               <label className="form-control">
@@ -565,7 +590,7 @@ function AddEmployee() {
   );
 }
 
-function InputField({ label, name, type = 'text', value, handleChange, error }) {
+function InputField({ label, name, type = 'text', value, handleChange, error, readOnly = false }) {
   return (
     <div>
       <label
@@ -582,6 +607,7 @@ function InputField({ label, name, type = 'text', value, handleChange, error }) 
         value={value}
         onChange={handleChange}
         className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
+        readOnly={readOnly}
       />
       {error && <p className="text-red-500 text-sm italic">{error}</p>}
     </div>

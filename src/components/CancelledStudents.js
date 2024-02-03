@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
+import { useSelector } from 'react-redux';
 
 
 function CancelledStudents() {
@@ -14,18 +14,18 @@ function CancelledStudents() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
-
+  const user = useSelector((state) => state.auth);
   useEffect(() => {
     const fetchCancelledStudents = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
+        const isManager = user.role==="Manager";
+        const query = isManager?{"studentStatus": "Cancelled"} : {"studentStatus": "Cancelled", "branch": user.branch};
         const opts = {
           body: {
             "collectionName": "students",
-            "query": {
-              "studentStatus": "Cancelled"
-            },
+            "query": query,
             "type": "findMany"
           }
         };

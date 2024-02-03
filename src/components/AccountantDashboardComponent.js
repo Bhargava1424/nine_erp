@@ -545,11 +545,12 @@ function ExecutiveComponent() {
             className="checkbox checkbox-normal" 
           />
         </label>
+        {showCancelled && <CancelledStudents />}
       </div>
 
 
 
-      {showCancelled && <CancelledStudents />}
+      
 
 
 

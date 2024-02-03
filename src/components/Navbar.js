@@ -112,7 +112,6 @@ function Navbar() {
     }}>
         <i className="fa fa-home fa-3x"></i>
         <h3 className="mt-2">Dashboard</h3>
-        <h4>Student Count: {user.totalStudentCount}</h4>
     </div>
 </div>
 

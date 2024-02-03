@@ -2,7 +2,7 @@ import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
+import { useSelector } from 'react-redux';
 
 
 function ListReceipts() {
@@ -16,18 +16,19 @@ function ListReceipts() {
     const fourDaysAgo = new Date(currentDate);
     fourDaysAgo.setDate(currentDate.getDate() - 4);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const fetchReceipts = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
         let query = {};
-        const userRole = localStorage.getItem('userRole');
-        console.log(userRole);
-        if (userRole === 'Accountant' || userRole === 'Executive') {
+        
+        console.log(user.role);
+        if (user.role === 'Accountant' || user.role === 'Executive') {
           query = {
-            'dateOfPayment': {'$gte': fourDaysAgo}
+            'dateOfPayment': {'$gte': fourDaysAgo},
+            'branch':user.branch
           }
         };
         const opts = {
