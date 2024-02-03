@@ -210,6 +210,24 @@ const handleEditSubmit = () => {
     );
     
 
+    const determineAmountPaid = (receipt) => {
+      const fees = [
+        receipt?.secondYearHostelFeePaid, 
+        receipt?.secondYearTuitionFeePaid, 
+        receipt?.firstYearHostelFeePaid, 
+        receipt?.firstYearTuitionFeePaid
+      ];
+    
+      // Log to inspect the values you're working with
+      console.log('Fees:', fees);
+    
+      // Find the first non-null and non-zero value, providing a default of 0 if none is found
+      const amountPaid = fees.find(fee => fee != null && fee !== 0) ?? 0;
+    
+      console.log('Determined amountPaid:', amountPaid);
+      return amountPaid;
+    };
+    
 
     const handleDownload = (receipt) => {
 
@@ -232,6 +250,10 @@ const handleEditSubmit = () => {
 
       // Redirect to DownloadReceipt component or specific URL
       // For example, using window.location:
+
+      amountPaid = determineAmountPaid(receipt);
+      console.log('Amount Paid for download:', amountPaid); // Ensure this logs a valid number
+
       
       const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receipt.receiptNumber}&feeType=${feeType}`;
       console.log(amountPaid);{/*error here */}
@@ -286,17 +308,7 @@ const handleEditSubmit = () => {
     }));
   };
 
-  const determineAmountPaid = (receipt) => {
-    const fees = [
-      receipt.secondYearHostelFeePaid, 
-      receipt.secondYearTuitionFeePaid, 
-      receipt.firstYearHostelFeePaid, 
-      receipt.firstYearTuitionFeePaid
-    ];
-    // Find the first non-null and non-zero value
-    return fees.find(fee => fee != null && fee !== 0) || 0;
-  };
-    
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
