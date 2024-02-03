@@ -99,7 +99,7 @@ function AddEmployee() {
           body: {
             "collectionName": "employees",
             "query": {
-              "employeeId": editingEmployee.employeeId // Use the employee's _id to identify the document to update
+              "employeeId": employees.employeeId // Use the employee's _id to identify the document to update
             },
             "type": 'updateOne',
             "update": {
@@ -528,16 +528,15 @@ function AddEmployee() {
       {isEditModalOpen && (
         <div className="edit-modal">
                     <h3 className="text-lg font-semibold mb-4">Editing Employee Details</h3>
-        <h3 className="text-lg font-semibold mb-4">Employee Id:{editingEmployee.employeeId}</h3>
           {/* Edit form layout */}
           <form onSubmit={handleEditSubmit}>
             {/* Include InputField components for each editable field */}
-              <label className="form-control">
-                <span className="label-text">Employee Name</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Employee Name</span>
                 <input type="text" name="employeeName" value={editingEmployee.employeeName} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
-                <span className="label-text">Role</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Role</span>
                 <select 
                   name="role" 
                   value={editingEmployee.role || ''} // Ensure this matches the value in editingEmployee
@@ -551,13 +550,13 @@ function AddEmployee() {
                 </select>
               </label>
 
-              <label className="form-control">
-                <span className="label-text">Phone Number</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Phone Number</span>
                 <input type="text" name="phoneNumber" value={editingEmployee.phoneNumber} onChange={handleEditChange} />
                 {errors.phoneNumber && <h className="text-red-500 text-xs italic">{errors.phoneNumber}</h>}
               </label>
-              <label className="form-control">
-                <span className="label-text">Branch</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Branch</span>
                 <select 
                   name="branch" 
                   value={editingEmployee.branch || ''} // Ensure this matches the value in editingEmployee
@@ -571,12 +570,12 @@ function AddEmployee() {
                   ))}
                 </select>
               </label>
-              <label className="form-control">
-                <span className="label-text">Username</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Username</span>
                 <input type="text" name="username" value={editingEmployee.username} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
-                <span className="label-text">Password</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Password</span>
                 <input type="text" name="password" value={editingEmployee.password} onChange={handleEditChange} />
               </label>
             {/* ...other input fields as needed */}

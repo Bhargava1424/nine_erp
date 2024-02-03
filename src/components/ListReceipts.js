@@ -114,7 +114,7 @@ const handleEditSubmit = () => {
               body: {
                   "collectionName": "receipts",
                   "query": {
-                      'receiptNumber': updatedReceipt.receiptNumber
+                      'receiptNumber': receipts.receiptNumber
                   },
                   "type": 'updateOne',
                   "update": {
@@ -462,8 +462,8 @@ const handleEditSubmit = () => {
         <p><strong>Student Name:</strong> {editingReceipt.studentName}</p>
         <p><strong>Receipt Number:</strong> {editingReceipt.receiptNumber}</p>
         <p><strong>Type of Payment:</strong> {editingReceipt.typeOfPayment}</p>
-        <label className="form-control">
-            <span className="label-text">Mode of Payment</span>
+        <label className="form-control text-xs">
+            <span className="label-text  text-xs">Mode of Payment</span>
             <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
                 <option value="">Select Mode of Payment</option>
                 <option value="Bank Transfer/UPI">Bank Transfer/UPI</option>
@@ -473,13 +473,13 @@ const handleEditSubmit = () => {
             </select>
         </label>
         {editingReceipt.modeOfPayment === 'Cheque' && (
-            <label className="form-control">
-                <span className="label-text">Cheque Number</span>
+            <label className="form-control text-xs">
+                <span className="label-text  text-xs">Cheque Number</span>
                 <input type="text" name="chequeNumber" value={editingReceipt.chequeNumber || ''} onChange={handleEditChange} required />
             </label>
         )}
-        <label className="form-control">
-            <span className="label-text">Amount Paid</span>
+        <label className="form-control text-xs">
+            <span className="label-text  text-xs">Amount Paid</span>
             <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
