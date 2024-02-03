@@ -11,6 +11,7 @@ const AddStudent = () => {
     return day + '-' + month + '-' + year;
 };
 
+  
   const [studentData, setStudentData] = useState({
     firstName: '',
     surName: '',
@@ -87,6 +88,30 @@ const AddStudent = () => {
     secondaryContactError: '',
 });
 
+useEffect(() => {
+  setStudentData(prevState => {
+    // Determine if the batch already ends with an asterisk
+    const batchEndsWithAsterisk = prevState.batch.endsWith('*');
+    let updatedBatch = prevState.batch;
+
+    // If turning On TC, add asterisk if not already present
+    if (isOnTC && !batchEndsWithAsterisk) {
+      updatedBatch += '*';
+    }
+    // If turning Off TC, remove asterisk if present
+    else if (!isOnTC && batchEndsWithAsterisk) {
+      updatedBatch = updatedBatch.slice(0, -1); // Remove last character (asterisk)
+    }
+
+    return {
+      ...prevState,
+      batch: updatedBatch,
+    };
+  });
+}, [isOnTC]);
+
+
+
 const handleInputChange = (e) => {
   const { name, value } = e.target;
   let newErrors = { ...errors };
@@ -117,6 +142,8 @@ const handleInputChange = (e) => {
           newErrors.secondaryContactError = 'Secondary contact must be different from primary.';
       }
   }
+
+  
 
   setStudentData(prevState => {
     let newState = { ...prevState, [name]: updatedValue };
