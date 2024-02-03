@@ -569,7 +569,6 @@ function AddEmployee() {
                     <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
                     
                   ))}
-                  <option>ALL</option>
                 </select>
               </label>
               <label className="form-control">
