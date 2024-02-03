@@ -31,7 +31,7 @@ function DownloadReceipt() {
 
         const fetchReceiptData = async () => {
             // try {
-            //     const response = await axios.get(`http://localhost:5000/api/students/name/${receiptNumber}`);
+            //     const response = await axios.get(`http://34.125.142.249:5000/api/students/name/${receiptNumber}`);
             //     setreceiptsData(response.data);
             //     setLoading(false);
             // } catch (err) {
