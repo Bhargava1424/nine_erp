@@ -471,32 +471,32 @@ function ExecutiveComponent() {
         <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
 
 
-        <label className="form-control">
-          <span className="label-text">First Name</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">First Name</span>
           <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Surname</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Surname</span>
           <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Parent Name</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Parent Name</span>
           <input type="text" name="parentName" value={editingStudent.parentName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Primary Contact</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Primary Contact</span>
           <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
           {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
         </label>
-        <label className="form-control">
-          <span className="label-text">Secondary Contact</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Secondary Contact</span>
           <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
           {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
         </label>
 
 
-        <label className="form-control">
-          <span className="label-text">Gender</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Gender</span>
           <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
             <option value="" disabled>Choose Gender</option>
             <option value="Male">Male</option>
@@ -504,8 +504,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Batch</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Batch</span>
           <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
             {generateBatchOptions().map(batch => (
               <option key={batch} value={batch}>{batch}</option>
@@ -513,8 +513,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Course</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Course</span>
           <select name="course" value={editingStudent.course} onChange={handleEditChange}>
             <option value="" disabled>Select Course</option>
             <option value="MPC">MPC</option>
@@ -522,8 +522,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Mode of Residence</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Mode of Residence</span>
           <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
             <option value="" disabled>Select Mode of Residence</option>
             <option value="Day Scholar">Day Scholar</option>
@@ -531,8 +531,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Student Status</span>
+        <label className="form-control text-xs">
+          <span className="label-text  text-xs">Student Status</span>
           <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
             <option value="Active">ACTIVE</option>
             <option value="Cancelled">CANCELLED</option>

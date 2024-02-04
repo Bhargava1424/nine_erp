@@ -97,58 +97,90 @@ function ListReceipts() {
         setEditingReceipt({ ...editingReceipt, [name]: value });
     }
 };
+
+
+
 const handleEditSubmit = () => {
-  // Include logic to ensure that chequeNumber is null if modeOfPayment is not 'Cheque'
+
   const updatedReceipt = {
-      ...editingReceipt,
-      chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber
-  };
-  if (editingReceipt.modeOfPayment === 'Cheque' && !editingReceipt.chequeNumber) {
+    ...editingReceipt,
+    chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber,
+};
+
+if (updatedReceipt.modeOfPayment === 'Cheque' && !updatedReceipt.chequeNumber) {
     alert("Please enter the Cheque Number.");
-    return; // Do not proceed with submission
+    return;
 }
-      try {
-          var SchoolManagementSystemApi = require('school_management_system_api');
-          var api = new SchoolManagementSystemApi.DbApi();
-          const opts = {
-              body: {
-                  "collectionName": "receipts",
-                  "query": {
-                      'receiptNumber': updatedReceipt.receiptNumber
-                  },
-                  "type": 'updateOne',
-                  "update": {
-                      "modeOfPayment": updatedReceipt.modeOfPayment,
-                      "amountPaid":updatedReceipt.amountPaid,
-                      "chequeNumber":updatedReceipt.chequeNumber
-                  }
-              }
-          };
 
-          api.dbUpdate(opts, function (error, data, response) {
-              if (error) {
-                  console.error('API Error:', error);
-              } else {
-                  try {
-                      const responseBody = response.body; // Assuming response.body is already in JSON format
-                      console.log(responseBody);
+// Assuming amountPaid is always related to tuition fees
+const amountDifference = parseFloat(updatedReceipt.amountPaid) - parseFloat(editingReceipt[PaidfeeType]);
 
-                      // Close the modal and reset editingReceipt
-                      setIsEditModalOpen(false);
-                      setEditingReceipt(null);
+let totalPaidField, pendingField;
 
-                      // Fetch updated receipts
-                      fetchReceipts();
-                      window.location.reload();
-                  } catch (parseError) {
-                      console.error('Error parsing response:', parseError);
-                  }
-              }
-          });
-      } catch (error) {
-          console.error("Error updating receipt: ", error);
+switch (PaidfeeType) {
+    case 'firstYearTuitionFeePaid':
+        totalPaidField = 'firstYearTotalTuitionFeePaid';
+        pendingField = 'firstYearTotalTuitionFeePending';
+        break;
+    case 'firstYearHostelFeePaid':
+        totalPaidField = 'firstYearTotalHostelFeePaid';
+        pendingField = 'firstYearTotalHostelFeePending';
+        break;
+    case 'secondYearTuitionFeePaid':
+        totalPaidField = 'secondYearTotalTuitionFeePaid';
+        pendingField = 'secondYearTotalTuitionFeePending';
+        break;
+    case 'secondYearHostelFeePaid':
+        totalPaidField = 'secondYearTotalHostelFeePaid';
+        pendingField = 'secondYearTotalHostelFeePending';
+        break;
+    default:
+        console.error("Invalid PaidfeeType.");
+        return;
+}
+
+// Update the dynamic field and calculate new totals and pendings
+const updateData = {
+    modeOfPayment: editingReceipt.modeOfPayment,
+    chequeNumber: editingReceipt.chequeNumber,
+    [PaidfeeType]: updatedReceipt.amountPaid,
+    [totalPaidField]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
+    [pendingField]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
+};
+
+  try {
+    var SchoolManagementSystemApi = require('school_management_system_api');
+    var api = new SchoolManagementSystemApi.DbApi();
+    const opts = {
+      body: {
+        "collectionName": "receipts",
+        "query": { 'receiptNumber': editingReceipt.receiptNumber },
+        "type": 'updateOne',
+        "update": updateData
       }
-  };
+    };
+
+    api.dbUpdate(opts, function (error, data, response) {
+      if (error) {
+        console.error('API Error:', error);
+      } else {
+        console.log('Update successful:', response.body);
+        setIsEditModalOpen(false);
+        setEditingReceipt(null);
+        fetchReceipts();
+      }
+    });
+  } catch (error) {
+    console.error("Error updating receipt: ", error);
+  }
+};
+
+
+
+
+
+
+  
     const filteredReceipts = handleSearch(searchTerm);
 
     // Calculate the pagination
@@ -358,6 +390,28 @@ const handleEditSubmit = () => {
     return '';
   };
 
+
+  let PaidfeeType; // This will hold the field name of the paid fee
+
+const determineFeeType = (receipt) => {
+  if (receipt.firstYearTuitionFeePaid != null && receipt.firstYearTuitionFeePaid !== 0) {
+    PaidfeeType = "firstYearTuitionFeePaid"; // Set the field name
+    return 'First Year Tuition Fee';
+  } else if (receipt.firstYearHostelFeePaid != null && receipt.firstYearHostelFeePaid !== 0) {
+    PaidfeeType = "firstYearHostelFeePaid"; // Set the field name
+    return 'First Year Hostel Fee';
+  } else if (receipt.secondYearTuitionFeePaid != null && receipt.secondYearTuitionFeePaid !== 0) {
+    PaidfeeType = "secondYearTuitionFeePaid"; // Set the field name
+    return 'Second Year Tuition Fee';
+  } else if (receipt.secondYearHostelFeePaid != null && receipt.secondYearHostelFeePaid !== 0) {
+    PaidfeeType = "secondYearHostelFeePaid"; // Set the field name
+    return 'Second Year Hostel Fee';
+  }
+  PaidfeeType = null; // If none of the conditions are met, reset PaidfeeType
+  return 'N/A'; // Default value if none of the fees are paid
+};
+
+
     
   
     return (
@@ -414,6 +468,9 @@ const handleEditSubmit = () => {
                 <th onClick={() => requestSort('amountPaid')}>
                   Amount Paid {getSortDirection('amountPaid')}
                 </th>
+                <th onClick={() => requestSort('feeType')}>
+                  Fee Type {getSortDirection('feeType')}
+                </th>
                 <th onClick={() => requestSort('modeOfPayment')}>
                   Mode of Payment {getSortDirection('modeOfPayment')}
                 </th>
@@ -436,6 +493,7 @@ const handleEditSubmit = () => {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.studentName}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.batch}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineAmountPaid(receipt)}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">

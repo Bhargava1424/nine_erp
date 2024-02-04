@@ -71,7 +71,7 @@ function AddBranch() {
           body: {
             "collectionName": "branches",
             "query": {
-              "branchId": editingBranch.branchId // Use the Branch's _id to identify the document to update
+              "branchName": branches.branchName // Use the Branch's _id to identify the document to update
             },
             "type": 'updateOne',
             "update": {
@@ -353,22 +353,21 @@ function AddBranch() {
       {isEditModalOpen && (
         <div className="edit-modal">
           {/* Edit form layout */}
-          <h3 className="text-lg font-semibold mb-4">Editing Branch Details</h3>
-        <h3 className="text-lg font-semibold mb-4">Branch Id:{editingBranch.branchId}</h3>
+          <h3 className="text-xs font-semibold mb-4">Editing Branch Details</h3>
 
           <form onSubmit={handleEditSubmit}>
             {/* Include InputField components for each editable field */}
 
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Name</span>
                 <input type="text" name="branchName" value={editingBranch.branchName} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Number</span>
                 <input type="text" name="branchCode" value={editingBranch.branchCode} onChange={handleEditChange} />
                 {errors.branchCode && <h className="text-red-500 text-xs italic">{errors.branchCode}</h>}
               </label>
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Address</span>
                 <input type="text" name="branchAddress" value={editingBranch.branchAddress} onChange={handleEditChange} />
               </label>
