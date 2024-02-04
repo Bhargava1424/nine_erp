@@ -93,17 +93,20 @@ function AdminComponent() {
       ));
     }
     
-    return filtered.sort((a, b) => {
-      if (!sortConfig.key) return 0;
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [students, searchQuery, sortConfig]);
+    // Ensure that filtered is not undefined before sorting
+  filtered = filtered || [];
+
+  return filtered.sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? 1 : -1;
+    }
+    return 0;
+  });
+}, [students, searchQuery, sortConfig]);
   
 
   const handleSearch = (searchQuery) => {
@@ -216,7 +219,7 @@ function AdminComponent() {
         body: {
           "collectionName": "students",
           "query": {
-            'applicationNumber': students.applicationNumber
+            'applicationNumber': editingStudent.applicationNumber
           },
           "type": 'updateOne',
           "update": {
@@ -261,7 +264,7 @@ function AdminComponent() {
         body : {
           "collectionName": "receipts",
           "query": {
-            'applicationNumber': students.applicationNumber
+            'applicationNumber': editingStudent.applicationNumber
           },
           "type": 'updateMany',
           "update": {
