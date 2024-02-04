@@ -411,7 +411,7 @@ const determineFeeType = (receipt) => {
   return 'N/A'; // Default value if none of the fees are paid
 };
 
-
+const isAccountantOrExecutive = ['Accountant', 'Executive'].includes(user.role);
     
   
     return (
@@ -477,9 +477,9 @@ const determineFeeType = (receipt) => {
                 <th onClick={() => requestSort('chequeNumber')}>
                   Cheque Number {getSortDirection('chequeNumber')}
                 </th>
-                <th>
-                  Action
-                </th>
+                {!isAccountantOrExecutive && (
+                                <th>Action</th> // Conditionally render the Action header
+                            )}
                 
                 <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
               </tr>
@@ -496,11 +496,14 @@ const determineFeeType = (receipt) => {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          <td className="border-2 text-sm border-gray-800 px-4 py-2">
-                                <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
-                                <i className="fas fa-edit"></i>
-                                </button>
-                            </td>
+                          {!isAccountantOrExecutive && (
+                                    <td className="border-2 text-sm border-gray-800 px-4 py-2">
+                                        {/* Conditionally render the Action buttons */}
+                                        <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
+                                            <i className="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                )}
                             <td className="border-2 border-gray-800 px-4 py-2">
                                 <button style={{backgroundColor: '#2D5990'}} onClick={() => handleDownload(receipt)} className="btn btn-blue text-white">
                                     Download
