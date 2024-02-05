@@ -386,8 +386,8 @@ function ExecutiveComponent() {
       Export to Excel
     </button>
   </div>
-  <div className="flex-1 flex justify-center mb-4 md:mb-0"> {/* Center-align the dashboard heading */}
-    <h2 className="text-2xl font-bold text-black">DASHBOARD</h2>
+  <div className="flex-1 flex justify-center card bg-slate-600 text-black px-4 py-2 text-center"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
   </div>
   <div className="flex flex-col items-center md:items-end w-full md:w-auto">
     <input

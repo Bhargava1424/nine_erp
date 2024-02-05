@@ -25,7 +25,7 @@ function ListReceipts() {
         let query = {};
         
         console.log(user.role);
-        if (user.role === 'Accountant' || user.role === 'Executive') {
+        if (user.role === 'Accountant') {
           query = {
             'dateOfPayment': {'$gte': fourDaysAgo},
             'branch':user.branch
