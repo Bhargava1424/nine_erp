@@ -66,10 +66,18 @@ function CancelledStudents() {
             student.batch.includes(term) ||
             student.course.toLowerCase().includes(term) ||
             student.modeOfResidence.toLowerCase().includes(term) ||
+            student.firstYearTuitionFee.toString().includes(term) ||
+            student.firstYearHostelFee.toString().includes(term) ||
+            student.secondYearTuitionFee.toString().includes(term) ||
+            student.secondYearHostelFee.toString().includes(term) ||
             student.pendingFirstYearTuitionFee.toString().includes(term) ||
             student.pendingFirstYearHostelFee.toString().includes(term) ||
             student.pendingSecondYearTuitionFee.toString().includes(term) ||
-            student.pendingSecondYearHostelFee.toString().includes(term)
+            student.pendingSecondYearHostelFee.toString().includes(term) ||
+            student.paidFirstYearTuitionFee.toString().includes(term) ||
+            student.paidFirstYearHostelFee.toString().includes(term) ||
+            student.paidSecondYearTuitionFee.toString().includes(term) ||
+            student.paidSecondYearHostelFee.toString().includes(term)
         // include other fields as necessary
       ));
     }
@@ -98,6 +106,14 @@ function CancelledStudents() {
       'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
       'Course': student.course,
       'Mode of Residence': student.modeOfResidence,
+      '1st Year Tuition Fee': student.firstYearTuitionFee,
+      '1st Year Hostel Fee': student.firstYearHostelFee,
+      '2nd Year Tuition Fee': student.secondYearTuitionFee,
+      '2nd Year Hostel Fee': student.secondYearHostelFee,
+      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
+      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
+      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
+      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
       'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
       'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
       'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
@@ -231,10 +247,19 @@ function CancelledStudents() {
           student.gender.toLowerCase().includes(term) ||
           student.batch.includes(term) ||
           student.course.toLowerCase().includes(term) ||
+          student.modeOfResidence.toLowerCase().includes(term) ||
+          student.firstYearTuitionFee.toString().includes(term) ||
+          student.firstYearHostelFee.toString().includes(term) ||
+          student.secondYearTuitionFee.toString().includes(term) ||
+          student.secondYearHostelFee.toString().includes(term) ||
           student.pendingFirstYearTuitionFee.toString().includes(term) ||
           student.pendingFirstYearHostelFee.toString().includes(term) ||
           student.pendingSecondYearTuitionFee.toString().includes(term) ||
-          student.pendingSecondYearHostelFee.toString().includes(term);
+          student.pendingSecondYearHostelFee.toString().includes(term) ||
+          student.paidFirstYearTuitionFee.toString().includes(term) ||
+          student.paidFirstYearHostelFee.toString().includes(term) ||
+          student.paidSecondYearTuitionFee.toString().includes(term) ||
+          student.paidSecondYearHostelFee.toString().includes(term);
       });
     });
   };
@@ -362,10 +387,19 @@ function CancelledStudents() {
                 <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
                 <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
                 <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+                <th  className="text-xs" onClick={() => requestSort('firstYearTuitionFee')}>1st Year Tuition Fee {getSortDirection('firstYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('firstYearHostelFee')}>1st Year Hostel Fee {getSortDirection('firstYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('secondYearTuitionFee')}>2nd Year Tuition Fee {getSortDirection('secondYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('secondYearHostelFee')}>2nd Year Hostel Fee {getSortDirection('secondYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidFirstYearTuitionFee')}>Paid 1st Year Tuition Fee {getSortDirection('paidFirstYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidFirstYearHostelFee')}>Paid 1st Year Hostel Fee {getSortDirection('paidFirstYearHostelFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidSecondYearTuitionFee')}>Paid 2nd Year Tuition Fee {getSortDirection('paidSecondYearTuitionFee')}</th>
+                <th  className="text-xs" onClick={() => requestSort('paidSecondYearHostelFee')}>Paid 2nd Year Hostel Fee {getSortDirection('paidSecondYearHostelFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+                <th  className="text-xs">Action</th> {/* Assuming no sorting for the action column */}
             </tr>
             </thead>
 
@@ -380,10 +414,23 @@ function CancelledStudents() {
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.batch}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.course}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.modeOfResidence}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.firstYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.firstYearHostelFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.secondYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.secondYearHostelFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidFirstYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidFirstYearHostelFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidSecondYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.paidSecondYearHostelFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearTuitionFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">
+                    <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+                        <i className="fas fa-edit"></i>
+                    </button>
+                </td>
                 </tr>
 
             ))}

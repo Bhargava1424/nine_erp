@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import CancelledStudents from './CancelledStudents';
+import ManagerCancelledStudents from './ManagerCancelledStudents';
 
 function AdminComponent() {
   const [students, setStudents] = useState([]);
@@ -634,7 +634,7 @@ function AdminComponent() {
 
 
 
-      {showCancelled && <CancelledStudents />}
+      {showCancelled && <ManagerCancelledStudents />}
 
       
 
