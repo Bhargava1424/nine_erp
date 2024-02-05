@@ -215,6 +215,9 @@ function AdminComponent() {
       if (editingStudent.studentStatus === "Cancelled") {
         editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
       }
+      else {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
+      }
       const opts = {
         body: {
           "collectionName": "students",

@@ -317,7 +317,7 @@ const updateData = {
 
   const mapDataToSchema = (data) => {
     return data.map(student => ({
-      'Name': `${student.firstName} ${student.surName}`,
+      'Name': student.firstName,
       'Application Number': student.applicationNumber,
       'Parent Name': student.parentName,
       'Branch': student.branch,

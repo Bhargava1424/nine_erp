@@ -91,14 +91,16 @@ function Login2() {
       <Navbar/>
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
-      <img alt="logo" src="/9logo.webp" className="responsive-logo" />
+        <div className="center-absolute justify-center image-full">
+          <img alt="logo" src="/9logo.webp" className="responsive-logo" />
+        </div>
         <form onSubmit={(e) => handleLogin(e)} className="space-y-4">
           {/* ... (rest of the form) */}
           <div className="flex flex-col">
-            <label className="text-sm mb-1">Email</label>
+            <label className="text-sm mb-1 mt-3">Email</label>
             <input
               type="email"
-              placeholder="email"
+              placeholder="Email"
               className="input input-bordered"
               required
               value={email}
@@ -109,7 +111,7 @@ function Login2() {
             <label className="text-sm mb-1">Password</label>
             <input
               type="password"
-              placeholder="password"
+              placeholder="Password"
               className="input input-bordered"
               required
               value={password}
