@@ -219,7 +219,7 @@ function AdminComponent() {
         body: {
           "collectionName": "students",
           "query": {
-            'applicationNumber': students.applicationNumber
+            'applicationNumber': editingStudent.applicationNumber
           },
           "type": 'updateOne',
           "update": {
@@ -264,7 +264,7 @@ function AdminComponent() {
         body : {
           "collectionName": "receipts",
           "query": {
-            'applicationNumber': students.applicationNumber
+            'applicationNumber': editingStudent.applicationNumber
           },
           "type": 'updateMany',
           "update": {
