@@ -259,6 +259,7 @@ function AddStudentReceipt() {
                                         <label>
                                             Amount Paid:
                                             <input
+                                                className='ml-2'
                                                 type="number"
                                                 value={amountPaid}
                                                 onChange={(e) => handleAmountChange(e, fee)}

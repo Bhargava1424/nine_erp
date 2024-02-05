@@ -247,7 +247,7 @@ function AddStudentConcession() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Waived:
-                                            <input type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
+                                            <input className='ml-2' type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>

@@ -1,57 +1,57 @@
-const handleEditSubmit = () => {
+
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+
+
+function Temp() {
+
   
-    if (editingReceipt.modeOfPayment === 'Cheque' && !editingReceipt.chequeNumber) {
-      alert("Please enter the Cheque Number.");
-      return; // Halt execution if the condition is not met
-    }
-  
-    // Calculate the difference between the new and previous amounts paid
-    const previousAmountPaid = editingReceipt[PaidfeeType] || 0; // Get the previous amount from the editing receipt
-    const newAmountPaid = updatedReceipt.amountPaid; // Get the new amount from the updated receipt form
-    const amountDifference = newAmountPaid - previousAmountPaid;
-  
-    // Prepare update data for the total paid and pending fees
-    let totalPaidField = PaidfeeType.replace('Paid', 'TotalTuitionFeePaid'); // Adjust this line to match your field naming pattern
-    let pendingField = PaidfeeType.replace('Paid', 'TotalTuitionFeePending'); // Adjust this line to match your field naming pattern
-  
-    // Update the total paid and pending amounts
-    editingReceipt[totalPaidField] = (editingReceipt[totalPaidField] || 0) + amountDifference;
-    editingReceipt[pendingField] = (editingReceipt[pendingField] || 0) - amountDifference;
-  
-    // Ensure the pending amount does not go below 0
-    editingReceipt[pendingField] = Math.max(0, editingReceipt[pendingField]);
-  
-    const updateData = {
-      modeOfPayment: editingReceipt.modeOfPayment,
-      chequeNumber: editingReceipt.chequeNumber,
-      [PaidfeeType]: updatedReceipt.amountPaid, // Update the specific paid field
-      [totalPaidField]: editingReceipt[totalPaidField], // Update the total paid field
-      [pendingField]: editingReceipt[pendingField] // Update the pending field
-    };
-  
-    try {
-      var SchoolManagementSystemApi = require('school_management_system_api');
-      var api = new SchoolManagementSystemApi.DbApi();
-      const opts = {
-        body: {
-          "collectionName": "receipts",
-          "query": { 'receiptNumber': editingReceipt.receiptNumber },
-          "type": 'updateOne',
-          "update": updateData
+  const [loading, setLoading] = useState(true);
+  const [shouldDownloadPdf, setShouldDownloadPdf] = useState(false);
+
+  useEffect(() => {
+    if (shouldDownloadPdf && !loading) {
+        const input = document.getElementById('download-receipt-content');
+        console.log(input)
+        if(!input) console.log('hi')
+        if (input) {
+            html2canvas(input).then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF();
+                pdf.addImage(imgData, 'PNG', 0, 0);
+                pdf.save("downloadReceipt.pdf");
+                setShouldDownloadPdf(false); // Reset the flag
+            }).catch((error) => {
+                console.error("Error generating PDF", error);
+            });
         }
-      };
-  
-      api.dbUpdate(opts, function (error, data, response) {
-        if (error) {
-          console.error('API Error:', error);
-        } else {
-          console.log('Update successful:', response.body);
-          setIsEditModalOpen(false);
-          setEditingReceipt(null);
-          fetchReceipts();
-        }
-      });
-    } catch (error) {
-      console.error("Error updating receipt: ", error);
     }
-  };
+}, [shouldDownloadPdf, loading]);
+
+const handleDownloadClick = () => {
+    setShouldDownloadPdf(true);
+};
+
+
+
+
+    return (
+      <div>
+        <div>
+            {/* Your existing JSX... */}
+            <button onClick={handleDownloadClick}>Download PDF</button>
+        </div>
+        <div id='download-receipt-content'>
+          <p>hello</p>
+        </div>
+      </div>
+        
+    );
+}
+
+export default Temp;
+
+
