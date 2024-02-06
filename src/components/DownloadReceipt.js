@@ -200,79 +200,79 @@ function DownloadReceipt() {
         <div className="bg-white p-8" >
             
             <div className="  mb-4">
-                <h1 className="text-3xl font-bold text-center mb-4">NINE EDUCATION</h1>
-                <h1 className="text-2xl font-bold text-center bg-black text-white">FEE RECEIPT</h1>
+                <h1 className="text-3xl font-bold text-center mb-4" style={{padding: '2px'}}>NINE EDUCATION</h1>
+                <h1 className="text-2xl font-bold text-center bg-black text-white" style={{padding: '2px'}}>FEE RECEIPT</h1>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 <div>
-                    <p className="text-xs">Receipt Number : <span className="font-bold">{receiptNumber}</span></p>
+                    <p className="text-xs">Receipt Number : <span className="font-bold" style={{padding: '2px'}}>{receiptNumber}</span></p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs">Payment Date : <span className="font-bold">{new Date().toISOString().split('T')[0]}</span></p> 
+                    <p className="text-xs">Payment Date : <span className="font-bold" style={{padding: '2px'}}>{new Date().toISOString().split('T')[0]}</span></p> 
                 </div>
             </div>
-            <h1 className="  text-lg font-bold text-center bg-slate-400 ">STUDENT DETAILS</h1>
+            <h1 className="  text-lg font-bold text-center bg-slate-400 " style={{padding: '2px'}}>STUDENT DETAILS</h1>
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 
             <div>
-                <p className="text-xs mb-2 whitespace-nowrap mt-2">Student's Name : <span className="font-bold">{receiptsData.studentName} {receiptsData.surName}</span></p>
-                <p className="text-xs mb-2">Parent's Name : <span className="font-bold">{receiptsData.parentName}</span></p>
-                <p className="text-xs mb-2">Application Number : <span className="font-bold">{receiptsData.applicationNumber}</span></p>
-                <p className="text-xs mb-2">Registered Mobile Number : <span className="font-bold">{receiptsData.registeredMobileNumber}</span></p>
+                <p className="text-xs mb-2 whitespace-nowrap mt-2" style={{padding: '2px'}}>Student's Name : <span className="font-bold">{receiptsData.studentName} {receiptsData.surName}</span></p>
+                <p className="text-xs mb-2" style={{padding: '2px'}}>Parent's Name : <span className="font-bold">{receiptsData.parentName}</span></p>
+                <p className="text-xs mb-2" style={{padding: '2px'}}>Application Number : <span className="font-bold">{receiptsData.applicationNumber}</span></p>
+                <p className="text-xs mb-2" style={{padding: '2px'}}>Registered Mobile Number : <span className="font-bold">{receiptsData.registeredMobileNumber}</span></p>
             </div>
 
             </div>
-            <h1 className="  text-lg font-bold text-center bg-slate-400 ">REGISTRATION DETAILS</h1>
+            <h1 className="  text-lg font-bold text-center bg-slate-400 " style={{padding: '2px'}}>REGISTRATION DETAILS</h1>
+            <div className="grid grid-cols-2 gap-4 mb-4  " >
+                
+                <div>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Batch : <span className='font-bold'>{receiptsData.batch}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Stream : <span className='font-bold'>{receiptsData.stream}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Branch : <span className='font-bold'>{receiptsData.branch}</span></p>
+                </div>
+                <div className="text-right">
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Date of Joining : <span className='font-bold text-transform: uppercase'>{receiptsData.dateOfJoining}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Gender : <span className='font-bold text-transform: uppercase'>{receiptsData.gender}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Residence Type : <span className='font-bold text-transform: uppercase'>{receiptsData.residenceType}</span></p>
+                </div>
+            </div>
+            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2" style={{padding: '2px'}}>FEE DETAILS OF THE STUDENT</h1>
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 
                 <div>
-                    <p className="text-xs mb-2">Batch : <span className='font-bold'>{receiptsData.batch}</span></p>
-                    <p className="text-xs mb-2">Stream : <span className='font-bold'>{receiptsData.stream}</span></p>
-                    <p className="text-xs mb-2">Branch : <span className='font-bold'>{receiptsData.branch}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTuitionFeePayable}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearHostelFeePayable}</span></p>  
                 </div>
                 <div className="text-right">
-                    <p className="text-xs mb-2">Date of Joining : <span className='font-bold text-transform: uppercase'>{receiptsData.dateOfJoining}</span></p>
-                    <p className="text-xs mb-2">Gender : <span className='font-bold text-transform: uppercase'>{receiptsData.gender}</span></p>
-                    <p className="text-xs mb-2">Residence Type : <span className='font-bold text-transform: uppercase'>{receiptsData.residenceType}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTuitionFeePayable}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (2nd Year) :  <span className="font-bold">₹ {receiptsData.secondYearHostelFeePayable}</span></p>  
                 </div>
             </div>
-            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2">FEE DETAILS OF THE STUDENT</h1>
-            <div className="grid grid-cols-2 gap-4 mb-4  ">
-                
-                <div>
-                    <p className="text-xs mb-2">Tuition Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTuitionFeePayable}</span></p>
-                    <p className="text-xs mb-2">Hostel Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearHostelFeePayable}</span></p>  
-                </div>
-                <div className="text-right">
-                    <p className="text-xs mb-2">Tuition Fee Payable (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTuitionFeePayable}</span></p>
-                    <p className="text-xs mb-2">Hostel Fee Payable (2nd Year) :  <span className="font-bold">₹ {receiptsData.secondYearHostelFeePayable}</span></p>  
-                </div>
-            </div>
-            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2">DETAILS OF THE CURRENT TRANSACTION</h1>
+            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2" style={{padding: '2px'}}>DETAILS OF THE CURRENT TRANSACTION</h1>
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 <div>
-                    <p className="text-xs mb-2">Amount Paid in Current Transaction : <span className="font-bold">₹ {amountPaid}</span></p>
-                    <p className="text-xs mb-2 whitespace-nowrap">Amount Paid in Words : <span className='font-bold text-transform: uppercase'>{amountInWords}</span>{/*Placeholder 1 */}</p>
-                    <p className="text-xs mb-2">Amount Paid Towards : <span className='font-bold text-transform: uppercase'>{feeType}</span> {/*Placeholder 2 */}</p>
-                    <p className="text-xs mb-2">Mode of Payment : <span className='font-bold'>{receiptsData.modeOfPayment}</span> {/*Placeholder 3 */} </p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid in Current Transaction : <span className="font-bold">₹ {amountPaid}</span></p>
+                    <p className="text-xs mb-2 whitespace-nowrap" style={{padding: '2px'}}>Amount Paid in Words : <span className='font-bold text-transform: uppercase'>{amountInWords}</span>{/*Placeholder 1 */}</p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid Towards : <span className='font-bold text-transform: uppercase'>{feeType}</span> {/*Placeholder 2 */}</p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Mode of Payment : <span className='font-bold'>{receiptsData.modeOfPayment}</span> {/*Placeholder 3 */} </p>
                     
                 </div>
             </div>
-            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2">DETAILS OF ALL TRANSACTIONS</h1>
+            <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2" style={{padding: '2px'}}>DETAILS OF ALL TRANSACTIONS</h1>
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 
                 <div>
-                    <p className="text-xs mb-2">Total Tuition Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePaid}</span></p>
-                    <p className="text-xs mb-2">Total Hostel Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePaid}</span></p> 
-                    <p className="text-xs mb-2">Total Tuition Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePaid}</span></p>
-                    <p className="text-xs mb-2">Total Hostel Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePaid}</span></p>  
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePaid}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePaid}</span></p> 
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePaid}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePaid}</span></p>  
                 </div>
                 <div className="text-right">
-                    <p className="text-xs mb-2">Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePending}</span></p>
-                    <p className="text-xs mb-2">Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePending}</span></p> 
-                    <p className="text-xs mb-2">Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePending}</span></p>
-                    <p className="text-xs mb-2">Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePending}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePending}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePending}</span></p> 
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePending}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePending}</span></p>
                 </div>
             </div>
 
