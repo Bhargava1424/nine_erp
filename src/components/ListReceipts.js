@@ -116,24 +116,32 @@ if (updatedReceipt.modeOfPayment === 'Cheque' && !updatedReceipt.chequeNumber) {
 // Assuming amountPaid is always related to tuition fees
 const amountDifference = parseFloat(updatedReceipt.amountPaid) - parseFloat(editingReceipt[PaidfeeType]);
 
-let totalPaidField, pendingField;
+let totalPaidField, pendingField, studentFeePaid, studentFeePending;
 
 switch (PaidfeeType) {
     case 'firstYearTuitionFeePaid':
         totalPaidField = 'firstYearTotalTuitionFeePaid';
         pendingField = 'firstYearTotalTuitionFeePending';
+        studentFeePaid = 'paidFirstYearTuitionFee';
+        studentFeePending = 'pendingFirstYearTuitionFee';
         break;
     case 'firstYearHostelFeePaid':
         totalPaidField = 'firstYearTotalHostelFeePaid';
         pendingField = 'firstYearTotalHostelFeePending';
+        studentFeePaid = 'paidFirstYearHostelFee';
+        studentFeePending = 'pendingFirstYearHostelFee';
         break;
     case 'secondYearTuitionFeePaid':
         totalPaidField = 'secondYearTotalTuitionFeePaid';
         pendingField = 'secondYearTotalTuitionFeePending';
+        studentFeePaid = 'paidSecondYearTuitionFee';
+        studentFeePending = 'pendingSecondYearTuitionFee';
         break;
     case 'secondYearHostelFeePaid':
         totalPaidField = 'secondYearTotalHostelFeePaid';
         pendingField = 'secondYearTotalHostelFeePending';
+        studentFeePaid = 'paidSecondYearHostelFee';
+        studentFeePending = 'pendingSecondYearHostelFee';
         break;
     default:
         console.error("Invalid PaidfeeType.");
@@ -144,9 +152,14 @@ switch (PaidfeeType) {
 const updateData = {
     modeOfPayment: editingReceipt.modeOfPayment,
     chequeNumber: editingReceipt.chequeNumber,
-    [PaidfeeType]: updatedReceipt.amountPaid,
+    [PaidfeeType]: parseInt(updatedReceipt.amountPaid),
     [totalPaidField]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
     [pendingField]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
+};
+
+const updateStudentData = {
+    [studentFeePaid]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
+    [studentFeePending]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
 };
 
   try {
@@ -161,14 +174,30 @@ const updateData = {
       }
     };
 
+    const opts2 = {
+      body: {
+        "collectionName": "students",
+        "query": { 'applicationNumber': editingReceipt.applicationNumber },
+        "type": 'updateOne',
+        "update": updateStudentData
+      }
+    };
+
     api.dbUpdate(opts, function (error, data, response) {
       if (error) {
         console.error('API Error:', error);
       } else {
-        console.log('Update successful:', response.body);
-        setIsEditModalOpen(false);
-        setEditingReceipt(null);
-        fetchReceipts();
+        api.dbUpdate(opts2, function (error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            console.log('Update successful:', response.body);
+            setIsEditModalOpen(false);
+            setEditingReceipt(null);
+            fetchReceipts();
+          }
+        }
+        );
       }
     });
   } catch (error) {
