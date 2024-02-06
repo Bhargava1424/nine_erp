@@ -44,93 +44,17 @@ function AddEmployee() {
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [filteredBranches, setFilteredBranches] = useState([]);
-    // Function to open the edit modal with the selected employee's data
+    const [originalUsername, setOriginalUsername] = useState('');
+
     const openEditModal = (employee) => {
-      setEditingEmployee({ ...employee });
+      setEditingEmployee(employee);
+      setOriginalUsername(employee.username); // Store the original username
       setIsEditModalOpen(true);
     };
-  
-    // Function to handle field changes in the edit modal
-    const handleEditChange = (e) => {
-      const { name, value } = e.target;
-      let updatedValue = value;
-      let newErrors = { ...errors };   
-      // Allow only alphabets in name fields and automatically capitalize them
-      if (name === "employeeName") {
-        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
-      }
-    
-      // Allow only numbers in the phone number field
-      if (name === "phoneNumber") {
-        updatedValue = value.replace(/[^0-9]/g, '');
-        if (updatedValue.length !== 10) {
-          newErrors.phoneNumber = 'Phone number must be 10 digits.';
-        } else {
-          newErrors.phoneNumber = '';
-        }
-      }
-      
-    
-      // Update state with validated and transformed values
-      setEditingEmployee({ ...editingEmployee, [name]: updatedValue });
-    
-      // Additional validation for phone number length on submit
-      if (name === "phoneNumber" && updatedValue.length !== 10) {
-        setErrors({ ...errors, phoneNumber: 'Phone number must be 10 digits.' });
-      } else {
-        setErrors({ ...errors, phoneNumber: '' });
-      }
-    };
     
   
-    // Function to submit the edited employee data
-    const handleEditSubmit = async (e) => {
-      e.preventDefault();
-      // Check for errors before submitting
-      if (errors.phoneNumber) {
-        alert("Please correct the errors before submitting.");
-        return;
-      }
+
     
-      try {
-        var SchoolManagementSystemApi = require('school_management_system_api');
-        var api = new SchoolManagementSystemApi.DbApi();
-        const opts = {
-          body: {
-            "collectionName": "employees",
-            "query": {
-              "employeeId": employees.employeeId // Use the employee's _id to identify the document to update
-            },
-            "type": 'updateOne',
-            "update": {
-              "employeeName": editingEmployee.employeeName,
-              "role": editingEmployee.role,
-              "phoneNumber": editingEmployee.phoneNumber,
-              "branch": editingEmployee.branch,
-              "username": editingEmployee.username,
-              "password": editingEmployee.password,
-              // Include other fields that need to be updated
-            }
-          }
-        };
-    
-        api.dbUpdate(opts, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-          } else {
-            // Handle successful update here
-            // For example, you can close the edit modal and clear the editing state
-            setIsEditModalOpen(false);
-            setEditingEmployee(null);
-            // Reload the employee list or use another method to update the UI
-            alert("Employees Updated Successfully")
-            window.location.reload()
-          }
-        });
-      } catch (error) {
-        console.error('There was an error updating the employee!', error);
-      }
-    };
     
 
   const handleChange = (e) => {
@@ -270,7 +194,80 @@ function AddEmployee() {
   };
   const [branches, setBranches] = useState([]);
   const [employees, setEmployees] = useState([]); 
-
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    let updatedValue = value;
+    let newErrors = { ...errors };
+  
+    if (name === "employeeName") {
+      updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+    }
+  
+    if (name === "phoneNumber") {
+      updatedValue = value.replace(/[^0-9]/g, '');
+      if (updatedValue.length !== 10) {
+        newErrors.phoneNumber = 'Phone number must be 10 digits.';
+      } else {
+        newErrors.phoneNumber = '';
+      }
+    }
+  
+    let updatedEditingEmployee = { ...editingEmployee, [name]: updatedValue };
+  
+    // Automatically set branch to "ALL" when role is Manager
+    if (name === "role" && value === "Manager") {
+      updatedEditingEmployee.branch = "ALL"; // Set branch to "ALL"
+    }
+  
+    setEditingEmployee(updatedEditingEmployee);
+    setErrors(newErrors);
+  };
+  
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (errors.phoneNumber) {
+      alert("Please correct the errors before submitting.");
+      return;
+    }
+  
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "employees",
+          "query": {
+            "username": originalUsername // Use the correct identifier for the employee
+          },
+          "type": 'updateOne',
+          "update": {
+              "employeeName": editingEmployee.employeeName,
+              "role": editingEmployee.role,
+              "phoneNumber": editingEmployee.phoneNumber,
+              "username":editingEmployee.username,
+              "branch": editingEmployee.branch,
+              "password": editingEmployee.password,
+              // Include other fields that need to be updated
+            
+          }
+        }
+      };
+      console.log(originalUsername);
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          setIsEditModalOpen(false);
+          setEditingEmployee(null);
+          alert("Employee Updated Successfully");
+          window.location.reload();
+        }
+      });
+    } catch (error) {
+      console.error('There was an error updating the employee!', error);
+    }
+  };
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -286,7 +283,7 @@ function AddEmployee() {
         };
     
         console.log(opts.body);
-    
+        
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -325,7 +322,7 @@ function AddEmployee() {
         };
     
         console.log(opts.body);
-    
+        
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -409,7 +406,7 @@ function AddEmployee() {
     fetchBranches();
   }, []);
   
-  
+
 
 
   return (
@@ -564,6 +561,7 @@ function AddEmployee() {
                   className="select select-bordered w-full max-w-xs"
                 >
                   <option value="" disabled>Select Branch</option>
+                  <option value="ALL">ALL</option>
                   {filteredBranches.map(branch => (
                     <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
                     

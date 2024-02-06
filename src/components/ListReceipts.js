@@ -560,7 +560,7 @@ const getSortIndicator = (columnName) => {
         )}
         <label className="form-control">
             <span className="label-text">Amount Paid</span>
-            <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
+            <input type="text" name="amountPaid" value={determineAmountPaid(editingReceipt)} onChange={handleEditChange} />
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
