@@ -253,7 +253,7 @@ function DownloadReceipt() {
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 <div>
                     <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid in Current Transaction : <span className="font-bold">₹ {amountPaid}</span></p>
-                    <p className="text-xs mb-2 whitespace-nowrap" style={{padding: '2px'}}>Amount Paid in Words : <span className='font-bold text-transform: uppercase'>{amountInWords}</span>{/*Placeholder 1 */}</p>
+                    <p className="text-xs mb-2 whitespace-nowrap" style={{padding: '2px'}}>Amount Paid in Words : <span className='font-bold text-transform: uppercase'>Rupees {amountInWords} Only</span>{/*Placeholder 1 */}</p>
                     <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid Towards : <span className='font-bold text-transform: uppercase'>{feeType}</span> {/*Placeholder 2 */}</p>
                     <p className="text-xs mb-2" style={{padding: '2px'}}>Mode of Payment : <span className='font-bold'>{receiptsData.modeOfPayment}</span> {/*Placeholder 3 */} </p>
                     

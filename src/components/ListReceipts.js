@@ -26,7 +26,7 @@ function ListReceipts() {
         let query = {};
         
         console.log(user.role);
-        if (user.role === 'Accountant') {
+        if (user.role === 'Accountant' || user.role === 'Executive') {
           query = {
             'dateOfPayment': {'$gte': fourDaysAgo},
             'branch':user.branch
@@ -546,10 +546,10 @@ const getSortIndicator = (columnName) => {
             <span className="label-text">Mode of Payment</span>
             <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
                 <option value="">Select Mode of Payment</option>
-                <option value="Bank Transfer/UPI">Bank Transfer/UPI</option>
-                <option value="Card">Card</option>
-                <option value="Cash">Cash</option>
-                <option value="Cheque">Cheque</option>
+                <option value="BANK TRANSFER/UPI">Bank Transfer/UPI</option>
+                <option value="CARD">Card</option>
+                <option value="CASH">Cash</option>
+                <option value="CHEQUE">Cheque</option>
             </select>
         </label>
         {editingReceipt.modeOfPayment === 'Cheque' && (
@@ -560,7 +560,7 @@ const getSortIndicator = (columnName) => {
         )}
         <label className="form-control">
             <span className="label-text">Amount Paid</span>
-            <input type="text" name="amountPaid" value={determineAmountPaid(editingReceipt)} onChange={handleEditChange} />
+            <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>

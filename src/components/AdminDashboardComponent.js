@@ -195,6 +195,41 @@ function AdminComponent() {
   
     setValidationErrors(newValidationErrors);
     setEditingStudent({ ...editingStudent, [name]: updatedValue });
+      // Handling Mode of Residence changes
+      if (name === 'modeOfResidence') {
+        if (value === 'Hostel') {
+          // Mode of Residence changed to Hostel
+          // Set firstYearHostelFee and secondYearHostelFee values to pending fees
+          setEditingStudent(prevState => ({
+            ...prevState,
+            [name]: updatedValue,
+            firstYearHostelFee: prevState.pendingFirstYearHostelFee,
+            secondYearHostelFee: prevState.pendingSecondYearHostelFee,
+            
+          }));
+        } else if (value === 'Day Scholar') {
+          // Mode of Residence changed to Day Scholar
+          if (editingStudent.pendingFirstYearHostelFee === 0 && editingStudent.pendingSecondYearHostelFee === 0) {
+            // If pending hostel fees are 0, set hostel fees to 0
+            setEditingStudent(prevState => ({
+              ...prevState,
+              [name]: updatedValue,
+              firstYearHostelFee: 0,
+              secondYearHostelFee: 0,
+            }));
+          } else {
+            // If pending fees are not cleared, alert the user and do not change Mode of Residence
+            alert("Since the pending fee for Hostel (1st Year and/or 2nd Year) is not zero, it needs to be cleared or waived off.");
+            // Do not update state, hence not changing Mode of Residence
+            setEditingStudent(prevState => ({ ...prevState, modeOfResidence: "Hostel" }));
+            return;
+          }
+        }
+      } else {
+        // Apply the updatedValue for other fields
+        setEditingStudent(prevState => ({ ...prevState, [name]: updatedValue }));
+      }
+      
   };
   
   
@@ -236,6 +271,13 @@ function AdminComponent() {
             "course": editingStudent.course,
             "modeOfResidence": editingStudent.modeOfResidence,
             "studentStatus": editingStudent.studentStatus,
+            // Ensure to include the potentially updated hostel fee fields
+            "firstYearHostelFee": editingStudent.firstYearHostelFee,
+            "secondYearHostelFee": editingStudent.secondYearHostelFee,
+            // You might also need to update pending fees if logic requires
+            "pendingFirstYearHostelFee": editingStudent.firstYearHostelFee,
+            "pendingSecondYearHostelFee": editingStudent.secondYearHostelFee,
+
           }
         }
       };
@@ -541,8 +583,8 @@ function AdminComponent() {
 
     {isEditModalOpen && (
       <div className="edit-modal">
-        <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
-        <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
+        <h3 className="text-xs font-semibold ">Editing Student Details</h3>
+        <h3 className="text-xs font-semibold ">{editingStudent.applicationNumber}</h3>
 
 
         <label className="form-control text-xs">
@@ -604,6 +646,18 @@ function AdminComponent() {
             <option value="Hostel">Hostel</option>
           </select>
         </label>
+        {editingStudent.modeOfResidence === 'Hostel' && (
+          <>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">First Year Hostel Fee</span>
+              <input type="number" name="firstYearHostelFee" value={editingStudent.firstYearHostelFee || ''} onChange={handleEditChange} />
+            </label>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">Second Year Hostel Fee</span>
+              <input type="number" name="secondYearHostelFee" value={editingStudent.secondYearHostelFee || ''} onChange={handleEditChange} />
+            </label>
+          </>
+        )}
 
         <label className="form-control text-xs">
           <span className="label-text text-xs">Student Status</span>
