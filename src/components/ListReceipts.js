@@ -15,7 +15,8 @@ function ListReceipts() {
     const currentDate = new Date();
     const fourDaysAgo = new Date(currentDate);
     fourDaysAgo.setDate(currentDate.getDate() - 4);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const [sortConfig, setSortConfig] = useState({ key: 'dateOfPayment', direction: 'descending' });
+
     const user = JSON.parse(localStorage.getItem('user'));
 
     const fetchReceipts = async () => {
@@ -115,24 +116,32 @@ if (updatedReceipt.modeOfPayment === 'Cheque' && !updatedReceipt.chequeNumber) {
 // Assuming amountPaid is always related to tuition fees
 const amountDifference = parseFloat(updatedReceipt.amountPaid) - parseFloat(editingReceipt[PaidfeeType]);
 
-let totalPaidField, pendingField;
+let totalPaidField, pendingField, studentFeePaid, studentFeePending;
 
 switch (PaidfeeType) {
     case 'firstYearTuitionFeePaid':
         totalPaidField = 'firstYearTotalTuitionFeePaid';
         pendingField = 'firstYearTotalTuitionFeePending';
+        studentFeePaid = 'paidFirstYearTuitionFee';
+        studentFeePending = 'pendingFirstYearTuitionFee';
         break;
     case 'firstYearHostelFeePaid':
         totalPaidField = 'firstYearTotalHostelFeePaid';
         pendingField = 'firstYearTotalHostelFeePending';
+        studentFeePaid = 'paidFirstYearHostelFee';
+        studentFeePending = 'pendingFirstYearHostelFee';
         break;
     case 'secondYearTuitionFeePaid':
         totalPaidField = 'secondYearTotalTuitionFeePaid';
         pendingField = 'secondYearTotalTuitionFeePending';
+        studentFeePaid = 'paidSecondYearTuitionFee';
+        studentFeePending = 'pendingSecondYearTuitionFee';
         break;
     case 'secondYearHostelFeePaid':
         totalPaidField = 'secondYearTotalHostelFeePaid';
         pendingField = 'secondYearTotalHostelFeePending';
+        studentFeePaid = 'paidSecondYearHostelFee';
+        studentFeePending = 'pendingSecondYearHostelFee';
         break;
     default:
         console.error("Invalid PaidfeeType.");
@@ -143,9 +152,14 @@ switch (PaidfeeType) {
 const updateData = {
     modeOfPayment: editingReceipt.modeOfPayment,
     chequeNumber: editingReceipt.chequeNumber,
-    [PaidfeeType]: updatedReceipt.amountPaid,
+    [PaidfeeType]: parseInt(updatedReceipt.amountPaid),
     [totalPaidField]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
     [pendingField]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
+};
+
+const updateStudentData = {
+    [studentFeePaid]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
+    [studentFeePending]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
 };
 
   try {
@@ -160,14 +174,30 @@ const updateData = {
       }
     };
 
+    const opts2 = {
+      body: {
+        "collectionName": "students",
+        "query": { 'applicationNumber': editingReceipt.applicationNumber },
+        "type": 'updateOne',
+        "update": updateStudentData
+      }
+    };
+
     api.dbUpdate(opts, function (error, data, response) {
       if (error) {
         console.error('API Error:', error);
       } else {
-        console.log('Update successful:', response.body);
-        setIsEditModalOpen(false);
-        setEditingReceipt(null);
-        fetchReceipts();
+        api.dbUpdate(opts2, function (error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            console.log('Update successful:', response.body);
+            setIsEditModalOpen(false);
+            setEditingReceipt(null);
+            fetchReceipts();
+          }
+        }
+        );
       }
     });
   } catch (error) {
@@ -296,52 +326,40 @@ const updateData = {
   };
 
   const exportToExcel = () => {
-    const dataToExport = mapDataToSchema(handleSearch(searchTerm));// Fetch the data to be exported
+    const dataToExport = mapDataToSchema(handleSearch(searchTerm)); // Fetch the data to be exported
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Receipts");
+  
     // Generate buffer
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+  
     const now = new Date();
     const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
-
-    
+  
     // Create a Blob
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    
+  
     // Use FileSaver to save the file
     saveAs(data, `Receipts ${formattedDate}.xlsx`);
   };
+  
 
   const mapDataToSchema = (data) => {
-    return data.map(student => ({
-      'Name': student.firstName,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
-      'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+    return data.map(receipt => ({
+      'Receipt Number': receipt.receiptNumber,
+      'Date of Payment': formatDate(receipt.dateOfPayment),
+      'Student Name': receipt.studentName,
+      'Batch': receipt.batch,
+      'Amount Paid': determineAmountPaid(receipt),
+      'Fee Type': determineFeeType(receipt),
+      'Mode of Payment': receipt.modeOfPayment,
+      'Cheque Number': receipt.chequeNumber || 'N/A', // Assuming chequeNumber might be null or not applicable
       // Add other fields if necessary
     }));
   };
+  
 
   
   const formatDate = (dateString) => {
@@ -355,40 +373,6 @@ const updateData = {
     return `${hours}:${minutes} ${day}-${month}-${year}`;
   };
   
-  const sortedReceipts = useMemo(() => {
-    let sortableItems = [...receipts];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableItems;
-  }, [receipts, sortConfig]);
-  
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-  
-  const getSortDirection = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
-    }
-    return '';
-  };
 
 
   let PaidfeeType; // This will hold the field name of the paid fee
@@ -411,8 +395,42 @@ const determineFeeType = (receipt) => {
   return 'N/A'; // Default value if none of the fees are paid
 };
 
-const isAccountantOrExecutive = ['Accountant', 'Executive'].includes(user.role);
-    
+const isAccountant = ['Accountant'].includes(user.role);
+const sortedReceipts = useMemo(() => {
+  let sortableItems = [...receipts];
+  if (sortConfig !== null) {
+    sortableItems.sort((a, b) => {
+      if (a[sortConfig.key] === b[sortConfig.key]) {
+        return 0;
+      }
+      const order = (sortConfig.direction === 'ascending') ? 1 : -1;
+      // For date comparison, convert strings to date objects
+      let comparison = 0;
+      if (sortConfig.key === 'dateOfPayment') {
+        comparison = new Date(a[sortConfig.key]) < new Date(b[sortConfig.key]) ? -1 : 1;
+      } else {
+        comparison = a[sortConfig.key] < b[sortConfig.key] ? -1 : 1;
+      }
+      return comparison * order;
+    });
+  }
+  return sortableItems;
+}, [receipts, sortConfig]);
+
+const requestSort = (key) => {
+  let direction = 'ascending';
+  if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+    direction = 'descending';
+  }
+  setSortConfig({ key, direction });
+};
+const getSortIndicator = (columnName) => {
+  if (sortConfig && sortConfig.key === columnName) {
+    return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+  }
+  return ''; // Return nothing if the column is not being sorted
+};
+
   
     return (
       <div className="main-container root-container">
@@ -454,39 +472,38 @@ const isAccountantOrExecutive = ['Accountant', 'Executive'].includes(user.role);
             <thead>
               <tr className="text-sm" style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
                 <th onClick={() => requestSort('receiptNumber')}>
-                  Receipt Number {getSortDirection('receiptNumber')}
+                  Receipt Number{getSortIndicator('receiptNumber')}
                 </th>
                 <th onClick={() => requestSort('dateOfPayment')}>
-                  Date of Payment {getSortDirection('dateOfPayment')}
+                  Date of Payment{getSortIndicator('dateOfPayment')}
                 </th>
                 <th onClick={() => requestSort('studentName')}>
-                  Student Name {getSortDirection('studentName')}
+                  Student Name{getSortIndicator('studentName')}
                 </th>
                 <th onClick={() => requestSort('batch')}>
-                  Batch {getSortDirection('batch')}
+                  Batch{getSortIndicator('batch')}
                 </th>
                 <th onClick={() => requestSort('amountPaid')}>
-                  Amount Paid {getSortDirection('amountPaid')}
+                  Amount Paid{getSortIndicator('amountPaid')}
                 </th>
-                <th onClick={() => requestSort('feeType')}>
-                  Fee Type {getSortDirection('feeType')}
+                <th>
+                  Fee Type
                 </th>
                 <th onClick={() => requestSort('modeOfPayment')}>
-                  Mode of Payment {getSortDirection('modeOfPayment')}
+                  Mode of Payment{getSortIndicator('modeOfPayment')}
                 </th>
                 <th onClick={() => requestSort('chequeNumber')}>
-                  Cheque Number {getSortDirection('chequeNumber')}
+                  Cheque Number{getSortIndicator('chequeNumber')}
                 </th>
-                {!isAccountantOrExecutive && (
-                                <th>Action</th> // Conditionally render the Action header
-                            )}
-                
+                {!isAccountant && <th>Action</th>}
                 <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
               </tr>
             </thead>
 
+
+
                 <tbody>
-                    {currentReceipts.map((receipt, index)  => (
+                {sortedReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt).map((receipt, index) => (
                         <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2] " key={index}>                          
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
@@ -496,7 +513,7 @@ const isAccountantOrExecutive = ['Accountant', 'Executive'].includes(user.role);
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          {!isAccountantOrExecutive && (
+                          {!isAccountant && (
                                     <td className="border-2 text-sm border-gray-800 px-4 py-2">
                                         {/* Conditionally render the Action buttons */}
                                         <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>

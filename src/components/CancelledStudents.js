@@ -20,8 +20,7 @@ function CancelledStudents() {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
-        const isManager = user.role==="Manager";
-        const query = isManager?{"studentStatus": "Cancelled"} : {"studentStatus": "Cancelled", "branch": user.branch};
+        const query = {"studentStatus": "Cancelled", "branch": user.branch};
         const opts = {
           body: {
             "collectionName": "students",
@@ -316,7 +315,7 @@ function CancelledStudents() {
 
     return options;
   };  
-
+  const isAccountant = ['Accountant'].includes(user.role);
 
   return (
     <div className="main-container">
@@ -366,6 +365,7 @@ function CancelledStudents() {
                 <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
                 <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+                {!isAccountant && <th  className="text-xs">Action</th>} {/* Assuming no sorting for the action column */}
             </tr>
             </thead>
 
@@ -384,6 +384,12 @@ function CancelledStudents() {
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
+                {!isAccountant && (
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">
+                    <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
+                        <i className="fas fa-edit"></i>
+                    </button>
+                </td>)}
                 </tr>
 
             ))}
