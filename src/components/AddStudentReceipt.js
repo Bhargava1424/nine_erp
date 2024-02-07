@@ -21,14 +21,23 @@ function AddStudentReceipt() {
 
     
     const handleAmountChange = (e, fee) => {
-        const amount = parseFloat(e.target.value);
-        if (amount > fee.pendingFee) {
-            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
-            setAmountPaid(''); // Reset the amount field
-        } else {
-            setAmountPaid(amount);
+        const value = e.target.value;
+    
+        // Allow only numeric input
+        const regex = /^[0-9]*\.?[0-9]*$/; // Updated regex to allow decimal points
+        if (value === '' || regex.test(value)) {
+            const amount = parseFloat(value); // Convert to float for comparison
+            // Check if the converted amount exceeds the pending fee, 
+            // and ensure it's not NaN (which happens if the input is empty or incomplete)
+            if (!isNaN(amount) && amount > fee.pendingFee) {
+                alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+                setAmountPaid(''); // Reset the amount field if invalid
+            } else {
+                setAmountPaid(value); // Keep as string for input field
+            }
         }
     };
+    
     
     
 
@@ -126,7 +135,7 @@ function AddStudentReceipt() {
         try {
             // Assuming the backend expects an object with the payment details
             const paymentDetails = {
-                amountPaid: parseFloat(amountPaid),
+                amountPaid: Number(parseFloat(amountPaid)),
                 modeOfPayment: modeOfPayment,
                 chequeNumber: modeOfPayment === 'CHEQUE' ? chequeNumber : undefined,
             };
@@ -255,12 +264,12 @@ function AddStudentReceipt() {
                             </button>
                             {selectedFeeType === fee.key && (
                                     <div>
-                                        <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
+                                        <h2>{studentData.firstName}'s {fee.key}:</h2>
                                         <label>
                                             Amount Paid:
                                             <input
                                                 className='ml-2'
-                                                type="number"
+                                                type="text"
                                                 value={amountPaid}
                                                 onChange={(e) => handleAmountChange(e, fee)}
                                                 max={fee.pendingFee}
