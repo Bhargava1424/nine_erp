@@ -65,7 +65,10 @@ function ListReceipts() {
     };
   
     useEffect(() => {
-      fetchReceipts();
+      if(receipts.length === 0)
+      {
+        fetchReceipts();
+      }
     }, );
 
 

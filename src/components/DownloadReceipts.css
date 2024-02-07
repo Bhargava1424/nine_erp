@@ -1,0 +1,95 @@
+/* Typography */
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  .font-bold {
+    font-weight: bold;
+  }
+  
+  /* Spacing */
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .p-8 {
+    padding: 2rem;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Flexbox */
+  .flex {
+    display: flex;
+  }
+  
+  .justify-between {
+    justify-content: space-between;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+  
+  /* Grid */
+  .grid {
+    display: grid;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .gap-4 {
+    gap: 1rem;
+  }
+  
+  /* Backgrounds and Colors */
+  .bg-white {
+    background-color: white;
+  }
+  
+  .bg-black {
+    background-color: black;
+  }
+  
+  .text-white {
+    color: white;
+  }
+  
+  /* Slate colors might need to be approximated */
+  .bg-slate-400 {
+    background-color: #cbd5e0;
+  }
+  
+  /* Misc */
+  .loading-lg {
+    /* Custom properties for large loading spinner */
+  }
+  
+  /* This assumes custom values for text-transform as Tailwind doesn't include utilities for uppercase by default */
+  .text-transform-uppercase {
+    text-transform: uppercase;
+  }
+  
+  /* Additional Tailwind utilities will need corresponding CSS if used elsewhere in your component */
+  
