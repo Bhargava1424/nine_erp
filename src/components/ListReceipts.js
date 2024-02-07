@@ -392,7 +392,8 @@ const determineFeeType = (receipt) => {
     return 'Second Year Hostel Fee';
   }
   PaidfeeType = null; // If none of the conditions are met, reset PaidfeeType
-  return 'N/A'; // Default value if none of the fees are paid
+  return 'N/A';
+ // Default value if none of the fees are paid
 };
 
 const isAccountant = ['Accountant'].includes(user.role);
@@ -559,7 +560,9 @@ const getSortIndicator = (columnName) => {
             </label>
         )}
         <label className="form-control">
-            <span className="label-text">Amount Paid</span>
+            <div className='label-text'>Current Amount Paid:{determineAmountPaid(editingReceipt)}</div>
+            <div className='label-text'>Current Fee Type:{determineFeeType(editingReceipt)}</div>
+            <span className="label-text">Enter Updated Amount Paid</span>
             <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
