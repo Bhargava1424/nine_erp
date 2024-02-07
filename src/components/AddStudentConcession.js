@@ -19,15 +19,21 @@ function AddStudentConcession() {
 
 
     const handleAmountChange = (e, fee) => {
-        const amount = parseFloat(e.target.value);
-        if (amount > fee.pendingFee) {
-            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
-            setAmountWaived(''); // Reset the amount field
-        } else {
-            setAmountWaived(amount);
+        const value = e.target.value;
+    
+        // Allow only numeric input, including decimals
+        const regex = /^[0-9]*\.?[0-9]*$/;
+        if (value === '' || regex.test(value)) {
+            const amount = parseFloat(value); // Convert to float for comparison
+            if (!isNaN(amount) && amount > fee.pendingFee) {
+                alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+                setAmountWaived(''); // Reset the amount field if invalid
+            } else {
+                setAmountWaived(value); // Keep as string for input field to preserve user input including decimal point
+            }
         }
-
     };
+    
 
 
     
@@ -247,7 +253,7 @@ function AddStudentConcession() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Waived:
-                                            <input className='ml-2' type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
+                                            <input className='ml-2' type="text" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>
