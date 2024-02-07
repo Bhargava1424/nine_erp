@@ -67,87 +67,86 @@ function AdminComponent() {
     if (searchQuery) {
       const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
       filtered = students.filter(student => searchTerms.every(term =>
-        student.firstName.toLowerCase().includes(term) ||
-            student.applicationNumber.toLowerCase().includes(term) ||
-            student.surName.toLowerCase().includes(term) ||
-            student.parentName.toLowerCase().includes(term) ||
-            student.branch.toLowerCase().includes(term) ||
-            student.primaryContact.includes(term) ||
-            student.gender.toLowerCase().includes(term) ||
-            student.batch.includes(term) ||
-            student.course.toLowerCase().includes(term) ||
-            student.modeOfResidence.toLowerCase().includes(term) ||
-            student.firstYearTuitionFee.toString().includes(term) ||
-            student.firstYearHostelFee.toString().includes(term) ||
-            student.secondYearTuitionFee.toString().includes(term) ||
-            student.secondYearHostelFee.toString().includes(term) ||
-            student.pendingFirstYearTuitionFee.toString().includes(term) ||
-            student.pendingFirstYearHostelFee.toString().includes(term) ||
-            student.pendingSecondYearTuitionFee.toString().includes(term) ||
-            student.pendingSecondYearHostelFee.toString().includes(term) ||
-            student.paidFirstYearTuitionFee.toString().includes(term) ||
-            student.paidFirstYearHostelFee.toString().includes(term) ||
-            student.paidSecondYearTuitionFee.toString().includes(term) ||
-            student.paidSecondYearHostelFee.toString().includes(term)
-        // include other fields as necessary
+        student.firstName?.toLowerCase().includes(term) ||
+        student.applicationNumber?.toLowerCase().includes(term) ||
+        student.surName?.toLowerCase().includes(term) ||
+        student.parentName?.toLowerCase().includes(term) ||
+        student.branch?.toLowerCase().includes(term) ||
+        student.primaryContact?.includes(term) ||
+        student.gender?.toLowerCase().includes(term) ||
+        student.batch?.includes(term) ||
+        student.course?.toLowerCase().includes(term) ||
+        student.modeOfResidence?.toLowerCase().includes(term) ||
+        (student.firstYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.firstYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.secondYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.secondYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.pendingFirstYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.pendingFirstYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.pendingSecondYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.pendingSecondYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.paidFirstYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.paidFirstYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.paidSecondYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.paidSecondYearHostelFee?.toString() ?? "").includes(term)
       ));
     }
     
-    // Ensure that filtered is not undefined before sorting
-  filtered = filtered || [];
-
-  return filtered.sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === 'ascending' ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === 'ascending' ? 1 : -1;
-    }
-    return 0;
-  });
-}, [students, searchQuery, sortConfig]);
-  
-
-  const handleSearch = (searchQuery) => {
-    if (!searchQuery) {
-      return students;
-    }
-  
-    const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
-  
-    return students.filter(student => {
-      return searchTerms.every(term => {
-        if (term === "male") {
-          // Use regex to match 'male' as a whole word, not as part of other words like 'female'
-          return new RegExp('\\bmale\\b').test(student.gender.toLowerCase());
-        }
-        // Other conditions remain the same
-        return student.firstName.toLowerCase().includes(term) ||
-          student.applicationNumber.toLowerCase().includes(term) ||
-          student.surName.toLowerCase().includes(term) ||
-          student.parentName.toLowerCase().includes(term) ||
-          student.branch.toLowerCase().includes(term) ||
-          student.primaryContact.includes(term) ||
-          student.gender.toLowerCase().includes(term) ||
-          student.batch.includes(term) ||
-          student.course.toLowerCase().includes(term) ||
-          student.modeOfResidence.toLowerCase().includes(term) ||
-          student.firstYearTuitionFee.toString().includes(term) ||
-          student.firstYearHostelFee.toString().includes(term) ||
-          student.secondYearTuitionFee.toString().includes(term) ||
-          student.secondYearHostelFee.toString().includes(term) ||
-          student.pendingFirstYearTuitionFee.toString().includes(term) ||
-          student.pendingFirstYearHostelFee.toString().includes(term) ||
-          student.pendingSecondYearTuitionFee.toString().includes(term) ||
-          student.pendingSecondYearHostelFee.toString().includes(term) ||
-          student.paidFirstYearTuitionFee.toString().includes(term) ||
-          student.paidFirstYearHostelFee.toString().includes(term) ||
-          student.paidSecondYearTuitionFee.toString().includes(term) ||
-          student.paidSecondYearHostelFee.toString().includes(term);
-      });
+    // Continue with the rest of the sorting logic as before
+    return filtered.sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
     });
-  };
+  }, [students, searchQuery, sortConfig]);
+  
+
+const handleSearch = (searchQuery) => {
+  if (!searchQuery) {
+    return students;
+  }
+
+  const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
+
+  return students.filter(student => {
+    return searchTerms.every(term => {
+      // Use regex to specifically match 'male' avoiding matches with 'female'
+      if (term === "male") {
+        return new RegExp('\\bmale\\b').test(student.gender?.toLowerCase() ?? "");
+      }
+      // Safely handle properties that could be null or undefined
+      return (student.firstName?.toLowerCase().includes(term) ?? false) ||
+        (student.applicationNumber?.toLowerCase().includes(term) ?? false) ||
+        (student.surName?.toLowerCase().includes(term) ?? false) ||
+        (student.parentName?.toLowerCase().includes(term) ?? false) ||
+        (student.branch?.toLowerCase().includes(term) ?? false) ||
+        (student.primaryContact?.includes(term) ?? false) || // Assuming primaryContact is always a string or number
+        (student.gender?.toLowerCase().includes(term) ?? false) ||
+        (student.batch?.includes(term) ?? false) ||
+        (student.course?.toLowerCase().includes(term) ?? false) ||
+        (student.modeOfResidence?.toLowerCase().includes(term) ?? false) ||
+        (student.firstYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.firstYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.secondYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.secondYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.pendingFirstYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.pendingFirstYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.pendingSecondYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.pendingSecondYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.paidFirstYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.paidFirstYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.paidSecondYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.paidSecondYearHostelFee?.toString().includes(term) ?? false);
+    });
+  });
+};
+
+
   
 
 

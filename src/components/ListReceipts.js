@@ -2,7 +2,7 @@ import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { useSelector } from 'react-redux';
+
 
 
 function ListReceipts() {
@@ -18,6 +18,10 @@ function ListReceipts() {
     const [sortConfig, setSortConfig] = useState({ key: 'dateOfPayment', direction: 'descending' });
 
     const user = JSON.parse(localStorage.getItem('user'));
+    
+    const isAccountant = ['Accountant'].includes(user.role);
+    const isExecutive = ['Executive'].includes(user.role);
+    const isManager = ['Manager'].includes(user.role);
 
     const fetchReceipts = async () => {
       try {
@@ -61,13 +65,12 @@ function ListReceipts() {
     };
   
     useEffect(() => {
-      fetchReceipts();
-    }, []);
+      if(receipts.length === 0)
+      {
+        fetchReceipts();
+      }
+    }, );
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value.toLowerCase());
-        setCurrentPage(1);
-    };
 
     const handleSearch = (searchQuery) => {
         if (!searchQuery) {
@@ -84,6 +87,29 @@ function ListReceipts() {
             );
         });
     };
+
+    const sortedAndFilteredReceipts = useMemo(() => {
+      const filteredReceipts = receipts.filter(receipt => {
+          if (!searchTerm) return true; // If no search term, don't filter
+          return Object.values(receipt).some(value =>
+              String(value).toLowerCase().includes(searchTerm.toLowerCase())
+          );
+      });
+
+      return filteredReceipts.sort((a, b) => {
+          if (sortConfig === null) return 0;
+          if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
+          if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
+          return 0;
+      });
+  }, [receipts, searchTerm, sortConfig]);
+
+  const handleSearchChange = (e) => {
+      setSearchTerm(e.target.value);
+      setCurrentPage(1); // Reset to first page
+  };
+
+
     const openEditModal = (receipt) => {
       setEditingReceipt({ ...receipt });
       setIsEditModalOpen(true);
@@ -215,8 +241,7 @@ const updateStudentData = {
 
     // Calculate the pagination
     const indexOfLastReceipt = currentPage * rowsPerPage;
-    const indexOfFirstReceipt = indexOfLastReceipt - rowsPerPage;
-    const currentReceipts = filteredReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt);
+    const indexOfFirstReceipt = indexOfLastReceipt - rowsPerPage; 
 
     // Calculate page numbers
     const pageNumbers = [];
@@ -321,7 +346,7 @@ const updateStudentData = {
 
       
       const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receipt.receiptNumber}&feeType=${feeType}`;
-      console.log(amountPaid);{/*error here */}
+      console.log(amountPaid); 
       window.open(receiptUrl, '_blank');
   };
 
@@ -395,8 +420,7 @@ const determineFeeType = (receipt) => {
   return 'N/A';
  // Default value if none of the fees are paid
 };
-
-const isAccountant = ['Accountant'].includes(user.role);
+ 
 const sortedReceipts = useMemo(() => {
   let sortableItems = [...receipts];
   if (sortConfig !== null) {
@@ -430,6 +454,14 @@ const getSortIndicator = (columnName) => {
     return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
   }
   return ''; // Return nothing if the column is not being sorted
+};
+
+const isRecentlyAdded = (dateOfPayment) => {
+  const receiptDate = new Date(dateOfPayment);
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // Calculate one hour ago from current time
+
+  return receiptDate > oneHourAgo;
 };
 
   
@@ -504,7 +536,7 @@ const getSortIndicator = (columnName) => {
 
 
                 <tbody>
-                {sortedReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt).map((receipt, index) => (
+                {sortedAndFilteredReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt).map((receipt, index) => (
                         <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2] " key={index}>                          
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
@@ -514,14 +546,15 @@ const getSortIndicator = (columnName) => {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          {!isAccountant && (
-                                    <td className="border-2 text-sm border-gray-800 px-4 py-2">
-                                        {/* Conditionally render the Action buttons */}
-                                        <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
-                                            <i className="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                )}
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">
+                            {!isAccountant && (
+                              (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) ? (
+                                <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
+                                  <i className="fas fa-edit"></i> Edit
+                                </button>
+                              ) : <p></p> // Empty paragraph for maintaining cell layout
+                            )}
+                          </td>
                             <td className="border-2 border-gray-800 px-4 py-2">
                                 <button style={{backgroundColor: '#2D5990'}} onClick={() => handleDownload(receipt)} className="btn btn-blue text-white">
                                     Download

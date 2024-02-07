@@ -67,29 +67,18 @@ function AddReceipts() {
     if (!searchQuery) {
       return students; // Return all students if the search query is empty
     }
-
+  
     const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
-
+  
     return students.filter(student => {
       return searchTerms.every(term =>
-        student.firstName.toLowerCase().includes(term) ||
-        student.surName.toLowerCase().includes(term) ||
-        student.parentName.toLowerCase().includes(term) ||
-        student.branch.toLowerCase().includes(term) ||
-        student.primaryContact.includes(term) ||
-        student.secondaryContact.includes(term) ||
-        student.gender.toLowerCase().includes(term) ||
-        student.batch.includes(term) ||
-        student.course.toLowerCase().includes(term) ||
-        student.modeOfResidence.toLowerCase().includes(term) ||
-        // Excluding fields related to Tuition and hostel fees
-        student.pendingFirstYearTuitionFee.toString().includes(term) ||
-        student.pendingFirstYearHostelFee.toString().includes(term) ||
-        student.pendingSecondYearTuitionFee.toString().includes(term) ||
-        student.pendingSecondYearHostelFee.toString().includes(term)
+        (student.firstName?.toLowerCase().includes(term) || "") ||
+        (student.surName?.toLowerCase().includes(term) || "") ||
+        (student.batch?.includes(term) || "")
       );
     });
   };
+  
 
   
 

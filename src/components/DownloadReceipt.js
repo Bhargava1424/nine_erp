@@ -185,6 +185,17 @@ function DownloadReceipt() {
     const amountInWords = numberToWordsIN(parseInt(amountPaid, 10));
     console.log(amountPaid);
 
+
+    function formatNumberIndia(num) {
+        var x = num.toString();
+        var lastThree = x.substring(x.length - 3);
+        var otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers !== '')
+            lastThree = ',' + lastThree;
+        var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return res;
+    }
+
     
     
     return (
@@ -241,18 +252,18 @@ function DownloadReceipt() {
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 
                 <div>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTuitionFeePayable}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearHostelFeePayable}</span></p>  
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (1st Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.firstYearTuitionFeePayable)}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (1st Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.firstYearHostelFeePayable)}/-</span></p>  
                 </div>
                 <div className="text-right">
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTuitionFeePayable}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (2nd Year) :  <span className="font-bold">₹ {receiptsData.secondYearHostelFeePayable}</span></p>  
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Tuition Fee Payable (2nd Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.secondYearTuitionFeePayable)}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Hostel Fee Payable (2nd Year) :  <span className="font-bold">₹ {formatNumberIndia(receiptsData.secondYearHostelFeePayable)}/-</span></p>  
                 </div>
             </div>
             <h1 className="  text-lg font-bold text-center bg-slate-400 mb-2" style={{padding: '2px'}}>DETAILS OF THE CURRENT TRANSACTION</h1>
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 <div>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid in Current Transaction : <span className="font-bold">₹ {amountPaid}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid in Current Transaction : <span className="font-bold">₹ {formatNumberIndia(amountPaid)}/-</span></p>
                     <p className="text-xs mb-2 whitespace-nowrap" style={{padding: '2px'}}>Amount Paid in Words : <span className='font-bold text-transform: uppercase'>Rupees {amountInWords} Only</span>{/*Placeholder 1 */}</p>
                     <p className="text-xs mb-2" style={{padding: '2px'}}>Amount Paid Towards : <span className='font-bold text-transform: uppercase'>{feeType}</span> {/*Placeholder 2 */}</p>
                     <p className="text-xs mb-2" style={{padding: '2px'}}>Mode of Payment : <span className='font-bold'>{receiptsData.modeOfPayment}</span> {/*Placeholder 3 */} </p>
@@ -263,16 +274,16 @@ function DownloadReceipt() {
             <div className="grid grid-cols-2 gap-4 mb-4  ">
                 
                 <div>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePaid}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePaid}</span></p> 
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePaid}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (2nd Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePaid}</span></p>  
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (1st Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.firstYearTotalTuitionFeePaid)}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (1st Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.firstYearTotalHostelFeePaid)}/-</span></p> 
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Paid (2nd Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.secondYearTotalTuitionFeePaid)}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Paid (2nd Year) : <span className="font-bold">₹ {formatNumberIndia(receiptsData.secondYearTotalHostelFeePaid)}/-</span></p>  
                 </div>
                 <div className="text-right">
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.firstYearTotalTuitionFeePending}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.firstYearTotalHostelFeePending}</span></p> 
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {receiptsData.secondYearTotalTuitionFeePending}</span></p>
-                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {receiptsData.secondYearTotalHostelFeePending}</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {formatNumberIndia((receiptsData.firstYearTotalTuitionFeePending))}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {formatNumberIndia((receiptsData.firstYearTotalHostelFeePending))}/-</span></p> 
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Tuition Fee Pending (1st Year) : <span className="font-bold">₹ {formatNumberIndia((receiptsData.secondYearTotalTuitionFeePending))}/-</span></p>
+                    <p className="text-xs mb-2" style={{padding: '2px'}}>Total Hostel Fee Pending (1st Year) :  <span className="font-bold">₹ {formatNumberIndia((receiptsData.secondYearTotalHostelFeePending))}/-</span></p>
                 </div>
             </div>
 
