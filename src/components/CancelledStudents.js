@@ -3,10 +3,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { useSelector } from 'react-redux';
 
-
 function CancelledStudents() {
-
-
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudent, setEditingStudent] = useState(null);
@@ -14,65 +11,82 @@ function CancelledStudents() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
+  const [totalStudentCount, setTotalStudentCount] = useState(0);
   const user = useSelector((state) => state.auth);
+  const [originalModeOfResidence, setOriginalModeOfResidence] = useState('');
   useEffect(() => {
-    const fetchCancelledStudents = async () => {
+    // Function to fetch students data from the backend
+    const fetchStudents = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
-        const query = {"studentStatus": "Cancelled", "branch": user.branch};
         const opts = {
           body: {
             "collectionName": "students",
-            "query": query,
+            "query": {
+              "studentStatus": "Cancelled",
+              "branch":user.branch
+            },
             "type": "findMany"
           }
         };
-  
+
+
+        console.log(opts.body);
+
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
           } else {
             try {
-              const responseBody = response.body; // Handle the response as per your API structure
+              const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
-              setStudents(responseBody); // Assuming responseBody has the array of students
+              setStudents(responseBody)
+              setTotalStudentCount(responseBody.length);
+               // Assuming the actual data is in responseBody.data
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
           }
         });
+
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
-    fetchCancelledStudents();
-  }, []); // The dependency array is empty, so this will run once on component mount
+    fetchStudents();
+  }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+    const filtered = handleSearch(e.target.value.toLowerCase());
+    setTotalStudentCount(filtered.length);
+
+  };
 
   const sortedAndFilteredStudents = useMemo(() => {
     let filtered = students;
     if (searchQuery) {
       const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
       filtered = students.filter(student => searchTerms.every(term =>
-        student.firstName.toLowerCase().includes(term) ||
-            student.applicationNumber.toLowerCase().includes(term) ||
-            student.surName.toLowerCase().includes(term) ||
-            student.parentName.toLowerCase().includes(term) ||
-            student.branch.toLowerCase().includes(term) ||
-            student.primaryContact.includes(term) ||
-            student.gender.toLowerCase().includes(term) ||
-            student.batch.includes(term) ||
-            student.course.toLowerCase().includes(term) ||
-            student.modeOfResidence.toLowerCase().includes(term) ||
-            student.pendingFirstYearTuitionFee.toString().includes(term) ||
-            student.pendingFirstYearHostelFee.toString().includes(term) ||
-            student.pendingSecondYearTuitionFee.toString().includes(term) ||
-            student.pendingSecondYearHostelFee.toString().includes(term)
-        // include other fields as necessary
+        student.firstName?.toLowerCase().includes(term) ||
+        student.applicationNumber?.toLowerCase().includes(term) ||
+        student.surName?.toLowerCase().includes(term) ||
+        student.parentName?.toLowerCase().includes(term) ||
+        student.branch?.toLowerCase().includes(term) ||
+        student.primaryContact?.includes(term) ||
+        student.gender?.toLowerCase().includes(term) ||
+        student.batch?.includes(term) ||
+        student.course?.toLowerCase().includes(term) ||
+        student.modeOfResidence?.toLowerCase().includes(term) ||
+        (student.pendingFirstYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.pendingFirstYearHostelFee?.toString() ?? "").includes(term) ||
+        (student.pendingSecondYearTuitionFee?.toString() ?? "").includes(term) ||
+        (student.pendingSecondYearHostelFee?.toString() ?? "").includes(term)
       ));
     }
     
+    // Continue with the rest of the sorting logic as before
     return filtered.sort((a, b) => {
       if (!sortConfig.key) return 0;
       if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -84,86 +98,49 @@ function CancelledStudents() {
       return 0;
     });
   }, [students, searchQuery, sortConfig]);
+  
 
-  const mapDataToSchema = (data) => {
-    return data.map(student => ({
-      'Name': `${student.firstName} ${student.surName}`,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
-      'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
-      // Add other fields if necessary
-    }));
-  };
+const handleSearch = (searchQuery) => {
+  if (!searchQuery) {
+    return students;
+  }
 
+  const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
 
-  const exportToExcel = () => {
-    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+  return students.filter(student => {
+    return searchTerms.every(term => {
+      // Use regex to specifically match 'male' avoiding matches with 'female'
+      if (term === "male") {
+        return new RegExp('\\bmale\\b').test(student.gender?.toLowerCase() ?? "");
+      }
+      // Safely handle properties that could be null or undefined
+      return (student.firstName?.toLowerCase().includes(term) ?? false) ||
+        (student.applicationNumber?.toLowerCase().includes(term) ?? false) ||
+        (student.surName?.toLowerCase().includes(term) ?? false) ||
+        (student.parentName?.toLowerCase().includes(term) ?? false) ||
+        (student.branch?.toLowerCase().includes(term) ?? false) ||
+        (student.primaryContact?.includes(term) ?? false) || // Assuming primaryContact is always a string or number
+        (student.gender?.toLowerCase().includes(term) ?? false) ||
+        (student.batch?.includes(term) ?? false) ||
+        (student.course?.toLowerCase().includes(term) ?? false) ||
+        (student.modeOfResidence?.toLowerCase().includes(term) ?? false) ||
+        (student.pendingFirstYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.pendingFirstYearHostelFee?.toString().includes(term) ?? false) ||
+        (student.pendingSecondYearTuitionFee?.toString().includes(term) ?? false) ||
+        (student.pendingSecondYearHostelFee?.toString().includes(term) ?? false);
+    });
+  });
+};
 
-    // Generate buffer
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-    // Create a Blob
-    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    
-    // Use FileSaver to save the file
-    saveAs(data, 'students_data.xlsx');
-  };
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  } 
-
-
-  const getSortDirection = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
-    }
-    return '';
-  };
-
-
-  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
-
-  const paginate = pageNumber => setCurrentPage(pageNumber);
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(
-        <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-          {i}
-        </button>
-      );
-    }
-    return pageNumbers;
-  };
 
   
-  const indexOfLastStudent = currentPage * rowsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
 
+  // New function to open the edit modal
   const openEditModal = (student) => {
     setEditingStudent({ ...student });
     setIsEditModalOpen(true);
+    setOriginalModeOfResidence(student.modeOfResidence);
   };
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
@@ -204,44 +181,46 @@ function CancelledStudents() {
   
     setValidationErrors(newValidationErrors);
     setEditingStudent({ ...editingStudent, [name]: updatedValue });
-  };
-
-
-  const handleSearch = (searchQuery) => {
-    if (!searchQuery) {
-      return students;
-    }
-  
-    const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
-  
-    return students.filter(student => {
-      return searchTerms.every(term => {
-        if (term === "male") {
-          // Use regex to match 'male' as a whole word, not as part of other words like 'female'
-          return new RegExp('\\bmale\\b').test(student.gender.toLowerCase());
+      // Handling Mode of Residence changes
+      if (name === 'modeOfResidence') {
+        if (value === 'Hostel') {
+          // Mode of Residence changed to Hostel
+          // Set firstYearHostelFee and secondYearHostelFee values to pending fees
+          setEditingStudent(prevState => ({
+            ...prevState,
+            [name]: updatedValue,
+            firstYearHostelFee: prevState.pendingFirstYearHostelFee,
+            secondYearHostelFee: prevState.pendingSecondYearHostelFee,
+            
+          }));
+        } else if (value === 'Day Scholar') {
+          // Mode of Residence changed to Day Scholar
+          if (editingStudent.pendingFirstYearHostelFee === 0 && editingStudent.pendingSecondYearHostelFee === 0) {
+            // If pending hostel fees are 0, set hostel fees to 0
+            setEditingStudent(prevState => ({
+              ...prevState,
+              [name]: updatedValue,
+              firstYearHostelFee: 0,
+              secondYearHostelFee: 0,
+            }));
+          } else {
+            // If pending fees are not cleared, alert the user and do not change Mode of Residence
+            alert("Since the pending fee for Hostel (1st Year and/or 2nd Year) is not zero, it needs to be cleared or waived off.");
+            // Do not update state, hence not changing Mode of Residence
+            setEditingStudent(prevState => ({ ...prevState, modeOfResidence: "Hostel" }));
+            return;
+          }
         }
-        // Other conditions remain the same
-        return student.firstName.toLowerCase().includes(term) ||
-          student.applicationNumber.toLowerCase().includes(term) ||
-          student.surName.toLowerCase().includes(term) ||
-          student.parentName.toLowerCase().includes(term) ||
-          student.branch.toLowerCase().includes(term) ||
-          student.primaryContact.includes(term) ||
-          student.gender.toLowerCase().includes(term) ||
-          student.batch.includes(term) ||
-          student.course.toLowerCase().includes(term) ||
-          student.pendingFirstYearTuitionFee.toString().includes(term) ||
-          student.pendingFirstYearHostelFee.toString().includes(term) ||
-          student.pendingSecondYearTuitionFee.toString().includes(term) ||
-          student.pendingSecondYearHostelFee.toString().includes(term);
-      });
-    });
+      } else {
+        // Apply the updatedValue for other fields
+        setEditingStudent(prevState => ({ ...prevState, [name]: updatedValue }));
+      }
+      
   };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value.toLowerCase());
-  };
-
+  
+  
+   
+  // New function to submit edited data without actual backend update
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
@@ -254,6 +233,12 @@ function CancelledStudents() {
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
+      if (editingStudent.studentStatus === "Cancelled") {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
+      }
+      else {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
+      }
       const opts = {
         body: {
           "collectionName": "students",
@@ -272,10 +257,17 @@ function CancelledStudents() {
             "course": editingStudent.course,
             "modeOfResidence": editingStudent.modeOfResidence,
             "studentStatus": editingStudent.studentStatus,
+            // Ensure to include the potentially updated hostel fee fields
+            "firstYearHostelFee": editingStudent.firstYearHostelFee,
+            "secondYearHostelFee": editingStudent.secondYearHostelFee,
+            // You might also need to update pending fees if logic requires
+            "pendingFirstYearHostelFee": editingStudent.firstYearHostelFee,
+            "pendingSecondYearHostelFee": editingStudent.secondYearHostelFee,
+
           }
         }
       };
-  
+
       api.dbUpdate(opts, function(error, data, response) {
         if (error) {
           console.error('API Error:', error);
@@ -283,7 +275,7 @@ function CancelledStudents() {
           try {
             const responseBody = response.body; // Assuming response.body is already in JSON format
             console.log(responseBody);
-            setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
+            
   
             // Close the modal and reset editingStudent
             setIsEditModalOpen(false);
@@ -292,17 +284,57 @@ function CancelledStudents() {
             // Display success message with changes
             console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
   
-            // Reload the page
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+
+
+      const opts2 = {
+        body : {
+          "collectionName": "receipts",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber
+          },
+          "type": 'updateMany',
+          "update": {
+            "studentName": editingStudent.studentName,
+            "parentName": editingStudent.parentName,
+            "registeredMobileNumber": editingStudent.primaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "stream": editingStudent.course,
+            "residenceType": editingStudent.modeOfResidence,
+            "studentStatus": editingStudent.studentStatus,
+          }
+        }
+      }
+
+      api.dbUpdate(opts2, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+  
+            // Display success message with changes
+            console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
+            // relod the window
             window.location.reload();
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
           }
         }
       });
+
+
     } catch (error) {
       console.error("Error updating student: ", error);
     }
   }; 
+  
 
   const generateBatchOptions = () => {
     const startYear = 2022;
@@ -316,62 +348,167 @@ function CancelledStudents() {
     return options;
   };  
   const isAccountant = ['Accountant'].includes(user.role);
+  
+  const exportToExcel = () => {
+    const dataToExport = mapDataToSchema(handleSearch(searchQuery));// Fetch the data to be exported
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+
+    const now = new Date();
+    const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+
+    
+    // Create a Blob
+    const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    
+    // Use FileSaver to save the file
+    saveAs(data, `Cancelled Student Dashboard ${formattedDate}.xlsx`);
+  };
+
+  const mapDataToSchema = (data) => {
+    return data.map(student => ({
+      'Name': `${student.firstName} ${student.surName}`,
+      'Application Number': student.applicationNumber,
+      'Parent Name': student.parentName,
+      'Branch': student.branch,
+      'Primary Contact': student.primaryContact,
+      'Gender': student.gender,
+      'Batch': student.batch,
+      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      'Course': student.course,
+      'Mode of Residence': student.modeOfResidence,
+      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
+      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
+      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
+      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+      // Add other fields if necessary
+    }));
+  };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  } 
+
+
+  const getSortDirection = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+    }
+    return '';
+  };
+
+
+  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    let pageNumbers = [];
+    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+    const pageBuffer = 3; // Number of pages to show before and after current page
+  
+    for (let i = 1; i <= totalPages; i++) {
+      // Always add the first and last few pages
+      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
+        pageNumbers.push(
+          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+            {i}
+          </button>
+        );
+      }
+    }
+  
+    // Insert ellipses where there are gaps in the page numbers
+    const withEllipses = [];
+    let prevPage = null;
+    for (const page of pageNumbers) {
+      if (prevPage) {
+        // If there's a gap between this page and the previous page, insert ellipses
+        if (page.key - prevPage.key > 1) {
+          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
+        }
+      }
+      withEllipses.push(page);
+      prevPage = page;
+    }
+  
+    return withEllipses;
+  };
+
+  
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+
+
 
   return (
-    <div className="main-container">
 
-    <div className="flex justify-center items-center">
-        <div className="flex items-center">
-        <p>
-        <button onClick={exportToExcel} className="btn btn-primary" style={{backgroundColor: '#00A0E3', margin: '20px'}}>
-            Export to Excel
-        </button>
-        </p>
+    
+    <div >   
+
+<div className="overflow-x-auto mt-3">
+<div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+  <div className="mb-4 md:mb-0">
+    <button onClick={exportToExcel} className="btn btn-primary bg-blue-500 hover:bg-blue-700">
+      Export to Excel
+    </button>
+  </div>
+  <div className="flex-1 flex justify-center card bg-slate-600 text-black px-4 py-2 text-center"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-white">CANCELLED STUDENT DASHBOARD</h2>
+  </div>
+  <div className="flex flex-col items-center md:items-end w-full md:w-auto">
+    <input
+      type="text"
+      placeholder="Search students..."
+      className="input input-bordered w-full md:max-w-xs text-black placeholder-black mb-4 md:mb-0"
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+    <div className="text-m font-bold text-black w-full md:w-auto md:pr-0 " style={{ paddingRight: '4rem' }}>Total Students: {totalStudentCount}</div>
+
+  </div>
+</div>
+
+
+
+
+        <div className="pagination">
+          {renderPageNumbers()}
+        </div>       
             
-        </div>
-        <div className="rm-10 flex-grow"></div> {/* Empty div with left margin */}
-        <div role="tablist" className="tabs tabs-boxed">
-        <h2 className="text-2xl font-bold text-blue-500 bg-grey-800">CANCELLED STUDENTS</h2>
-        </div>
-
-
-        <div className="flex-grow flex justify-end">
-            <input
-            type="text"
-            placeholder="Search students..."
-            className="input input-bordered max-w-xs text-black placeholder-black"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            />
-        </div>
-    </div>
-
-      <div className="pagination">
-        {renderPageNumbers()}
-      </div>
-
         <table className="min-w-full border border-gray-800 border-collapse">
-            <thead>
+          <thead>
             <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-                <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
-                <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
-                <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
-                <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
-                <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
-                <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
-                <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
-                <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
-                <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
-                <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
-                <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
-                <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
-                {!isAccountant && <th  className="text-xs">Action</th>} {/* Assuming no sorting for the action column */}
+              <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
+              <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
+              <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
+              <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
+              <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
+              <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
+              <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
+              <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+              {!isAccountant && <th  className="text-xs">Action</th>} {/* Assuming no sorting for the action column */}
             </tr>
-            </thead>
+          </thead>
 
-            <tbody>
+          <tbody>
             {currentStudents.map((student, index) => (
-                <tr className="bg-[#ff8989]" key={index}>
+              <tr className="bg-[#ff8989]"key={index}>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
@@ -390,48 +527,49 @@ function CancelledStudents() {
                         <i className="fas fa-edit"></i>
                     </button>
                 </td>)}
-                </tr>
+      </tr>
 
             ))}
-            </tbody>
+          </tbody>
         </table>
-      <div className="pagination">
-        {renderPageNumbers()}
+
+
+
       </div>
 
 
-      {isEditModalOpen && (
+    {isEditModalOpen && (
       <div className="edit-modal">
-        <h3 className="text-lg font-semibold mb-4">Editing Student Details</h3>
-        <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
+        <h3 className="text-xs font-semibold ">Editing Student Details</h3>
+        <h3 className="text-xs font-semibold ">{editingStudent.applicationNumber}</h3>
 
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">First Name</span>
+          <span className="label-text text-xs">First Name</span>
           <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
         </label>
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Surname</span>
+          <span className="label-text text-xs">Surname</span>
           <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
         </label>
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Parent Name</span>
+          <span className="label-text text-xs">Parent Name</span>
           <input type="text" name="parentName" value={editingStudent.parentName} onChange={handleEditChange} />
         </label>
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Primary Contact</span>
+          <span className="label-text text-xs">Primary Contact</span>
           <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
           {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
         </label>
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Secondary Contact</span>
+          <span className="label-text text-xs">Secondary Contact</span>
           <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
           {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
         </label>
 
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Gender</span>
+          <span className="label-text text-xs">Gender</span>
           <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
             <option value="" disabled>Choose Gender</option>
             <option value="Male">Male</option>
@@ -440,7 +578,7 @@ function CancelledStudents() {
         </label>
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Batch</span>
+          <span className="label-text text-xs">Batch</span>
           <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
             {generateBatchOptions().map(batch => (
               <option key={batch} value={batch}>{batch}</option>
@@ -449,7 +587,7 @@ function CancelledStudents() {
         </label>
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Course</span>
+          <span className="label-text text-xs">Course</span>
           <select name="course" value={editingStudent.course} onChange={handleEditChange}>
             <option value="" disabled>Select Course</option>
             <option value="MPC">MPC</option>
@@ -458,29 +596,52 @@ function CancelledStudents() {
         </label>
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Mode of Residence</span>
+          <span className="label-text text-xs">Mode of Residence</span>
           <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
             <option value="" disabled>Select Mode of Residence</option>
             <option value="Day Scholar">Day Scholar</option>
             <option value="Hostel">Hostel</option>
           </select>
         </label>
+        {editingStudent.modeOfResidence === 'Hostel' && originalModeOfResidence === 'Day Scholar' && (
+          <>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">First Year Hostel Fee</span>
+              <input type="number" name="firstYearHostelFee" value={editingStudent.firstYearHostelFee || ''} onChange={handleEditChange} />
+            </label>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">Second Year Hostel Fee</span>
+              <input type="number" name="secondYearHostelFee" value={editingStudent.secondYearHostelFee || ''} onChange={handleEditChange} />
+            </label>
+          </>
+        )}
 
         <label className="form-control text-xs">
-          <span className="label-text  text-xs">Student Status</span>
+          <span className="label-text text-xs">Student Status</span>
           <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
             <option value="Active">ACTIVE</option>
             <option value="Cancelled">CANCELLED</option>
           </select>
         </label>
 
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+        <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+        <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
     )}
+      <div className="pagination">
+        {renderPageNumbers()}
+      </div>
+
+      
 
 
-    </div>
+
+
+      
+
+      
+
+</div>
   );
 }
 

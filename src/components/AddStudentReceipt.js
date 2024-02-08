@@ -223,6 +223,21 @@ function AddStudentReceipt() {
     ];
 
     const user = JSON.parse(localStorage.getItem('user'));
+    const getFeeDisplayName = (key) => {
+        switch(key) {
+            case 'firstYearTuitionFee':
+                return 'First Year Tuition Fee';
+            case 'firstYearHostelFee':
+                return 'First Year Hostel Fee';
+            case 'secondYearTuitionFee':
+                return 'Second Year Tuition Fee';
+            case 'secondYearHostelFee':
+                return 'Second Year Hostel Fee';
+            default:
+                return 'Unknown Fee'; // Fallback for unknown keys
+        }
+    };
+
     return (
         <div className="main-container root-container">
             <Navbar />
@@ -264,7 +279,7 @@ function AddStudentReceipt() {
                             </button>
                             {selectedFeeType === fee.key && (
                                     <div>
-                                        <h2>{studentData.firstName}'s {fee.key}:</h2>
+                                         <h2>{studentData.firstName}'s {getFeeDisplayName(fee.key)}:</h2>
                                         <label>
                                             Amount Paid:
                                             <input

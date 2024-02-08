@@ -450,13 +450,14 @@ function AddEmployee() {
                         readOnly
                       />
                     ) : (
-                      <SelectField
-                        label="Branch"
-                        name="branch"
-                        options={branches.map(branch => ({ label: branch.branchCode, value: branch.branchCode }))}
-                        value={employeeData.branch}
-                        handleChange={handleChange}
-                      />
+                        <SelectField
+                          label="Branch"
+                          name="branch"
+                          options={branches.map(branch => ({ label: `${branch.branchName} (${branch.branchCode})`, value: branch.branchCode }))}
+                          value={employeeData.branch}
+                          handleChange={handleChange}
+                        />
+
                     )}
                   <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
                   <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
@@ -563,7 +564,7 @@ function AddEmployee() {
                   <option value="" disabled>Select Branch</option>
                   <option value="ALL">ALL</option>
                   {filteredBranches.map(branch => (
-                    <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
+                    <option key={branch._id} value={branch.branchCode}>{branch.branchName} ({branch.branchCode})</option>
                     
                   ))}
                 </select>

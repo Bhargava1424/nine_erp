@@ -10,6 +10,7 @@ function Login2() {
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
   let userBranch = '';
+  let employeeName='';
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -27,11 +28,13 @@ function Login2() {
         } else {
           try {
             var responseBody = JSON.parse(response.text); // Assuming response.body is already in JSON format
-            console.log(responseBody.message);
+            console.log(responseBody);
             console.log(responseBody.data.employeeRole);
             if (responseBody.message === 'Login Successful') {
               userRole = responseBody.data.employeeRole;
               userBranch = responseBody.data.employeeBranch;
+              employeeName= responseBody.data.employeeName;
+
               // Fetch students based on the branch here
               const isManager = userRole==="Manager";
               const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch};
@@ -58,7 +61,7 @@ function Login2() {
                       
                       const studentsCount = responseBody.length; // This is an example, adjust based on actual API response structure
                       // Now call authServiceLogin with role, branch, and students count
-                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount }); 
+                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount, employeeName:employeeName }); 
                       navigate('/');
                     } catch (parseError) {
                       console.error('Error parsing response:', parseError);
