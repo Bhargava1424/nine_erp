@@ -179,6 +179,7 @@ function AddStudentReceipt() {
                                     console.log(paymentDetails.amountPaid);
                                     if (response.data[feeType + 'Paid'] === paymentDetails.amountPaid) {
                                         console.log('Receipt generated');
+                                        feeType=getFeeDisplayName(feeType);
                                         // Include the amountPaid in the URL
                                         const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${response.data.receiptNumber}&feeType=${feeType}`;
                                         console.log(amountPaid)
