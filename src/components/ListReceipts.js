@@ -375,16 +375,12 @@ const updateStudentData = {
   
 
   
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-  
-    return `${hours}:${minutes} ${day}-${month}-${year}`;
-  };
+  function formatDate(dateString) {
+    // Split the date and time parts
+    const [time, date] = dateString.split(' ');
+    // Reorder to DD-MM-YYYY HH-mm format
+    return `${date} ${time}`;
+}
   
 
 
@@ -445,19 +441,20 @@ const getSortIndicator = (columnName) => {
 };
 
 const isRecentlyAdded = (dateOfPayment) => {
-  // Split the dateOfPayment string into date and time components
-  const [datePart, timePart] = dateOfPayment.split(' ');
-  const [year, month, day] = datePart.split('-').map(num => parseInt(num, 10));
-  const [hours, minutes, seconds] = timePart.split(':').map(num => parseInt(num, 10));
+  // Split the dateOfPayment string into time and date components
+  const [timePart, datePart] = dateOfPayment.split(' ');
+  const [hours, minutes] = timePart.split('-').map(num => parseInt(num, 10));
+  const [day, month, year] = datePart.split('-').map(num => parseInt(num, 10));
 
   // Create a new Date object using the local time zone
-  const receiptDate = new Date(year, month - 1, day, hours, minutes, seconds);
+  const receiptDate = new Date(year, month - 1, day, hours, minutes);
 
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // Calculate one hour ago from current time
 
   return receiptDate > oneHourAgo;
 };
+
 
 
   
