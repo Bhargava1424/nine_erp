@@ -265,6 +265,8 @@ function AccountantComponent() {
             "stream": editingStudent.course,
             "residenceType": editingStudent.modeOfResidence,
             "studentStatus": editingStudent.studentStatus,
+            "firstYearHostelFeePayable":editingStudent.firstYearHostelFee,
+            "secondYearHostelFeePayable":editingStudent.secondYearHostelFee
           }
         }
       }

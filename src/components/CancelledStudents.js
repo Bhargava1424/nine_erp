@@ -316,6 +316,10 @@ const handleSearch = (searchQuery) => {
             "stream": editingStudent.course,
             "residenceType": editingStudent.modeOfResidence,
             "studentStatus": editingStudent.studentStatus,
+            "firstYearHostelFeePayable":editingStudent.firstYearHostelFee,
+            "secondYearHostelFeePayable":editingStudent.secondYearHostelFee,    
+            "firstYearTotalHostelFeePending":editingStudent.firstYearHostelFee,
+            "secondYearTotalHostelFeePending":editingStudent.secondYearHostelFee,            
           }
         }
       }
