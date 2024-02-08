@@ -51,7 +51,6 @@ function Navbar() {
     localStorage.removeItem('user');
     window.location.reload();
   };
-
   return (
     <>
       <div className="navbar bg-base-100 custom-navbar-padding" style={{ backgroundColor: '#2D5990' }}>
@@ -82,9 +81,13 @@ function Navbar() {
                 )}
               </div>
               {isProfileDropdownOpen && (
+                <>
+
                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                  <li onClick={handleLogout} className="btn btn-outline text-white" style={{ backgroundColor: '#00A0E3' }}>Logout</li>
+                  <li className="btn btn-outline label-text text-xs text-white" style={{ backgroundColor: 'rgb(45, 89, 144)' }}>{user.employeeName}-{user.branch}-{user.role}</li>
+                  <li onClick={handleLogout} className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#00A0E3' }}>Logout</li>
                 </ul>
+                </>
               )}
             </div>
           )}

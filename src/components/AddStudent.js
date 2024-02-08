@@ -435,7 +435,7 @@ const handleInputChange = (e) => {
                 >
                   <option value="" disabled>Choose Branch</option>
                   {branches.map((branch) => (
-                    <option key={branch.branchCode} value={branch.branchCode}>{branch.branchName}</option>
+                    <option key={branch.branchCode} value={branch.branchCode}>{branch.branchName} ({branch.branchCode})</option>
                   ))}
                 </select>
               )

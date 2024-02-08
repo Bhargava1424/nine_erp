@@ -12,7 +12,7 @@ function AdminComponent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
   const [totalStudentCount, setTotalStudentCount] = useState(0);
-
+  const [originalModeOfResidence, setOriginalModeOfResidence] = useState('');
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
@@ -38,7 +38,7 @@ function AdminComponent() {
           } else {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
-              console.log(responseBody);
+              console.log("Get Kundan Testing",responseBody);
               setStudents(responseBody)
               setTotalStudentCount(responseBody.length);
                // Assuming the actual data is in responseBody.data
@@ -154,6 +154,7 @@ const handleSearch = (searchQuery) => {
   const openEditModal = (student) => {
     setEditingStudent({ ...student });
     setIsEditModalOpen(true);
+    setOriginalModeOfResidence(student.modeOfResidence);
   };
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
@@ -238,11 +239,19 @@ const handleSearch = (searchQuery) => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
   
-    if (hasValidationErrors) {
-      alert("Please correct the errors before submitting.");
+    // Additional validation for hostel fees when modeOfResidence is "Hostel"
+    const requiresHostelFees = editingStudent.modeOfResidence === 'Hostel' && originalModeOfResidence === 'Day Scholar';
+    const hostelFeesNotProvided = requiresHostelFees && (!editingStudent.firstYearHostelFee || !editingStudent.secondYearHostelFee);
+
+    if (hasValidationErrors || hostelFeesNotProvided) {
+      let errorMessage = "Please correct the errors before submitting.";
+      if (hostelFeesNotProvided) {
+        errorMessage = "Please enter the hostel fees before submitting.";
+      }
+      alert(errorMessage);
       return;
     }
-  
+
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
@@ -287,8 +296,8 @@ const handleSearch = (searchQuery) => {
         } else {
           try {
             const responseBody = response.body; // Assuming response.body is already in JSON format
-            console.log(responseBody);
-            setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
+            console.log("Update Kundan Testing",responseBody);
+            // setStudents(responseBody.data); // Assuming the actual data is in responseBody.data
   
             // Close the modal and reset editingStudent
             setIsEditModalOpen(false);
@@ -645,7 +654,7 @@ const handleSearch = (searchQuery) => {
             <option value="Hostel">Hostel</option>
           </select>
         </label>
-        {editingStudent.modeOfResidence === 'Hostel' && (
+        {editingStudent.modeOfResidence === 'Hostel' && originalModeOfResidence === 'Day Scholar' && (
           <>
             <label className="form-control text-xs">
               <span className="label-text text-xs">First Year Hostel Fee</span>

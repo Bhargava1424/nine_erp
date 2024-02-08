@@ -201,12 +201,6 @@ function DownloadReceipt() {
     return (
         
     <div id="download-receipt-content">
-
-        <div>
-            {/* Your existing JSX... */}
-            <button onClick={downloadPdfDocument}>Download PDF</button>
-        </div>
-
         
         <div className="bg-white p-8" >
             

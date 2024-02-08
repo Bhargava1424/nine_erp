@@ -322,22 +322,10 @@ const updateStudentData = {
       let feeType = '';
     let amountPaid = 0;
 
-    if (receipt.firstYearTuitionFeePayable != null) {
-        feeType = 'FirstYearTuitionFee';
-        amountPaid = receipt.firstYearTuitionFeePaid;
-    } else if (receipt.firstYearHostelFeePayable != null) {
-        feeType = 'FirstYearHostelFee';
-        amountPaid = receipt.firstYearHostelFeePaid;
-    } else if (receipt.secondYearTuitionFeePayable != null) {
-        feeType = 'SecondYearTuitionFee';
-        amountPaid = receipt.secondYearTuitionFeePaid;
-    } else if (receipt.secondYearHostelFeePayable != null) {
-        feeType = 'SecondYearHostelFee';
-        amountPaid = receipt.secondYearHostelFeePaid;
-    }
 
 
       amountPaid = determineAmountPaid(receipt);
+      feeType = determineFeeType(receipt);
       // Redirect to DownloadReceipt component or specific URL
       // For example, using window.location:
 
