@@ -150,12 +150,13 @@ function AddStudentReceipt() {
             var SchoolManagementSystemApi = require('school_management_system_api');
             var api = new SchoolManagementSystemApi.ReceiptsApi();
             var body = new SchoolManagementSystemApi.ReceiptCreateRequest();
-            
+            const now = new Date();
             body.applicationNumber = applicationNumber;
             body.feeType = feeType;
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
+            body.dateOfPayment= `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
             console.log(body);
             

@@ -445,12 +445,20 @@ const getSortIndicator = (columnName) => {
 };
 
 const isRecentlyAdded = (dateOfPayment) => {
-  const receiptDate = new Date(dateOfPayment);
+  // Split the dateOfPayment string into date and time components
+  const [datePart, timePart] = dateOfPayment.split(' ');
+  const [year, month, day] = datePart.split('-').map(num => parseInt(num, 10));
+  const [hours, minutes, seconds] = timePart.split(':').map(num => parseInt(num, 10));
+
+  // Create a new Date object using the local time zone
+  const receiptDate = new Date(year, month - 1, day, hours, minutes, seconds);
+
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // Calculate one hour ago from current time
 
   return receiptDate > oneHourAgo;
 };
+
 
   
     return (

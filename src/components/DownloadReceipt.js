@@ -197,7 +197,10 @@ function DownloadReceipt() {
     }
 
     
-    
+    function formatDate(dateString) {
+        const [year, month, day] = dateString.split(' ')[0].split('-');
+        return `${day}-${month}-${year}`;
+    }    
     return (
         
     <div id="download-receipt-content">
@@ -214,7 +217,7 @@ function DownloadReceipt() {
                     <p className="text-xs">Receipt Number : <span className="font-bold" style={{padding: '2px'}}>{receiptNumber}</span></p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs">Payment Date : <span className="font-bold" style={{padding: '2px'}}>{new Date().toISOString().split('T')[0]}</span></p> 
+                    <p className="text-xs">Payment Date : <span className="font-bold" style={{padding: '2px'}}>{formatDate(receiptsData.dateOfPayment)}</span></p> 
                 </div>
             </div>
             <h1 className="  text-lg font-bold text-center bg-slate-400 " style={{padding: '2px'}}>STUDENT DETAILS</h1>
