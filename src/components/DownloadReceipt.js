@@ -198,9 +198,15 @@ function DownloadReceipt() {
 
     
     function formatDate(dateString) {
-        const [year, month, day] = dateString.split(' ')[0].split('-');
+        // Assuming dateString format is "HH-MM DD-MM-YYYY" and we need "DD-MM-YYYY"
+        const parts = dateString.split(' ');
+        // Extracting the date part based on the assumed format
+        const datePart = parts.length > 1 ? parts[1] : '';
+        // Splitting the date part to rearrange it into "DD-MM-YYYY"
+        const [day, month, year] = datePart.split('-');
         return `${day}-${month}-${year}`;
-    }    
+    }
+      
     return (
         
     <div id="download-receipt-content">
