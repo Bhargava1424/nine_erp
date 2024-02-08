@@ -225,11 +225,19 @@ const handleSearch = (searchQuery) => {
   const handleEditSubmit = () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
-  
-    if (hasValidationErrors) {
-      alert("Please correct the errors before submitting.");
+    // Additional validation for hostel fees when modeOfResidence is "Hostel"
+    const requiresHostelFees = editingStudent.modeOfResidence === 'Hostel' && originalModeOfResidence === 'Day Scholar';
+    const hostelFeesNotProvided = requiresHostelFees && (!editingStudent.firstYearHostelFee || !editingStudent.secondYearHostelFee);
+
+    if (hasValidationErrors || hostelFeesNotProvided) {
+      let errorMessage = "Please correct the errors before submitting.";
+      if (hostelFeesNotProvided) {
+        errorMessage = "Please enter the hostel fees before submitting.";
+      }
+      alert(errorMessage);
       return;
     }
+
   
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
