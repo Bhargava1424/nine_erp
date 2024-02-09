@@ -134,21 +134,26 @@ const handleSearch = (searchQuery) => {
 
 
   
-
+const [originalStudentData, setOriginalStudentData] = useState(null);
 
   // New function to open the edit modal
   const openEditModal = (student) => {
     setEditingStudent({ ...student });
+    setOriginalStudentData({ ...student });
     setIsEditModalOpen(true);
     setOriginalModeOfResidence(student.modeOfResidence);
   };
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
+  const [changesToConfirm, setChangesToConfirm] = useState({});
+  
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
     let newValidationErrors = { ...validationErrors };
+    // Use the original value from originalStudentData for comparison
+    const originalValue = originalStudentData[name];
   
     // Validation for names
     if (name === 'firstName' || name === 'surName' || name === 'parentName') {
@@ -215,10 +220,23 @@ const handleSearch = (searchQuery) => {
         // Apply the updatedValue for other fields
         setEditingStudent(prevState => ({ ...prevState, [name]: updatedValue }));
       }
+      // Update the editingStudent state with potentially validated and corrected value
+      setEditingStudent((prevState) => ({ ...prevState, [name]: updatedValue }));
+
+      // Track changes for confirmation
+      if (originalValue !== updatedValue) {
+        setChangesToConfirm((prev) => ({ ...prev, [name]: updatedValue }));
+      } else {
+        // If the value was changed back to the original, remove it from changesToConfirm
+        const updatedChanges = { ...changesToConfirm };
+        delete updatedChanges[name];
+        setChangesToConfirm(updatedChanges);
+      }      
       
   };
   
-  
+  const [isConfirmed, setIsConfirmed] = useState(false); 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);  
    
   // New function to submit edited data without actual backend update
   const handleEditSubmit = () => {
@@ -236,118 +254,146 @@ const handleSearch = (searchQuery) => {
       }
       alert(errorMessage);
       return;
+      
+    }
+    if (isConfirmed) {
+      // If already confirmed through some logic, directly perform submission
+      performSubmission();
+    } else {
+          // If not confirmed, open the confirmation modal and close the edit modal
+          setIsEditModalOpen(false);
+          setIsConfirmModalOpen(true);
+
     }
 
   
-    try {
-      var SchoolManagementSystemApi = require('school_management_system_api');
-      var api = new SchoolManagementSystemApi.DbApi();
-      if (editingStudent.studentStatus === "Cancelled") {
-        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
-      }
-      else {
-        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
-      }
-      const opts = {
-        body: {
-          "collectionName": "students",
-          "query": {
-            'applicationNumber': editingStudent.applicationNumber
-          },
-          "type": 'updateOne',
-          "update": {
-            "firstName": editingStudent.firstName,
-            "surName": editingStudent.surName,
-            "parentName": editingStudent.parentName,
-            "primaryContact": editingStudent.primaryContact,
-            "secondaryContact": editingStudent.secondaryContact,
-            "gender": editingStudent.gender,
-            "batch": editingStudent.batch,
-            "course": editingStudent.course,
-            "modeOfResidence": editingStudent.modeOfResidence,
-            "studentStatus": editingStudent.studentStatus,
-            // Ensure to include the potentially updated hostel fee fields
-            "firstYearHostelFee": editingStudent.firstYearHostelFee,
-            "secondYearHostelFee": editingStudent.secondYearHostelFee,
-            // You might also need to update pending fees if logic requires
-            "pendingFirstYearHostelFee": editingStudent.firstYearHostelFee,
-            "pendingSecondYearHostelFee": editingStudent.secondYearHostelFee,
-
-          }
-        }
-      };
-
-      api.dbUpdate(opts, function(error, data, response) {
-        if (error) {
-          console.error('API Error:', error);
-        } else {
-          try {
-            const responseBody = response.body; // Assuming response.body is already in JSON format
-            console.log(responseBody);
-            
-  
-            // Close the modal and reset editingStudent
-            setIsEditModalOpen(false);
-            setEditingStudent(null);
-  
-            // Display success message with changes
-            console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
-  
-          } catch (parseError) {
-            console.error('Error parsing response:', parseError);
-          }
-        }
-      });
-
-
-      const opts2 = {
-        body : {
-          "collectionName": "receipts",
-          "query": {
-            'applicationNumber': editingStudent.applicationNumber
-          },
-          "type": 'updateMany',
-          "update": {
-            "studentName": editingStudent.studentName,
-            "parentName": editingStudent.parentName,
-            "registeredMobileNumber": editingStudent.primaryContact,
-            "gender": editingStudent.gender,
-            "batch": editingStudent.batch,
-            "stream": editingStudent.course,
-            "residenceType": editingStudent.modeOfResidence,
-            "studentStatus": editingStudent.studentStatus,
-            "firstYearHostelFeePayable":editingStudent.firstYearHostelFee,
-            "secondYearHostelFeePayable":editingStudent.secondYearHostelFee,    
-            "firstYearTotalHostelFeePending":editingStudent.firstYearHostelFee,
-            "secondYearTotalHostelFeePending":editingStudent.secondYearHostelFee,            
-          }
-        }
-      }
-
-      api.dbUpdate(opts2, function(error, data, response) {
-        if (error) {
-          console.error('API Error:', error);
-        } else {
-          try {
-            const responseBody = response.body; // Assuming response.body is already in JSON format
-            console.log(responseBody);
-  
-            // Display success message with changes
-            console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
-            // relod the window
-            window.location.reload();
-          } catch (parseError) {
-            console.error('Error parsing response:', parseError);
-          }
-        }
-      });
-
-
-    } catch (error) {
-      console.error("Error updating student: ", error);
-    }
   }; 
+
+    // Adjust the confirmation and cancellation handlers accordingly
+    const handleConfirmationAccept = async () => {
+      setIsConfirmed(true);
+      setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+    // Directly perform the submission logic here
+    await performSubmission();
+    };
+    
+    const handleConfirmationCancel = () => {
+      setIsConfirmModalOpen(false);
+      setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+      setIsConfirmed(false);
+    };
   
+ // Extracted submission logic into a separate function for clarity
+ const performSubmission = async () => {
+  try {
+    var SchoolManagementSystemApi = require('school_management_system_api');
+    var api = new SchoolManagementSystemApi.DbApi();
+    if (editingStudent.studentStatus === "Cancelled") {
+      editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
+    }
+    else {
+      editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
+    }
+    const opts = {
+      body: {
+        "collectionName": "students",
+        "query": {
+          'applicationNumber': editingStudent.applicationNumber
+        },
+        "type": 'updateOne',
+        "update": {
+          "firstName": editingStudent.firstName,
+          "surName": editingStudent.surName,
+          "parentName": editingStudent.parentName,
+          "primaryContact": editingStudent.primaryContact,
+          "secondaryContact": editingStudent.secondaryContact,
+          "gender": editingStudent.gender,
+          "batch": editingStudent.batch,
+          "course": editingStudent.course,
+          "modeOfResidence": editingStudent.modeOfResidence,
+          "studentStatus": editingStudent.studentStatus,
+          // Ensure to include the potentially updated hostel fee fields
+          "firstYearHostelFee": editingStudent.firstYearHostelFee,
+          "secondYearHostelFee": editingStudent.secondYearHostelFee,
+          // You might also need to update pending fees if logic requires
+          "pendingFirstYearHostelFee": editingStudent.firstYearHostelFee,
+          "pendingSecondYearHostelFee": editingStudent.secondYearHostelFee,
+
+        }
+      }
+    };
+
+    api.dbUpdate(opts, function(error, data, response) {
+      if (error) {
+        console.error('API Error:', error);
+      } else {
+        try {
+          const responseBody = response.body; // Assuming response.body is already in JSON format
+          console.log(responseBody);
+          
+
+          // Close the modal and reset editingStudent
+          setIsEditModalOpen(false);
+          setEditingStudent(null);
+
+          // Display success message with changes
+          console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
+
+        } catch (parseError) {
+          console.error('Error parsing response:', parseError);
+        }
+      }
+    });
+
+
+    const opts2 = {
+      body : {
+        "collectionName": "receipts",
+        "query": {
+          'applicationNumber': editingStudent.applicationNumber
+        },
+        "type": 'updateMany',
+        "update": {
+          "studentName": editingStudent.studentName,
+          "parentName": editingStudent.parentName,
+          "registeredMobileNumber": editingStudent.primaryContact,
+          "gender": editingStudent.gender,
+          "batch": editingStudent.batch,
+          "stream": editingStudent.course,
+          "residenceType": editingStudent.modeOfResidence,
+          "studentStatus": editingStudent.studentStatus,
+          "firstYearHostelFeePayable":editingStudent.firstYearHostelFee,
+          "secondYearHostelFeePayable":editingStudent.secondYearHostelFee,    
+          "firstYearTotalHostelFeePending":editingStudent.firstYearHostelFee,
+          "secondYearTotalHostelFeePending":editingStudent.secondYearHostelFee,            
+        }
+      }
+    }
+
+    api.dbUpdate(opts2, function(error, data, response) {
+      if (error) {
+        console.error('API Error:', error);
+      } else {
+        try {
+          const responseBody = response.body; // Assuming response.body is already in JSON format
+          console.log(responseBody);
+
+          // Display success message with changes
+          console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
+          // relod the window
+          window.location.reload();
+        } catch (parseError) {
+          console.error('Error parsing response:', parseError);
+        }
+      }
+    });
+
+
+  } catch (error) {
+    console.error("Error updating student: ", error);
+  }
+  console.log("Performing submission with the edited data...");
+};     
 
   const generateBatchOptions = () => {
     const startYear = 2022;
@@ -641,6 +687,47 @@ const handleSearch = (searchQuery) => {
         <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
     )}
+    {isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationAccept}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       <div className="pagination">
         {renderPageNumbers()}
       </div>

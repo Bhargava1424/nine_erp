@@ -46,16 +46,16 @@ function AddEmployee() {
     const [filteredBranches, setFilteredBranches] = useState([]);
     const [originalUsername, setOriginalUsername] = useState('');
 
+    const [originalEmployeeData, setOriginalEmployeeData] = useState(null);
+
     const openEditModal = (employee) => {
       setEditingEmployee(employee);
+      setOriginalEmployeeData({ ...employee });
       setOriginalUsername(employee.username); // Store the original username
       setIsEditModalOpen(true);
     };
     
-  
 
-    
-    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -194,10 +194,15 @@ function AddEmployee() {
   };
   const [branches, setBranches] = useState([]);
   const [employees, setEmployees] = useState([]); 
+  const [changesToConfirm, setChangesToConfirm] = useState({}); 
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
     let newErrors = { ...errors };
+
+      // Use the original value from originalStudentData for comparison
+      const originalValue = originalEmployeeData[name];
   
     if (name === "employeeName") {
       updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
@@ -221,7 +226,20 @@ function AddEmployee() {
   
     setEditingEmployee(updatedEditingEmployee);
     setErrors(newErrors);
+
+          // Track changes for confirmation
+      if (originalValue !== updatedValue) {
+        setChangesToConfirm((prev) => ({ ...prev, [name]: updatedValue }));
+      } else {
+        // If the value was changed back to the original, remove it from changesToConfirm
+        const updatedChanges = { ...changesToConfirm };
+        delete updatedChanges[name];
+        setChangesToConfirm(updatedChanges);
+      }
   };
+
+  const [isConfirmed, setIsConfirmed] = useState(false); 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -230,7 +248,34 @@ function AddEmployee() {
       alert("Please correct the errors before submitting.");
       return;
     }
+    if (isConfirmed) {
+      // If already confirmed through some logic, directly perform submission
+      performSubmission();
+    } else {
+          // If not confirmed, open the confirmation modal and close the edit modal
+          setIsEditModalOpen(false);
+          setIsConfirmModalOpen(true);
+
+    }  
+  };
+
+  // Adjust the confirmation and cancellation handlers accordingly
+  const handleConfirmationAccept = async () => {
+    setIsConfirmed(true);
+    setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+  // Directly perform the submission logic here
+  await performSubmission();
+  };
   
+  const handleConfirmationCancel = () => {
+    setIsConfirmModalOpen(false);
+    setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+    setIsConfirmed(false);
+  };
+
+
+ // Extracted submission logic into a separate function for clarity
+  const performSubmission = async () => {
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
@@ -267,7 +312,9 @@ function AddEmployee() {
     } catch (error) {
       console.error('There was an error updating the employee!', error);
     }
-  };
+    console.log("Performing submission with the edited data...");
+  }; 
+  
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -583,6 +630,48 @@ function AddEmployee() {
           </form>
         </div>
       )}
+
+{isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationAccept}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

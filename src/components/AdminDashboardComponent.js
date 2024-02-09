@@ -150,99 +150,119 @@ const handleSearch = (searchQuery) => {
   
 
 
-  // New function to open the edit modal
-  const openEditModal = (student) => {
+const [originalStudentData, setOriginalStudentData] = useState(null);
+
+const openEditModal = (student) => {
     setEditingStudent({ ...student });
+    setOriginalStudentData({ ...student }); // Store the original student data
     setIsEditModalOpen(true);
     setOriginalModeOfResidence(student.modeOfResidence);
-  };
+};
+
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
+  const [changesToConfirm, setChangesToConfirm] = useState({});
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    let updatedValue = value;
-    let newValidationErrors = { ...validationErrors };
-  
-    // Validation for names
-    if (name === 'firstName' || name === 'surName' || name === 'parentName') {
-      updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
-    }
-  
-    // Validation for contacts
-    if (name === 'primaryContact' || name === 'secondaryContact') {
-      updatedValue = value.replace(/[^0-9]/g, '');
-  
-      // Check for 10 digit length
-      if (updatedValue.length !== 10) {
-        newValidationErrors[name] = 'Contact number must be 10 digits.';
-      } else {
-        newValidationErrors[name] = '';
-      }
-    }
-  
-    // Check if primary and secondary contacts are not the same
-    const newPrimaryContact = name === 'primaryContact' ? updatedValue : editingStudent.primaryContact;
-    const newSecondaryContact = name === 'secondaryContact' ? updatedValue : editingStudent.secondaryContact;
-  
-    if (newPrimaryContact === newSecondaryContact && newPrimaryContact.length === 10 && newSecondaryContact.length === 10) {
-      newValidationErrors.primaryContact = 'Primary and Secondary contacts must be different.';
-      newValidationErrors.secondaryContact = 'Primary and Secondary contacts must be different.';
+const handleEditChange = (e) => {
+  const { name, value } = e.target;
+  let updatedValue = value;
+  let newValidationErrors = { ...validationErrors };
+
+  // Use the original value from originalStudentData for comparison
+  const originalValue = originalStudentData[name];
+
+  // Validation for names
+  if (name === 'firstName' || name === 'surName' || name === 'parentName') {
+    updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
+  }
+
+  // Validation for contacts
+  if (name === 'primaryContact' || name === 'secondaryContact') {
+    updatedValue = value.replace(/[^0-9]/g, '');
+
+    // Check for 10 digit length
+    if (updatedValue.length !== 10) {
+      newValidationErrors[name] = 'Contact number must be 10 digits.';
     } else {
-      if (newPrimaryContact.length === 10) newValidationErrors.primaryContact = '';
-      if (newSecondaryContact.length === 10) newValidationErrors.secondaryContact = '';
+      newValidationErrors[name] = '';
     }
-  
-    setValidationErrors(newValidationErrors);
-    setEditingStudent({ ...editingStudent, [name]: updatedValue });
-      // Handling Mode of Residence changes
-      if (name === 'modeOfResidence') {
-        if (value === 'Hostel') {
-          // Mode of Residence changed to Hostel
-          // Set firstYearHostelFee and secondYearHostelFee values to pending fees
-          setEditingStudent(prevState => ({
-            ...prevState,
-            [name]: updatedValue,
-            firstYearHostelFee: prevState.pendingFirstYearHostelFee,
-            secondYearHostelFee: prevState.pendingSecondYearHostelFee,
-            
-          }));
-        } else if (value === 'Day Scholar') {
-          // Mode of Residence changed to Day Scholar
-          if (editingStudent.pendingFirstYearHostelFee === 0 && editingStudent.pendingSecondYearHostelFee === 0) {
-            // If pending hostel fees are 0, set hostel fees to 0
-            setEditingStudent(prevState => ({
-              ...prevState,
-              [name]: updatedValue,
-              firstYearHostelFee: 0,
-              secondYearHostelFee: 0,
-            }));
-          } else {
-            // If pending fees are not cleared, alert the user and do not change Mode of Residence
-            alert("Since the pending fee for Hostel (1st Year and/or 2nd Year) is not zero, it needs to be cleared or waived off.");
-            // Do not update state, hence not changing Mode of Residence
-            setEditingStudent(prevState => ({ ...prevState, modeOfResidence: "Hostel" }));
-            return;
-          }
-        }
+  }
+
+  // Check if primary and secondary contacts are not the same
+  const newPrimaryContact = name === 'primaryContact' ? updatedValue : editingStudent.primaryContact;
+  const newSecondaryContact = name === 'secondaryContact' ? updatedValue : editingStudent.secondaryContact;
+
+  if (newPrimaryContact === newSecondaryContact && newPrimaryContact.length === 10 && newSecondaryContact.length === 10) {
+    newValidationErrors.primaryContact = 'Primary and Secondary contacts must be different.';
+    newValidationErrors.secondaryContact = 'Primary and Secondary contacts must be different.';
+  } else {
+    if (newPrimaryContact.length === 10) newValidationErrors.primaryContact = '';
+    if (newSecondaryContact.length === 10) newValidationErrors.secondaryContact = '';
+  }
+
+  setValidationErrors(newValidationErrors);
+  setEditingStudent({ ...editingStudent, [name]: updatedValue });
+  // Handling Mode of Residence changes
+  if (name === 'modeOfResidence') {
+    if (value === 'Hostel') {
+      // Mode of Residence changed to Hostel
+      // Set firstYearHostelFee and secondYearHostelFee values to pending fees
+      setEditingStudent(prevState => ({
+        ...prevState,
+        [name]: updatedValue,
+        firstYearHostelFee: prevState.pendingFirstYearHostelFee,
+        secondYearHostelFee: prevState.pendingSecondYearHostelFee,
+        
+      }));
+    } else if (value === 'Day Scholar') {
+      // Mode of Residence changed to Day Scholar
+      if (editingStudent.pendingFirstYearHostelFee === 0 && editingStudent.pendingSecondYearHostelFee === 0) {
+        // If pending hostel fees are 0, set hostel fees to 0
+        setEditingStudent(prevState => ({
+          ...prevState,
+          [name]: updatedValue,
+          firstYearHostelFee: 0,
+          secondYearHostelFee: 0,
+        }));
       } else {
-        // Apply the updatedValue for other fields
-        setEditingStudent(prevState => ({ ...prevState, [name]: updatedValue }));
+        // If pending fees are not cleared, alert the user and do not change Mode of Residence
+        alert("Since the pending fee for Hostel (1st Year and/or 2nd Year) is not zero, it needs to be cleared or waived off.");
+        // Do not update state, hence not changing Mode of Residence
+        setEditingStudent(prevState => ({ ...prevState, modeOfResidence: "Hostel" }));
+        return;
       }
-      
-  };
+    }
+  } else {
+    // Apply the updatedValue for other fields
+    setEditingStudent(prevState => ({ ...prevState, [name]: updatedValue }));
+  }
+
+  // Update the editingStudent state with potentially validated and corrected value
+  setEditingStudent((prevState) => ({ ...prevState, [name]: updatedValue }));
+
+  // Track changes for confirmation
+  if (originalValue !== updatedValue) {
+    setChangesToConfirm((prev) => ({ ...prev, [name]: updatedValue }));
+  } else {
+    // If the value was changed back to the original, remove it from changesToConfirm
+    const updatedChanges = { ...changesToConfirm };
+    delete updatedChanges[name];
+    setChangesToConfirm(updatedChanges);
+  }
+};
+
   
-  
-   
+const [isConfirmed, setIsConfirmed] = useState(false); 
+const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // New function to submit edited data without actual backend update
-  const handleEditSubmit = () => {
+  const handleEditSubmit = async () => {
     // Check for validation errors
     const hasValidationErrors = Object.values(validationErrors).some(error => error !== '');
   
     // Additional validation for hostel fees when modeOfResidence is "Hostel"
     const requiresHostelFees = editingStudent.modeOfResidence === 'Hostel' && originalModeOfResidence === 'Day Scholar';
     const hostelFeesNotProvided = requiresHostelFees && (!editingStudent.firstYearHostelFee || !editingStudent.secondYearHostelFee);
-
+  
     if (hasValidationErrors || hostelFeesNotProvided) {
       let errorMessage = "Please correct the errors before submitting.";
       if (hostelFeesNotProvided) {
@@ -251,7 +271,35 @@ const handleSearch = (searchQuery) => {
       alert(errorMessage);
       return;
     }
+  
+    if (isConfirmed) {
+      // If already confirmed through some logic, directly perform submission
+      performSubmission();
+    } else {
+          // If not confirmed, open the confirmation modal and close the edit modal
+          setIsEditModalOpen(false);
+          setIsConfirmModalOpen(true);
 
+    }
+  };
+  
+  // Adjust the confirmation and cancellation handlers accordingly
+  const handleConfirmationAccept = async () => {
+    setIsConfirmed(true);
+    setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+  // Directly perform the submission logic here
+  await performSubmission();
+  };
+  
+  const handleConfirmationCancel = () => {
+    setIsConfirmModalOpen(false);
+    setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+    setIsConfirmed(false);
+  };
+
+
+ // Extracted submission logic into a separate function for clarity
+  const performSubmission = async () => {
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
@@ -346,6 +394,11 @@ const handleSearch = (searchQuery) => {
             console.log(responseBody);
   
             // Display success message with changes
+            setIsEditModalOpen(false);
+            setEditingStudent(null);
+            setChangesToConfirm({});
+            setIsConfirmed(false); // Reset the confirmation flag
+    
             console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
             // relod the window
             window.location.reload();
@@ -359,6 +412,7 @@ const handleSearch = (searchQuery) => {
     } catch (error) {
       console.error("Error updating student: ", error);
     }
+    console.log("Performing submission with the edited data...");
   }; 
   
 
@@ -683,6 +737,51 @@ const handleSearch = (searchQuery) => {
         <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
     )}
+
+{isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationAccept}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
       <div className="pagination">
         {renderPageNumbers()}
       </div>
