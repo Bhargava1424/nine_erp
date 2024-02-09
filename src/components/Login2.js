@@ -11,6 +11,7 @@ function Login2() {
   let userRole = '';
   let userBranch = '';
   let employeeName='';
+  let userName='';
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -34,10 +35,11 @@ function Login2() {
               userRole = responseBody.data.employeeRole;
               userBranch = responseBody.data.employeeBranch;
               employeeName= responseBody.data.employeeName;
+              userName= responseBody.data.employeeUsername;
 
               // Fetch students based on the branch here
               const isManager = userRole==="Manager";
-              const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch};
+              const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch, "username":userName};
               try {
                 var SchoolManagementSystemApi = require('school_management_system_api');
                 var api = new SchoolManagementSystemApi.DbApi();
@@ -61,7 +63,7 @@ function Login2() {
                       
                       const studentsCount = responseBody.length; // This is an example, adjust based on actual API response structure
                       // Now call authServiceLogin with role, branch, and students count
-                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount, employeeName:employeeName }); 
+                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount, employeeName:employeeName, userName:userName }); 
                       navigate('/');
                     } catch (parseError) {
                       console.error('Error parsing response:', parseError);
