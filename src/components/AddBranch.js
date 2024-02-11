@@ -16,18 +16,25 @@ function AddBranch() {
     // State for managing edit functionality
     const [editingBranch, setEditingBranch] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
+
+  const [originalBranchData, setOriginalBranchData] = useState(null);
+  const [originalBranchname, setOriginalBranchname] = useState('');
     // Function to open the edit modal with the selected Branch's data
     const openEditModal = (Branch) => {
       setEditingBranch({ ...Branch });
+      setOriginalBranchData({...branches});
+      setOriginalBranchname(Branch.branchName);
       setIsEditModalOpen(true);
     };
+
+    const [changesToConfirm, setChangesToConfirm] = useState({});
   
     // Function to handle field changes in the edit modal
     const handleEditChange = (e) => {
       const { name, value } = e.target;
       let updatedValue = value;
-      let newErrors = { ...errors };   
+      let newErrors = { ...errors }; 
+      const originalValue = originalBranchData[name];
       // Allow only alphabets in name fields and automatically capitalize them
       if (name === "branchName") {
         updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
@@ -52,9 +59,20 @@ function AddBranch() {
       } else {
         setErrors({ ...errors, branchCode: '' });
       }
+          // Track changes for confirmation
+          if (originalValue !== updatedValue) {
+            setChangesToConfirm((prev) => ({ ...prev, [name]: updatedValue }));
+          } else {
+            // If the value was changed back to the original, remove it from changesToConfirm
+            const updatedChanges = { ...changesToConfirm };
+            delete updatedChanges[name];
+            setChangesToConfirm(updatedChanges);
+          }      
+      
     };
     
-  
+    const [isConfirmed, setIsConfirmed] = useState(false); 
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);  
     // Function to submit the edited Branch data
     const handleEditSubmit = async (e) => {
       e.preventDefault();
@@ -63,43 +81,73 @@ function AddBranch() {
         alert("Please correct the errors before submitting.");
         return;
       }
-    
-      try {
-        var SchoolManagementSystemApi = require('school_management_system_api');
-        var api = new SchoolManagementSystemApi.DbApi();
-        const opts = {
-          body: {
-            "collectionName": "branches",
-            "query": {
-              "branchId": editingBranch.branchId // Use the Branch's _id to identify the document to update
-            },
-            "type": 'updateOne',
-            "update": {
-              "branchName": editingBranch.branchName,
-              "branchCode": editingBranch.branchCode,
-              "branchAddress": editingBranch.branchAddress,
-              // Include other fields that need to be updated
-            }
-          }
-        };
-    
-        api.dbUpdate(opts, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-          } else {
-            // Handle successful update here
-            // For example, you can close the edit modal and clear the editing state
+      if (isConfirmed) {
+        // If already confirmed through some logic, directly perform submission
+        performSubmission();
+      } else {
+            // If not confirmed, open the confirmation modal and close the edit modal
             setIsEditModalOpen(false);
-            setEditingBranch(null);
-            // Reload the Branch list or use another method to update the UI
-            alert("Branches Updated Successfully")
-            window.location.reload()
-          }
-        });
-      } catch (error) {
-        console.error('There was an error updating the Branch!', error);
-      }
+            setIsConfirmModalOpen(true);
+  
+      } 
+    
+
     };
+
+      // Adjust the confirmation and cancellation handlers accordingly
+  const handleConfirmationAccept = async () => {
+    setIsConfirmed(true);
+    setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+  // Directly perform the submission logic here
+  await performSubmission();
+  };
+  
+  const handleConfirmationCancel = () => {
+    setIsConfirmModalOpen(false);
+    setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+    setIsConfirmed(false);
+  };
+
+
+ // Extracted submission logic into a separate function for clarity
+  const performSubmission = async () => {
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "branches",
+          "query": {
+            "branchName": originalBranchname // Use the Branch's _id to identify the document to update
+          },
+          "type": 'updateOne',
+          "update": {
+            "branchName": editingBranch.branchName,
+            "branchCode": editingBranch.branchCode,
+            "branchAddress": editingBranch.branchAddress,
+            // Include other fields that need to be updated
+          }
+        }
+      };
+  
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          // Handle successful update here
+          // For example, you can close the edit modal and clear the editing state
+          setIsEditModalOpen(false);
+          setEditingBranch(null);
+          // Reload the Branch list or use another method to update the UI
+          alert("Branches Updated Successfully")
+          window.location.reload()
+        }
+      });
+    } catch (error) {
+      console.error('There was an error updating the Branch!', error);
+    }
+    console.log("Performing submission with the edited data...");
+  }; 
     
 
     const handleChange = (e) => {
@@ -353,22 +401,21 @@ function AddBranch() {
       {isEditModalOpen && (
         <div className="edit-modal">
           {/* Edit form layout */}
-          <h3 className="text-lg font-semibold mb-4">Editing Branch Details</h3>
-        <h3 className="text-lg font-semibold mb-4">Branch Id:{editingBranch.branchId}</h3>
+          <h3 className="text-xs font-semibold mb-4">Editing Branch Details</h3>
 
           <form onSubmit={handleEditSubmit}>
             {/* Include InputField components for each editable field */}
 
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Name</span>
                 <input type="text" name="branchName" value={editingBranch.branchName} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Number</span>
                 <input type="text" name="branchCode" value={editingBranch.branchCode} onChange={handleEditChange} />
                 {errors.branchCode && <h className="text-red-500 text-xs italic">{errors.branchCode}</h>}
               </label>
-              <label className="form-control">
+              <label className="form-control text-xs">
                 <span className="label-text">Branch Address</span>
                 <input type="text" name="branchAddress" value={editingBranch.branchAddress} onChange={handleEditChange} />
               </label>
@@ -378,6 +425,47 @@ function AddBranch() {
           </form>
         </div>
       )}
+      {isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationAccept}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

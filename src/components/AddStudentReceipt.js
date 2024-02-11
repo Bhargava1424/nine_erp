@@ -21,14 +21,23 @@ function AddStudentReceipt() {
 
     
     const handleAmountChange = (e, fee) => {
-        const amount = parseFloat(e.target.value);
-        if (amount > fee.pendingFee) {
-            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
-            setAmountPaid(''); // Reset the amount field
-        } else {
-            setAmountPaid(amount);
+        const value = e.target.value;
+    
+        // Allow only numeric input
+        const regex = /^[0-9]*\.?[0-9]*$/; // Updated regex to allow decimal points
+        if (value === '' || regex.test(value)) {
+            const amount = parseFloat(value); // Convert to float for comparison
+            // Check if the converted amount exceeds the pending fee, 
+            // and ensure it's not NaN (which happens if the input is empty or incomplete)
+            if (!isNaN(amount) && amount > fee.pendingFee) {
+                alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+                setAmountPaid(''); // Reset the amount field if invalid
+            } else {
+                setAmountPaid(value); // Keep as string for input field
+            }
         }
     };
+    
     
     
 
@@ -126,7 +135,7 @@ function AddStudentReceipt() {
         try {
             // Assuming the backend expects an object with the payment details
             const paymentDetails = {
-                amountPaid: parseFloat(amountPaid),
+                amountPaid: Number(parseFloat(amountPaid)),
                 modeOfPayment: modeOfPayment,
                 chequeNumber: modeOfPayment === 'CHEQUE' ? chequeNumber : undefined,
             };
@@ -141,12 +150,13 @@ function AddStudentReceipt() {
             var SchoolManagementSystemApi = require('school_management_system_api');
             var api = new SchoolManagementSystemApi.ReceiptsApi();
             var body = new SchoolManagementSystemApi.ReceiptCreateRequest();
-            
+            const now = new Date();
             body.applicationNumber = applicationNumber;
             body.feeType = feeType;
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
+            body.dateOfPayment= `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
             console.log(body);
             
@@ -170,6 +180,7 @@ function AddStudentReceipt() {
                                     console.log(paymentDetails.amountPaid);
                                     if (response.data[feeType + 'Paid'] === paymentDetails.amountPaid) {
                                         console.log('Receipt generated');
+                                        feeType=getFeeDisplayName(feeType);
                                         // Include the amountPaid in the URL
                                         const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${response.data.receiptNumber}&feeType=${feeType}`;
                                         console.log(amountPaid)
@@ -214,6 +225,21 @@ function AddStudentReceipt() {
     ];
 
     const user = JSON.parse(localStorage.getItem('user'));
+    const getFeeDisplayName = (key) => {
+        switch(key) {
+            case 'firstYearTuitionFee':
+                return 'First Year Tuition Fee';
+            case 'firstYearHostelFee':
+                return 'First Year Hostel Fee';
+            case 'secondYearTuitionFee':
+                return 'Second Year Tuition Fee';
+            case 'secondYearHostelFee':
+                return 'Second Year Hostel Fee';
+            default:
+                return 'Unknown Fee'; // Fallback for unknown keys
+        }
+    };
+
     return (
         <div className="main-container root-container">
             <Navbar />
@@ -255,11 +281,12 @@ function AddStudentReceipt() {
                             </button>
                             {selectedFeeType === fee.key && (
                                     <div>
-                                        <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
+                                         <h2>{studentData.firstName}'s {getFeeDisplayName(fee.key)}:</h2>
                                         <label>
                                             Amount Paid:
                                             <input
-                                                type="number"
+                                                className='ml-2'
+                                                type="text"
                                                 value={amountPaid}
                                                 onChange={(e) => handleAmountChange(e, fee)}
                                                 max={fee.pendingFee}

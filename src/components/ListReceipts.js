@@ -2,7 +2,7 @@ import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { useSelector } from 'react-redux';
+
 
 
 function ListReceipts() {
@@ -12,11 +12,21 @@ function ListReceipts() {
     const [rowsPerPage] = useState(10);
     const [editingReceipt, setEditingReceipt] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     const currentDate = new Date();
     const fourDaysAgo = new Date(currentDate);
     fourDaysAgo.setDate(currentDate.getDate() - 4);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    
+    
+    console.log('---->', fourDaysAgo);
+
+    const [sortConfig, setSortConfig] = useState({ key: 'dateOfPayment', direction: 'descending' });
+
     const user = JSON.parse(localStorage.getItem('user'));
+    
+    const isAccountant = ['Accountant'].includes(user.role);
+    const isExecutive = ['Executive'].includes(user.role);
+    const isManager = ['Manager'].includes(user.role);
 
     const fetchReceipts = async () => {
       try {
@@ -25,9 +35,9 @@ function ListReceipts() {
         let query = {};
         
         console.log(user.role);
-        if (user.role === 'Accountant' || user.role === 'Executive') {
+        if (user.role === 'Accountant') {
           query = {
-            'dateOfPayment': {'$gte': fourDaysAgo},
+            'dateIso': {'$gte': fourDaysAgo},
             'branch':user.branch
           }
         };
@@ -49,6 +59,7 @@ function ListReceipts() {
               const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
               setReceipts(responseBody); // Assuming the actual data is in responseBody
+              
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
@@ -60,13 +71,12 @@ function ListReceipts() {
     };
   
     useEffect(() => {
-      fetchReceipts();
-    }, []);
+      if(receipts.length === 0)
+      {
+        fetchReceipts();
+      }
+    }, );
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value.toLowerCase());
-        setCurrentPage(1);
-    };
 
     const handleSearch = (searchQuery) => {
         if (!searchQuery) {
@@ -83,78 +93,206 @@ function ListReceipts() {
             );
         });
     };
+
+    const sortedAndFilteredReceipts = useMemo(() => {
+      const filteredReceipts = receipts.filter(receipt => {
+          if (!searchTerm) return true; // If no search term, don't filter
+          return Object.values(receipt).some(value =>
+              String(value).toLowerCase().includes(searchTerm.toLowerCase())
+          );
+      });
+
+      return filteredReceipts.sort((a, b) => {
+          if (sortConfig === null) return 0;
+          if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
+          if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
+          return 0;
+      });
+  }, [receipts, searchTerm, sortConfig]);
+
+  const handleSearchChange = (e) => {
+      setSearchTerm(e.target.value);
+      setCurrentPage(1); // Reset to first page
+  };
+  const [originalReceiptData, setOriginalReceiptData] = useState(null);
+
     const openEditModal = (receipt) => {
       setEditingReceipt({ ...receipt });
+      setOriginalReceiptData({ ...receipt }); 
       setIsEditModalOpen(true);
   };
 
+  // New function to handle field change in the edit modal
+  const [changesToConfirm, setChangesToConfirm] = useState({});
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
+      // Use the original value from originalStudentData for comparison
+  const originalValue = originalReceiptData[name];
     if (name === 'modeOfPayment' && value !== 'Cheque') {
         // If mode of payment is changed from 'Cheque' to something else, set chequeNumber to null
         setEditingReceipt({ ...editingReceipt, [name]: value, chequeNumber: null });
     } else {
         setEditingReceipt({ ...editingReceipt, [name]: value });
     }
+      // Track changes for confirmation
+  if (originalValue !== editingReceipt) {
+    setChangesToConfirm((prev) => ({ ...prev, [name]: value }));
+  } else {
+    // If the value was changed back to the original, remove it from changesToConfirm
+    const updatedChanges = { ...changesToConfirm };
+    delete updatedChanges[name];
+    setChangesToConfirm(updatedChanges);
+  }
 };
+
+const [isConfirmed, setIsConfirmed] = useState(false); 
+const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
 const handleEditSubmit = () => {
-  // Include logic to ensure that chequeNumber is null if modeOfPayment is not 'Cheque'
+
+  if (isConfirmed) {
+    // If already confirmed through some logic, directly perform submission
+    performSubmission();
+  } else {
+        // If not confirmed, open the confirmation modal and close the edit modal
+        setIsEditModalOpen(false);
+        setIsConfirmModalOpen(true);
+
+  }
+};
+
+ // Adjust the confirmation and cancellation handlers accordingly
+ const handleConfirmationAccept = async (editingReceipt) => {
+  setIsConfirmed(true);
+  setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+// Directly perform the submission logic here
+await performSubmission(editingReceipt);
+};
+
+const handleConfirmationCancel = () => {
+  setIsConfirmModalOpen(false);
+  setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+  setIsConfirmed(false);
+};
+
+
+// Extracted submission logic into a separate function for clarity
+const performSubmission = async (editingReceipt) => {
+  determineFeeType(editingReceipt)
   const updatedReceipt = {
-      ...editingReceipt,
-      chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber
-  };
-  if (editingReceipt.modeOfPayment === 'Cheque' && !editingReceipt.chequeNumber) {
+    ...editingReceipt,
+    chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber,
+};
+
+if (updatedReceipt.modeOfPayment === 'Cheque' && !updatedReceipt.chequeNumber) {
     alert("Please enter the Cheque Number.");
-    return; // Do not proceed with submission
+    return;
 }
-      try {
-          var SchoolManagementSystemApi = require('school_management_system_api');
-          var api = new SchoolManagementSystemApi.DbApi();
-          const opts = {
-              body: {
-                  "collectionName": "receipts",
-                  "query": {
-                      'receiptNumber': updatedReceipt.receiptNumber
-                  },
-                  "type": 'updateOne',
-                  "update": {
-                      "modeOfPayment": updatedReceipt.modeOfPayment,
-                      "amountPaid":updatedReceipt.amountPaid,
-                      "chequeNumber":updatedReceipt.chequeNumber
-                  }
-              }
-          };
 
-          api.dbUpdate(opts, function (error, data, response) {
-              if (error) {
-                  console.error('API Error:', error);
-              } else {
-                  try {
-                      const responseBody = response.body; // Assuming response.body is already in JSON format
-                      console.log(responseBody);
+// Assuming amountPaid is always related to tuition fees
+const amountDifference = parseFloat(updatedReceipt.amountPaid) - parseFloat(editingReceipt[PaidfeeType]);
 
-                      // Close the modal and reset editingReceipt
-                      setIsEditModalOpen(false);
-                      setEditingReceipt(null);
+let totalPaidField, pendingField, studentFeePaid, studentFeePending;
 
-                      // Fetch updated receipts
-                      fetchReceipts();
-                      window.location.reload();
-                  } catch (parseError) {
-                      console.error('Error parsing response:', parseError);
-                  }
-              }
-          });
-      } catch (error) {
-          console.error("Error updating receipt: ", error);
+switch (PaidfeeType) {
+    case 'firstYearTuitionFeePaid':
+        totalPaidField = 'firstYearTotalTuitionFeePaid';
+        pendingField = 'firstYearTotalTuitionFeePending';
+        studentFeePaid = 'paidFirstYearTuitionFee';
+        studentFeePending = 'pendingFirstYearTuitionFee';
+        break;
+    case 'firstYearHostelFeePaid':
+        totalPaidField = 'firstYearTotalHostelFeePaid';
+        pendingField = 'firstYearTotalHostelFeePending';
+        studentFeePaid = 'paidFirstYearHostelFee';
+        studentFeePending = 'pendingFirstYearHostelFee';
+        break;
+    case 'secondYearTuitionFeePaid':
+        totalPaidField = 'secondYearTotalTuitionFeePaid';
+        pendingField = 'secondYearTotalTuitionFeePending';
+        studentFeePaid = 'paidSecondYearTuitionFee';
+        studentFeePending = 'pendingSecondYearTuitionFee';
+        break;
+    case 'secondYearHostelFeePaid':
+        totalPaidField = 'secondYearTotalHostelFeePaid';
+        pendingField = 'secondYearTotalHostelFeePending';
+        studentFeePaid = 'paidSecondYearHostelFee';
+        studentFeePending = 'pendingSecondYearHostelFee';
+        break;
+    default:
+        console.error("Invalid PaidfeeType.");
+        return;
+}
+
+// Update the dynamic field and calculate new totals and pendings
+const updateData = {
+    modeOfPayment: editingReceipt.modeOfPayment,
+    chequeNumber: editingReceipt.chequeNumber,
+    [PaidfeeType]: parseInt(updatedReceipt.amountPaid),
+    [totalPaidField]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
+    [pendingField]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
+};
+
+const updateStudentData = {
+    [studentFeePaid]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
+    [studentFeePending]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
+};
+
+  try {
+    var SchoolManagementSystemApi = require('school_management_system_api');
+    var api = new SchoolManagementSystemApi.DbApi();
+    const opts = {
+      body: {
+        "collectionName": "receipts",
+        "query": { 'receiptNumber': editingReceipt.receiptNumber },
+        "type": 'updateOne',
+        "update": updateData
       }
-  };
+    };
+
+    const opts2 = {
+      body: {
+        "collectionName": "students",
+        "query": { 'applicationNumber': editingReceipt.applicationNumber },
+        "type": 'updateOne',
+        "update": updateStudentData
+      }
+    };
+
+    api.dbUpdate(opts, function (error, data, response) {
+      if (error) {
+        console.error('API Error:', error);
+      } else {
+        api.dbUpdate(opts2, function (error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            console.log('Update successful:', response.body);
+            setIsEditModalOpen(false);
+            setEditingReceipt(null);
+            fetchReceipts();
+          }
+        }
+        );
+      }
+    });
+  } catch (error) {
+    console.error("Error updating receipt: ", error);
+  }
+  console.log("Performing submission with the edited data...");
+};
+
+
+
+
+
+  
     const filteredReceipts = handleSearch(searchTerm);
 
     // Calculate the pagination
     const indexOfLastReceipt = currentPage * rowsPerPage;
-    const indexOfFirstReceipt = indexOfLastReceipt - rowsPerPage;
-    const currentReceipts = filteredReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt);
+    const indexOfFirstReceipt = indexOfLastReceipt - rowsPerPage; 
 
     // Calculate page numbers
     const pageNumbers = [];
@@ -235,22 +373,10 @@ const handleEditSubmit = () => {
       let feeType = '';
     let amountPaid = 0;
 
-    if (receipt.firstYearTuitionFeePayable != null) {
-        feeType = 'FirstYearTuitionFee';
-        amountPaid = receipt.firstYearTuitionFeePaid;
-    } else if (receipt.firstYearHostelFeePayable != null) {
-        feeType = 'FirstYearHostelFee';
-        amountPaid = receipt.firstYearHostelFeePaid;
-    } else if (receipt.secondYearTuitionFeePayable != null) {
-        feeType = 'SecondYearTuitionFee';
-        amountPaid = receipt.secondYearTuitionFeePaid;
-    } else if (receipt.secondYearHostelFeePayable != null) {
-        feeType = 'SecondYearHostelFee';
-        amountPaid = receipt.secondYearHostelFeePaid;
-    }
 
 
       amountPaid = determineAmountPaid(receipt);
+      feeType = determineFeeType(receipt);
       // Redirect to DownloadReceipt component or specific URL
       // For example, using window.location:
 
@@ -259,106 +385,110 @@ const handleEditSubmit = () => {
 
       
       const receiptUrl = `/DownloadReceipt?amountPaid=${amountPaid}&receiptNumber=${receipt.receiptNumber}&feeType=${feeType}`;
-      console.log(amountPaid);{/*error here */}
+      console.log(amountPaid); 
       window.open(receiptUrl, '_blank');
   };
 
   const exportToExcel = () => {
-    const dataToExport = mapDataToSchema(handleSearch(searchTerm));// Fetch the data to be exported
+    const dataToExport = mapDataToSchema(handleSearch(searchTerm)); // Fetch the data to be exported
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Receipts");
+  
     // Generate buffer
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+  
     const now = new Date();
     const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
-
-    
+  
     // Create a Blob
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    
+  
     // Use FileSaver to save the file
     saveAs(data, `Receipts ${formattedDate}.xlsx`);
   };
+  
 
   const mapDataToSchema = (data) => {
-    return data.map(student => ({
-      'Name': `${student.firstName} ${student.surName}`,
-      'Application Number': student.applicationNumber,
-      'Parent Name': student.parentName,
-      'Branch': student.branch,
-      'Primary Contact': student.primaryContact,
-      'Gender': student.gender,
-      'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
-      'Course': student.course,
-      'Mode of Residence': student.modeOfResidence,
-      '1st Year Tuition Fee': student.firstYearTuitionFee,
-      '1st Year Hostel Fee': student.firstYearHostelFee,
-      '2nd Year Tuition Fee': student.secondYearTuitionFee,
-      '2nd Year Hostel Fee': student.secondYearHostelFee,
-      'Paid 1st Year Tuition Fee': student.paidFirstYearTuitionFee,
-      'Paid 1st Year Hostel Fee': student.paidFirstYearHostelFee,
-      'Paid 2nd Year Tuition Fee': student.paidSecondYearTuitionFee,
-      'Paid 2nd Year Hostel Fee': student.paidSecondYearHostelFee,
-      'Pending 1st Year Tuition Fee': student.pendingFirstYearTuitionFee,
-      'Pending 1st Year Hostel Fee': student.pendingFirstYearHostelFee,
-      'Pending 2nd Year Tuition Fee': student.pendingSecondYearTuitionFee,
-      'Pending 2nd Year Hostel Fee': student.pendingSecondYearHostelFee,
+    return data.map(receipt => ({
+      'Receipt Number': receipt.receiptNumber,
+      'Date of Payment': formatDate(receipt.dateOfPayment),
+      'Student Name': receipt.studentName,
+      'Batch': receipt.batch,
+      'Amount Paid': determineAmountPaid(receipt),
+      'Fee Type': determineFeeType(receipt),
+      'Mode of Payment': receipt.modeOfPayment,
+      'Cheque Number': receipt.chequeNumber || 'N/A', // Assuming chequeNumber might be null or not applicable
       // Add other fields if necessary
     }));
   };
+  
 
   
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+  function formatDate(dateString) {
+    // Split the date and time parts
+    const [time, date] = dateString.split(' ');
+    // Reorder to DD-MM-YYYY HH-mm format
+    return `${date} ${time}`;
+}
   
-    return `${hours}:${minutes} ${day}-${month}-${year}`;
-  };
-  
-  const sortedReceipts = useMemo(() => {
-    let sortableItems = [...receipts];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableItems;
-  }, [receipts, sortConfig]);
-  
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-  
-  const getSortDirection = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
-    }
-    return '';
-  };
 
-    
+
+  let PaidfeeType; // This will hold the field name of the paid fee
+
+const determineFeeType = (receipt) => {
+  if (receipt.firstYearTuitionFeePaid != null && receipt.firstYearTuitionFeePaid !== 0) {
+    PaidfeeType = "firstYearTuitionFeePaid"; // Set the field name
+    return 'First Year Tuition Fee';
+  } else if (receipt.firstYearHostelFeePaid != null && receipt.firstYearHostelFeePaid !== 0) {
+    PaidfeeType = "firstYearHostelFeePaid"; // Set the field name
+    return 'First Year Hostel Fee';
+  } else if (receipt.secondYearTuitionFeePaid != null && receipt.secondYearTuitionFeePaid !== 0) {
+    PaidfeeType = "secondYearTuitionFeePaid"; // Set the field name
+    return 'Second Year Tuition Fee';
+  } else if (receipt.secondYearHostelFeePaid != null && receipt.secondYearHostelFeePaid !== 0) {
+    PaidfeeType = "secondYearHostelFeePaid"; // Set the field name
+    return 'Second Year Hostel Fee';
+  }
+  PaidfeeType = null; // If none of the conditions are met, reset PaidfeeType
+  return 'N/A';
+ // Default value if none of the fees are paid
+};
+ 
+
+
+const requestSort = (key) => {
+  let direction = 'ascending';
+  if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+    direction = 'descending';
+  }
+  setSortConfig({ key, direction });
+};
+const getSortIndicator = (columnName) => {
+  if (sortConfig && sortConfig.key === columnName) {
+    return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
+  }
+  return ''; // Return nothing if the column is not being sorted
+};
+
+const isRecentlyAdded = (dateOfPayment) => {
+  // Split the dateOfPayment string into time and date components
+  const [timePart, datePart] = dateOfPayment.split(' ');
+  const [hours, minutes] = timePart.split('-').map(num => parseInt(num, 10));
+  const [day, month, year] = datePart.split('-').map(num => parseInt(num, 10));
+
+  // Create a new Date object using the local time zone
+  const receiptDate = new Date(year, month - 1, day, hours, minutes);
+
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // Calculate one hour ago from current time
+
+  return receiptDate > oneHourAgo;
+};
+
+
+
   
     return (
       <div className="main-container root-container">
@@ -400,49 +530,54 @@ const handleEditSubmit = () => {
             <thead>
               <tr className="text-sm" style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
                 <th onClick={() => requestSort('receiptNumber')}>
-                  Receipt Number {getSortDirection('receiptNumber')}
+                  Receipt Number{getSortIndicator('receiptNumber')}
                 </th>
                 <th onClick={() => requestSort('dateOfPayment')}>
-                  Date of Payment {getSortDirection('dateOfPayment')}
+                  Date of Payment{getSortIndicator('dateOfPayment')}
                 </th>
                 <th onClick={() => requestSort('studentName')}>
-                  Student Name {getSortDirection('studentName')}
+                  Student Name{getSortIndicator('studentName')}
                 </th>
                 <th onClick={() => requestSort('batch')}>
-                  Batch {getSortDirection('batch')}
+                  Batch{getSortIndicator('batch')}
                 </th>
                 <th onClick={() => requestSort('amountPaid')}>
-                  Amount Paid {getSortDirection('amountPaid')}
-                </th>
-                <th onClick={() => requestSort('modeOfPayment')}>
-                  Mode of Payment {getSortDirection('modeOfPayment')}
-                </th>
-                <th onClick={() => requestSort('chequeNumber')}>
-                  Cheque Number {getSortDirection('chequeNumber')}
+                  Amount Paid{getSortIndicator('amountPaid')}
                 </th>
                 <th>
-                  Action
+                  Fee Type
                 </th>
-                
+                <th onClick={() => requestSort('modeOfPayment')}>
+                  Mode of Payment{getSortIndicator('modeOfPayment')}
+                </th>
+                <th onClick={() => requestSort('chequeNumber')}>
+                  Cheque Number{getSortIndicator('chequeNumber')}
+                </th>
+                {!isAccountant && <th>Action</th>}
                 <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
               </tr>
             </thead>
 
+
+
                 <tbody>
-                    {currentReceipts.map((receipt, index)  => (
+                {sortedAndFilteredReceipts.slice(indexOfFirstReceipt, indexOfLastReceipt).map((receipt, index) => (
                         <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2] " key={index}>                          
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.studentName}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.batch}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineAmountPaid(receipt)}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          <td className="border-2 text-sm border-gray-800 px-4 py-2">
-                                <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
-                                <i className="fas fa-edit"></i>
-                                </button>
+                          {!isAccountant && (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) && (
+                            <td className="border-2 text-sm border-gray-800 px-4 py-2">
+                              <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
+                                <i className="fas fa-edit"></i> Edit
+                              </button>
                             </td>
+                          )}
                             <td className="border-2 border-gray-800 px-4 py-2">
                                 <button style={{backgroundColor: '#2D5990'}} onClick={() => handleDownload(receipt)} className="btn btn-blue text-white">
                                     Download
@@ -468,10 +603,10 @@ const handleEditSubmit = () => {
             <span className="label-text">Mode of Payment</span>
             <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
                 <option value="">Select Mode of Payment</option>
-                <option value="Bank Transfer/UPI">Bank Transfer/UPI</option>
-                <option value="Card">Card</option>
-                <option value="Cash">Cash</option>
-                <option value="Cheque">Cheque</option>
+                <option value="BANK TRANSFER/UPI">Bank Transfer/UPI</option>
+                <option value="CARD">Card</option>
+                <option value="CASH">Cash</option>
+                <option value="CHEQUE">Cheque</option>
             </select>
         </label>
         {editingReceipt.modeOfPayment === 'Cheque' && (
@@ -481,12 +616,58 @@ const handleEditSubmit = () => {
             </label>
         )}
         <label className="form-control">
-            <span className="label-text">Amount Paid</span>
+            <div className='label-text'>Current Amount Paid:{determineAmountPaid(editingReceipt)}</div>
+            <div className='label-text'>Current Fee Type:{determineFeeType(editingReceipt)}</div>
+            <span className="label-text">Enter Updated Amount Paid</span>
             <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
     </div>
+)}
+{isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                    onClick={() => {
+                      handleConfirmationAccept(editingReceipt);
+                      determineFeeType(editingReceipt);
+                    }}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
 )}
       
       </div>

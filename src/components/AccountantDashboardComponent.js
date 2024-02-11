@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo  } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { useSelector } from 'react-redux';
 import CancelledStudents from './CancelledStudents';
-function ExecutiveComponent() {
+import { useSelector } from 'react-redux';
+function AccountantComponent() {
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudent, setEditingStudent] = useState(null);
@@ -12,23 +12,25 @@ function ExecutiveComponent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(100);
   const [totalStudentCount, setTotalStudentCount] = useState(0);
-  const branch = useSelector((state) => state.auth.branch);
+  const user = useSelector((state) => state.auth);
   useEffect(() => {
     // Function to fetch students data from the backend
     const fetchStudents = async () => {
       try {
         var SchoolManagementSystemApi = require('school_management_system_api');
         var api = new SchoolManagementSystemApi.DbApi();
+        
         const opts = {
           body: {
             "collectionName": "students",
             "query": {
               "studentStatus": "Active",
-              "branch":branch
+              "branch":user.branch
             },
             "type": "findMany"
           }
         };
+
 
         console.log(opts.body);
 
@@ -85,102 +87,61 @@ function ExecutiveComponent() {
       ));
     }
     
-    return filtered.sort((a, b) => {
-      if (!sortConfig.key) return 0;
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [students, searchQuery, sortConfig]);
+    // Ensure that filtered is not undefined before sorting
+  filtered = filtered || [];
+
+  return filtered.sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? 1 : -1;
+    }
+    return 0;
+  });
+}, [students, searchQuery, sortConfig]);
   
 
   const handleSearch = (searchQuery) => {
     if (!searchQuery) {
-      return students; // Return all students if the search query is empty
+      return students;
     }
-
-
-  
   
     const searchTerms = searchQuery.split(',').map(term => term.trim().toLowerCase());
   
     return students.filter(student => {
-        return searchTerms.every(term =>
-            student.firstName.toLowerCase().includes(term) ||
-            student.applicationNumber.toLowerCase().includes(term) ||
-            student.surName.toLowerCase().includes(term) ||
-            student.parentName.toLowerCase().includes(term) ||
-            student.branch.toLowerCase().includes(term) ||
-            student.primaryContact.includes(term) ||
-            student.gender.toLowerCase().includes(term) ||
-            student.batch.includes(term) ||
-            student.course.toLowerCase().includes(term) ||
-            student.modeOfResidence.toLowerCase().includes(term) ||
-            student.pendingFirstYearTuitionFee.toString().includes(term) ||
-            student.pendingFirstYearHostelFee.toString().includes(term) ||
-            student.pendingSecondYearTuitionFee.toString().includes(term) ||
-            student.pendingSecondYearHostelFee.toString().includes(term)
-            // Add any additional fields that you might have in your data structure
-          );
+      return searchTerms.every(term => {
+        if (term === "male") {
+          // Use regex to match 'male' as a whole word, not as part of other words like 'female'
+          return new RegExp('\\bmale\\b').test(student.gender.toLowerCase());
+        }
+        // Other conditions remain the same
+        return student.firstName.toLowerCase().includes(term) ||
+          student.applicationNumber.toLowerCase().includes(term) ||
+          student.surName.toLowerCase().includes(term) ||
+          student.parentName.toLowerCase().includes(term) ||
+          student.branch.toLowerCase().includes(term) ||
+          student.primaryContact.includes(term) ||
+          student.gender.toLowerCase().includes(term) ||
+          student.batch.includes(term) ||
+          student.course.toLowerCase().includes(term) ||
+          student.modeOfResidence.toLowerCase().includes(term) ||
+          student.pendingFirstYearTuitionFee.toString().includes(term) ||
+          student.pendingFirstYearHostelFee.toString().includes(term) ||
+          student.pendingSecondYearTuitionFee.toString().includes(term) ||
+          student.pendingSecondYearHostelFee.toString().includes(term)
+      });
     });
   };
-
-  const filteredStudents = handleSearch(searchQuery);
-
-  let currentStudents = []; 
-  if (filteredStudents) {
-    const indexOfLastStudent = currentPage * rowsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
-    currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-
-  }
-
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Handle change in rows per page
-
-  // Render pagination
-  const renderPageNumbers = () => {
-    let pageNumbers = [];
-    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
-    const pageBuffer = 3; // Number of pages to show before and after current page
   
-    for (let i = 1; i <= totalPages; i++) {
-      // Always add the first and last few pages
-      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
-        pageNumbers.push(
-          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
-            {i}
-          </button>
-        );
-      }
-    }
-  
-    // Insert ellipses where there are gaps in the page numbers
-    const withEllipses = [];
-    let prevPage = null;
-    for (const page of pageNumbers) {
-      if (prevPage) {
-        // If there's a gap between this page and the previous page, insert ellipses
-        if (page.key - prevPage.key > 1) {
-          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
-        }
-      }
-      withEllipses.push(page);
-      prevPage = page;
-    }
-  
-    return withEllipses;
-  };
 
 
   // New function to open the edit modal
-  
+  const openEditModal = (student) => {
+    setEditingStudent({ ...student });
+    setIsEditModalOpen(true);
+  };
   // New function to handle field change in the edit modal
   const [validationErrors, setValidationErrors] = useState({ primaryContact: '', secondaryContact: '' });
 
@@ -237,6 +198,12 @@ function ExecutiveComponent() {
     try {
       var SchoolManagementSystemApi = require('school_management_system_api');
       var api = new SchoolManagementSystemApi.DbApi();
+      if (editingStudent.studentStatus === "Cancelled") {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
+      }
+      else {
+        editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
+      }
       const opts = {
         body: {
           "collectionName": "students",
@@ -258,7 +225,7 @@ function ExecutiveComponent() {
           }
         }
       };
-  
+
       api.dbUpdate(opts, function(error, data, response) {
         if (error) {
           console.error('API Error:', error);
@@ -275,19 +242,58 @@ function ExecutiveComponent() {
             // Display success message with changes
             console.log(`Student updated successfully: ${JSON.stringify(editingStudent)}`);
   
-            // Reload the page
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+
+
+      const opts2 = {
+        body : {
+          "collectionName": "receipts",
+          "query": {
+            'applicationNumber': editingStudent.applicationNumber
+          },
+          "type": 'updateMany',
+          "update": {
+            "studentName": editingStudent.studentName,
+            "parentName": editingStudent.parentName,
+            "registeredMobileNumber": editingStudent.primaryContact,
+            "gender": editingStudent.gender,
+            "batch": editingStudent.batch,
+            "stream": editingStudent.course,
+            "residenceType": editingStudent.modeOfResidence,
+            "studentStatus": editingStudent.studentStatus,
+            "firstYearHostelFeePayable":editingStudent.firstYearHostelFee,
+            "secondYearHostelFeePayable":editingStudent.secondYearHostelFee
+          }
+        }
+      }
+
+      api.dbUpdate(opts2, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+  
+            // Display success message with changes
+            console.log(`bulk receipt updated successfully: ${JSON.stringify(responseBody)}`);
+            // relod the window
             window.location.reload();
           } catch (parseError) {
             console.error('Error parsing response:', parseError);
           }
         }
       });
+
+
     } catch (error) {
       console.error("Error updating student: ", error);
     }
   }; 
-  
-  
   
 
   const generateBatchOptions = () => {
@@ -311,6 +317,8 @@ function ExecutiveComponent() {
 
     // Generate buffer
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+
     const now = new Date();
     const formattedDate = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
@@ -359,18 +367,54 @@ function ExecutiveComponent() {
   };
 
 
+  const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    let pageNumbers = [];
+    const totalPages = Math.ceil(sortedAndFilteredStudents.length / rowsPerPage);
+    const pageBuffer = 3; // Number of pages to show before and after current page
+  
+    for (let i = 1; i <= totalPages; i++) {
+      // Always add the first and last few pages
+      if (i === 1 || i === totalPages || i === currentPage || (i >= currentPage - pageBuffer && i <= currentPage + pageBuffer)) {
+        pageNumbers.push(
+          <button key={i} onClick={() => paginate(i)} className={`btn ${currentPage === i ? 'btn-active' : ''}`}>
+            {i}
+          </button>
+        );
+      }
+    }
+  
+    // Insert ellipses where there are gaps in the page numbers
+    const withEllipses = [];
+    let prevPage = null;
+    for (const page of pageNumbers) {
+      if (prevPage) {
+        // If there's a gap between this page and the previous page, insert ellipses
+        if (page.key - prevPage.key > 1) {
+          withEllipses.push(<span key={`ellipsis-${prevPage.key}`} className="px-2">...</span>);
+        }
+      }
+      withEllipses.push(page);
+      prevPage = page;
+    }
+  
+    return withEllipses;
+  };
+
+  
+  const indexOfLastStudent = currentPage * rowsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - rowsPerPage;
+  const currentStudents = sortedAndFilteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
   const [showCancelled, setShowCancelled] = useState(false);
 
   // Function to toggle showCancelled state
   const toggleShowCancelled = () => {
     setShowCancelled(!showCancelled);
   };
-  
-
-
-  
-
-  
   
 
 
@@ -386,8 +430,8 @@ function ExecutiveComponent() {
       Export to Excel
     </button>
   </div>
-  <div className="flex-1 flex justify-center mb-4 md:mb-0"> {/* Center-align the dashboard heading */}
-    <h2 className="text-2xl font-bold text-black">DASHBOARD</h2>
+  <div className="flex-1 flex justify-center card bg-slate-600 text-black px-4 py-2 text-center"> {/* Center-align the dashboard heading */}
+    <h2 className="text-2xl font-bold text-white">DASHBOARD</h2>
   </div>
   <div className="flex flex-col items-center md:items-end w-full md:w-auto">
     <input
@@ -397,7 +441,7 @@ function ExecutiveComponent() {
       value={searchQuery}
       onChange={handleSearchChange}
     />
-    <div className="text-lg font-bold text-black w-full md:w-auto md:pr-0" style={{ paddingRight: '5rem' }}>Total Students: {totalStudentCount}</div>
+    <div className="text-m font-bold text-black w-full md:w-auto md:pr-0 " style={{ paddingRight: '4rem' }}>Total Students: {totalStudentCount}</div>
 
   </div>
 </div>
@@ -405,52 +449,53 @@ function ExecutiveComponent() {
 
 
 
+        <div className="pagination">
+          {renderPageNumbers()}
+        </div>       
+            
+        <table className="min-w-full border border-gray-800 border-collapse">
+          <thead>
+            <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+              <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
+              <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
+              <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
+              <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
+              <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
+              <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
+              <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
+              <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
+              <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+            </tr>
+          </thead>
 
-
-  
-  
-  <table className="min-w-full border border-gray-800 border-collapse">
-    <thead>
-      <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
-        <th  className="text-xs" onClick={() => requestSort('firstName')}>Student Name {getSortDirection('firstName')}</th>
-        <th  className="text-xs" onClick={() => requestSort('applicationNumber')}>Application Number {getSortDirection('applicationNumber')}</th>
-        <th  className="text-xs" onClick={() => requestSort('parentName')}>Parent Name {getSortDirection('parentName')}</th>
-        <th  className="text-xs" onClick={() => requestSort('primaryContact')}>Primary Contact {getSortDirection('primaryContact')}</th>
-        <th  className="text-xs" onClick={() => requestSort('gender')}>Gender {getSortDirection('gender')}</th>
-        <th  className="text-xs" onClick={() => requestSort('batch')}>Batch {getSortDirection('batch')}</th>
-        <th  className="text-xs" onClick={() => requestSort('course')}>Course {getSortDirection('course')}</th>
-        <th  className="text-xs" onClick={() => requestSort('modeOfResidence')}>Mode of Residence {getSortDirection('modeOfResidence')}</th>
-        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearTuitionFee')}>Pending 1st Year Tuition Fee {getSortDirection('pendingFirstYearTuitionFee')}</th>
-        <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
-        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
-        <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
+          <tbody>
+            {currentStudents.map((student, index) => (
+              <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.primaryContact}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.gender}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.batch}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.course}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.modeOfResidence}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
+                <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
       </tr>
-    </thead>
 
-    <tbody>
-      {currentStudents.map((student, index) => (
-        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs" >{`${student.firstName} ${student.surName}`.trim()}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.applicationNumber}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.parentName}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.primaryContact}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.gender}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.batch}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.course}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.modeOfResidence}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
-          <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
-</tr>
-
-      ))}
-    </tbody>
-  </table>
+            ))}
+          </tbody>
+        </table>
 
 
 
-</div>
+      </div>
+
 
     {isEditModalOpen && (
       <div className="edit-modal">
@@ -458,32 +503,32 @@ function ExecutiveComponent() {
         <h3 className="text-lg font-semibold mb-4">{editingStudent.applicationNumber}</h3>
 
 
-        <label className="form-control">
-          <span className="label-text">First Name</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">First Name</span>
           <input type="text" name="firstName" value={editingStudent.firstName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Surname</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Surname</span>
           <input type="text" name="surName" value={editingStudent.surName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Parent Name</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Parent Name</span>
           <input type="text" name="parentName" value={editingStudent.parentName} onChange={handleEditChange} />
         </label>
-        <label className="form-control">
-          <span className="label-text">Primary Contact</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Primary Contact</span>
           <input type="text" name="primaryContact" value={editingStudent.primaryContact} onChange={handleEditChange} />
           {validationErrors.primaryContact && <span className="text-red-500">{validationErrors.primaryContact}</span>}
         </label>
-        <label className="form-control">
-          <span className="label-text">Secondary Contact</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Secondary Contact</span>
           <input type="text" name="secondaryContact" value={editingStudent.secondaryContact} onChange={handleEditChange} />
           {validationErrors.secondaryContact && <span className="text-red-500">{validationErrors.secondaryContact}</span>}
         </label>
 
 
-        <label className="form-control">
-          <span className="label-text">Gender</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Gender</span>
           <select name="gender" value={editingStudent.gender} onChange={handleEditChange}>
             <option value="" disabled>Choose Gender</option>
             <option value="Male">Male</option>
@@ -491,8 +536,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Batch</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Batch</span>
           <select name="batch" value={editingStudent.batch} onChange={handleEditChange}>
             {generateBatchOptions().map(batch => (
               <option key={batch} value={batch}>{batch}</option>
@@ -500,8 +545,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Course</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Course</span>
           <select name="course" value={editingStudent.course} onChange={handleEditChange}>
             <option value="" disabled>Select Course</option>
             <option value="MPC">MPC</option>
@@ -509,8 +554,8 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Mode of Residence</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Mode of Residence</span>
           <select name="modeOfResidence" value={editingStudent.modeOfResidence} onChange={handleEditChange}>
             <option value="" disabled>Select Mode of Residence</option>
             <option value="Day Scholar">Day Scholar</option>
@@ -518,22 +563,23 @@ function ExecutiveComponent() {
           </select>
         </label>
 
-        <label className="form-control">
-          <span className="label-text">Student Status</span>
+        <label className="form-control text-xs">
+          <span className="label-text text-xs">Student Status</span>
           <select name="studentStatus" value={editingStudent.studentStatus} onChange={handleEditChange}>
             <option value="Active">ACTIVE</option>
             <option value="Cancelled">CANCELLED</option>
           </select>
         </label>
 
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
-        <button className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
+        <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
+        <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>
       </div>
     )}
       <div className="pagination">
         {renderPageNumbers()}
       </div>
 
+      
 
       <div className="my-4 ml-4">
         <label className="flex items-center">
@@ -545,14 +591,11 @@ function ExecutiveComponent() {
             className="checkbox checkbox-normal" 
           />
         </label>
-        {showCancelled && <CancelledStudents />}
       </div>
 
 
 
-      
-
-
+      {showCancelled && <CancelledStudents />}
 
       
 
@@ -560,4 +603,4 @@ function ExecutiveComponent() {
   );
 }
 
-export default ExecutiveComponent;
+export default AccountantComponent;

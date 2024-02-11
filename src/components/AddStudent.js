@@ -180,7 +180,7 @@ const handleInputChange = (e) => {
 
 
   const validateInput = (name, value) => {
-    if (name === 'primaryContact' || name === 'secondaryContact') {
+    if (name === 'primaryContact' || name === 'secondaryContact' || name==='secondYearHostelFee' || name==="secondYearTuitionFee" || name==="firstYearHostelFee" || name==="firstYearTuitionFee") {
       return /^[0-9]*$/.test(value);
     }
     if (name === 'firstName' || name === 'surName' || name === 'parentName') {
@@ -207,10 +207,10 @@ const handleInputChange = (e) => {
         !studentData.dateOfJoining ||   
         !studentData.course || 
         !studentData.modeOfResidence ||
-        studentData.firstYearTuitionFee == null ||
-        studentData.firstYearHostelFee == null ||
-        studentData.secondYearTuitionFee == null ||
-        studentData.secondYearHostelFee == null) {
+        studentData.firstYearTuitionFee === "" ||
+        studentData.firstYearHostelFee === "" ||
+        studentData.secondYearTuitionFee === "" ||
+        studentData.secondYearHostelFee === "") {
       alert('Please fill in all required fields.');
        console.log('Form Data:', studentData);
       return false;
@@ -435,7 +435,7 @@ const handleInputChange = (e) => {
                 >
                   <option value="" disabled>Choose Branch</option>
                   {branches.map((branch) => (
-                    <option key={branch.branchCode} value={branch.branchCode}>{branch.branchName}</option>
+                    <option key={branch.branchCode} value={branch.branchCode}>{branch.branchName} ({branch.branchCode})</option>
                   ))}
                 </select>
               )
@@ -593,12 +593,16 @@ const handleInputChange = (e) => {
                     <span className="label-text">1st Year Tuition Fee</span>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="1st Year Tuition Fee"
                     className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearTuitionFee"
                     value={studentData.firstYearTuitionFee}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      if (validateInput(e.target.name, e.target.value)) {
+                        handleInputChange(e);
+                      }
+                    }}
                     disabled={isOnTC}
                   />
                 </label>
@@ -607,12 +611,16 @@ const handleInputChange = (e) => {
                     <span className="label-text">1st Year Hostel Fee</span>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="1st Year Hostel Fee"
                     className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="firstYearHostelFee"
                     value={studentData.firstYearHostelFee}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      if (validateInput(e.target.name, e.target.value)) {
+                        handleInputChange(e);
+                      }
+                    }}
                     disabled={isOnTC || isDayScholar}
                   />
                 </label>
@@ -623,12 +631,16 @@ const handleInputChange = (e) => {
                     <span className="label-text">2nd Year Tuition Fee</span>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="2nd Year Tuition Fee"
                     className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearTuitionFee"
                     value={studentData.secondYearTuitionFee}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      if (validateInput(e.target.name, e.target.value)) {
+                        handleInputChange(e);
+                      }
+                    }}
                   />
                 </label>
                 <label className="form-control w-1/2 pr-2">
@@ -636,12 +648,16 @@ const handleInputChange = (e) => {
                     <span className="label-text">2nd Year Hostel Fee</span>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="2nd Year Hostel Fee"
                     className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
                     name="secondYearHostelFee"
                     value={studentData.secondYearHostelFee}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      if (validateInput(e.target.name, e.target.value)) {
+                        handleInputChange(e);
+                      }
+                    }}
                     disabled={isDayScholar}
                   />
                 </label>

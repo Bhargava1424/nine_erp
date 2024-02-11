@@ -9,7 +9,8 @@ function AddStudentConcession() {
     const [amountWaived, setAmountWaived] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
     const [reason, setReason] = useState(''); 
-
+    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+    const [reEnteredPassword, setReEnteredPassword] = useState('');
 
 
 
@@ -19,15 +20,21 @@ function AddStudentConcession() {
 
 
     const handleAmountChange = (e, fee) => {
-        const amount = parseFloat(e.target.value);
-        if (amount > fee.pendingFee) {
-            alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
-            setAmountWaived(''); // Reset the amount field
-        } else {
-            setAmountWaived(amount);
+        const value = e.target.value;
+    
+        // Allow only numeric input, including decimals
+        const regex = /^[0-9]*\.?[0-9]*$/;
+        if (value === '' || regex.test(value)) {
+            const amount = parseFloat(value); // Convert to float for comparison
+            if (!isNaN(amount) && amount > fee.pendingFee) {
+                alert(`The amount cannot be greater than the pending fee of ${fee.pendingFee}`);
+                setAmountWaived(''); // Reset the amount field if invalid
+            } else {
+                setAmountWaived(value); // Keep as string for input field to preserve user input including decimal point
+            }
         }
-
     };
+    
 
 
     
@@ -102,85 +109,9 @@ function AddStudentConcession() {
             alert("Please provide a reason for the concession.");
             return;
         }
-
-    
-        try {
-            var SchoolManagementSystemApi = require('school_management_system_api');
-            var api = new SchoolManagementSystemApi.DbApi();
-            let update={}
-            if(selectedFeeType === 'firstYearTuitionFee')
-            {
-                update={
-                    'firstYearTuitionFee': studentData.firstYearTuitionFee - amountWaived,
-                    'pendingFirstYearTuitionFee': studentData.pendingFirstYearTuitionFee - amountWaived
-                }
-            } else if(selectedFeeType === 'secondYearHostelFee') {
-                update = {
-                    'secondYearHostelFee': Math.max(0, studentData.secondYearHostelFee - amountWaived),
-                    'pendingSecondYearHostelFee': Math.max(0, studentData.pendingSecondYearHostelFee - amountWaived)
-                };
-            } else if(selectedFeeType === 'secondYearTuitionFee') {
-                update = {
-                    'secondYearTuitionFee': Math.max(0, studentData.secondYearTuitionFee - amountWaived),
-                    'pendingSecondYearTuitionFee': Math.max(0, studentData.pendingSecondYearTuitionFee - amountWaived)
-                };
-            } else if(selectedFeeType === 'firstYearHostelFee') {
-                update = {
-                    'firstYearHostelFee': Math.max(0, studentData.firstYearHostelFee - amountWaived),
-                    'pendingFirstYearHostelFee': Math.max(0, studentData.pendingFirstYearHostelFee - amountWaived)
-                };
-            }
-            const opts = {
-                
-              body: {
-                "collectionName": "students",
-                "query": {
-                  'applicationNumber': studentData.applicationNumber
-                },
-                "type": 'updateOne',
-                "update": update
-              }
-            };
-        
-            api.dbUpdate(opts, function(error, data, response) {
-              if (error) {
-                console.error('API Error:', error);
-              } else {
-                try {
-                  const responseBody = response.body; // Assuming response.body is already in JSON format
-                  console.log(responseBody);
-                  // Reload the page
-                //   window.location.reload();
-                } catch (parseError) {
-                  console.error('Error parsing response:', parseError);
-                }
-              }
-            });
-
-            const authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
-            let body = {
-                "subject": "Concession Added",
-                "message": "Concession :" + amountWaived + "\n" + 
-                    "Name :" + studentData.firstName + " " + studentData.surName + "\n"  +
-                    "Fee Type :" + selectedFeeType + "\n" +
-                    "for the following reason :" + reason + "\n",
-            };
-            authorizationApi.sendMail(body, function(error, response) {
-                if (error) {
-                    console.error('API Error:', error);
-                } else {
-                    try {
-                        const responseBody = response.body; // Assuming response.body is already in JSON format
-                        console.log(responseBody);
-                        window.location.reload();
-                    } catch (parseError) {
-                        console.error('Error parsing response:', parseError);
-                    }
-                }
-            });
-        } catch (error) {
-            console.error("Error updating student: ", error);
-        }
+        // Show the confirmation modal instead of directly submitting
+        setIsConfirmModalVisible(true);
+        console.log(isConfirmModalVisible);
     };
 
     if (loading) {
@@ -212,7 +143,121 @@ function AddStudentConcession() {
         setReason(e.target.value);
     };
     const user = JSON.parse(localStorage.getItem('user'));
+
+
+    // New function to handle the actual submission after confirmation
+    const handleConfirmedSubmit = async () => {
+        // Use the login API to confirm the user's credentials
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.AuthorizationApi();
+        var body = new SchoolManagementSystemApi.LoginRequest();
+        body.username = JSON.parse(localStorage.getItem('user')).userName;
+        body.password = reEnteredPassword;
+
+        api.login(body, function (error, data, response) {
+            if (error) {
+                console.error('API Error:', error);
+                alert('Incorrect password. Please try again.');
+            } else {
+                // Assuming response format is similar to the one in your Login2 component
+                var responseBody = JSON.parse(response.text);
+                if (responseBody.message === 'Login Successful') {
+                    // Proceed with your existing update logic here
+                    // Make sure to close the modal and reset password field
+                    try {
+                        var SchoolManagementSystemApi = require('school_management_system_api');
+                        var api = new SchoolManagementSystemApi.DbApi();
+                        let update={}
+                        if(selectedFeeType === 'firstYearTuitionFee')
+                        {
+                            update={
+                                'firstYearTuitionFee': studentData.firstYearTuitionFee - amountWaived,
+                                'pendingFirstYearTuitionFee': studentData.pendingFirstYearTuitionFee - amountWaived
+                            }
+                        } else if(selectedFeeType === 'secondYearHostelFee') {
+                            update = {
+                                'secondYearHostelFee': Math.max(0, studentData.secondYearHostelFee - amountWaived),
+                                'pendingSecondYearHostelFee': Math.max(0, studentData.pendingSecondYearHostelFee - amountWaived)
+                            };
+                        } else if(selectedFeeType === 'secondYearTuitionFee') {
+                            update = {
+                                'secondYearTuitionFee': Math.max(0, studentData.secondYearTuitionFee - amountWaived),
+                                'pendingSecondYearTuitionFee': Math.max(0, studentData.pendingSecondYearTuitionFee - amountWaived)
+                            };
+                        } else if(selectedFeeType === 'firstYearHostelFee') {
+                            update = {
+                                'firstYearHostelFee': Math.max(0, studentData.firstYearHostelFee - amountWaived),
+                                'pendingFirstYearHostelFee': Math.max(0, studentData.pendingFirstYearHostelFee - amountWaived)
+                            };
+                        }
+                        const opts = {
+                            
+                          body: {
+                            "collectionName": "students",
+                            "query": {
+                              'applicationNumber': studentData.applicationNumber
+                            },
+                            "type": 'updateOne',
+                            "update": update
+                          }
+                        };
+                    
+                        api.dbUpdate(opts, function(error, data, response) {
+                          if (error) {
+                            console.error('API Error:', error);
+                          } else {
+                            try {
+                              const responseBody = response.body; // Assuming response.body is already in JSON format
+                              console.log(responseBody);
+                              // Reload the page
+                            //   window.location.reload();
+                            } catch (parseError) {
+                              console.error('Error parsing response:', parseError);
+                            }
+                          }
+                        });
+            
+                        const authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
+                        let body = {
+                            "subject": "Concession Added",
+                            "message": "Concession :" + amountWaived + "\n" + 
+                                "Name :" + studentData.firstName + " " + studentData.surName + "\n"  +
+                                "Fee Type :" + selectedFeeType + "\n" +
+                                "for the following reason :" + reason + "\n",
+                        };
+                        authorizationApi.sendMail(body, function(error, response) {
+                            if (error) {
+                                console.error('API Error:', error);
+                            } else {
+                                try {
+                                    const responseBody = response.body; // Assuming response.body is already in JSON format
+                                    console.log(responseBody);
+                                    window.location.reload();
+                                } catch (parseError) {
+                                    console.error('Error parsing response:', parseError);
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error updating student: ", error);
+                    }
+                    setIsConfirmModalVisible(false);
+                    setReEnteredPassword('');
+                    // Call your existing logic to update the backend here
+                } else {
+                    alert('Login failed. Please check your password and try again.');
+                }
+            }
+        });
+    };
+
+    // Function to close the modal and reset fields
+    const handleCancel = () => {
+        setIsConfirmModalVisible(false);
+        setReEnteredPassword('');
+    };    
     return (
+        <>
         <div className="main-container root-container">
             <Navbar />
             <h2 className="font-bold text-2xl mt-8 mb-4">{studentData.firstName} {studentData.surName}</h2>
@@ -247,7 +292,7 @@ function AddStudentConcession() {
                                         <h2>{studentData.firstName}'s 1st Year Tuition Fee:</h2>
                                         <label>
                                             Amount Waived:
-                                            <input type="number" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
+                                            <input className='ml-2' type="text" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>
@@ -276,10 +321,37 @@ function AddStudentConcession() {
                 </div>
             ))}
             </div>
-            
-            
-            {/* Repeat the above block for each fee type */}
+            {isConfirmModalVisible && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal">
+                    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                    <div className="mt-3 text-center">
+                        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Concession</h3>
+                        <div className="mt-2 px-7 py-3">
+                        <p className="text-sm text-black-500">You are about to waive {amountWaived} for {selectedFeeType}. Please confirm your password to proceed.</p>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            className="mt-2 px-3 py-2 border rounded-lg text-black-700 leading-tight focus:outline-none focus:shadow-outline w-full"
+                            value={reEnteredPassword}
+                            onChange={(e) => setReEnteredPassword(e.target.value)}
+                        />
+                        </div>
+                        <div className="items-center px-4 py-3">
+                        <button onClick={handleConfirmedSubmit} className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" style={{ backgroundColor: '#2D5990' }}>
+                            Confirm
+                        </button>
+                        <button onClick={handleCancel} className="ml-3 px-4 py-2 bg-black-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" style={{ backgroundColor: '#2D5990' }}>
+                            Cancel
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+        )}
+
         </div>
+
+                    </>
     );
 }
 

@@ -44,94 +44,18 @@ function AddEmployee() {
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [filteredBranches, setFilteredBranches] = useState([]);
-    // Function to open the edit modal with the selected employee's data
+    const [originalUsername, setOriginalUsername] = useState('');
+
+    const [originalEmployeeData, setOriginalEmployeeData] = useState(null);
+
     const openEditModal = (employee) => {
-      setEditingEmployee({ ...employee });
+      setEditingEmployee(employee);
+      setOriginalEmployeeData({ ...employee });
+      setOriginalUsername(employee.username); // Store the original username
       setIsEditModalOpen(true);
     };
-  
-    // Function to handle field changes in the edit modal
-    const handleEditChange = (e) => {
-      const { name, value } = e.target;
-      let updatedValue = value;
-      let newErrors = { ...errors };   
-      // Allow only alphabets in name fields and automatically capitalize them
-      if (name === "employeeName") {
-        updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
-      }
     
-      // Allow only numbers in the phone number field
-      if (name === "phoneNumber") {
-        updatedValue = value.replace(/[^0-9]/g, '');
-        if (updatedValue.length !== 10) {
-          newErrors.phoneNumber = 'Phone number must be 10 digits.';
-        } else {
-          newErrors.phoneNumber = '';
-        }
-      }
-      
-    
-      // Update state with validated and transformed values
-      setEditingEmployee({ ...editingEmployee, [name]: updatedValue });
-    
-      // Additional validation for phone number length on submit
-      if (name === "phoneNumber" && updatedValue.length !== 10) {
-        setErrors({ ...errors, phoneNumber: 'Phone number must be 10 digits.' });
-      } else {
-        setErrors({ ...errors, phoneNumber: '' });
-      }
-    };
-    
-  
-    // Function to submit the edited employee data
-    const handleEditSubmit = async (e) => {
-      e.preventDefault();
-      // Check for errors before submitting
-      if (errors.phoneNumber) {
-        alert("Please correct the errors before submitting.");
-        return;
-      }
-    
-      try {
-        var SchoolManagementSystemApi = require('school_management_system_api');
-        var api = new SchoolManagementSystemApi.DbApi();
-        const opts = {
-          body: {
-            "collectionName": "employees",
-            "query": {
-              "employeeId": editingEmployee.employeeId // Use the employee's _id to identify the document to update
-            },
-            "type": 'updateOne',
-            "update": {
-              "employeeName": editingEmployee.employeeName,
-              "role": editingEmployee.role,
-              "phoneNumber": editingEmployee.phoneNumber,
-              "branch": editingEmployee.branch,
-              "username": editingEmployee.username,
-              "password": editingEmployee.password,
-              // Include other fields that need to be updated
-            }
-          }
-        };
-    
-        api.dbUpdate(opts, function(error, data, response) {
-          if (error) {
-            console.error('API Error:', error);
-          } else {
-            // Handle successful update here
-            // For example, you can close the edit modal and clear the editing state
-            setIsEditModalOpen(false);
-            setEditingEmployee(null);
-            // Reload the employee list or use another method to update the UI
-            alert("Employees Updated Successfully")
-            window.location.reload()
-          }
-        });
-      } catch (error) {
-        console.error('There was an error updating the employee!', error);
-      }
-    };
-    
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -270,7 +194,127 @@ function AddEmployee() {
   };
   const [branches, setBranches] = useState([]);
   const [employees, setEmployees] = useState([]); 
+  const [changesToConfirm, setChangesToConfirm] = useState({}); 
 
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    let updatedValue = value;
+    let newErrors = { ...errors };
+
+      // Use the original value from originalStudentData for comparison
+      const originalValue = originalEmployeeData[name];
+  
+    if (name === "employeeName") {
+      updatedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
+    }
+  
+    if (name === "phoneNumber") {
+      updatedValue = value.replace(/[^0-9]/g, '');
+      if (updatedValue.length !== 10) {
+        newErrors.phoneNumber = 'Phone number must be 10 digits.';
+      } else {
+        newErrors.phoneNumber = '';
+      }
+    }
+  
+    let updatedEditingEmployee = { ...editingEmployee, [name]: updatedValue };
+  
+    // Automatically set branch to "ALL" when role is Manager
+    if (name === "role" && value === "Manager") {
+      updatedEditingEmployee.branch = "ALL"; // Set branch to "ALL"
+    }
+  
+    setEditingEmployee(updatedEditingEmployee);
+    setErrors(newErrors);
+
+          // Track changes for confirmation
+      if (originalValue !== updatedValue) {
+        setChangesToConfirm((prev) => ({ ...prev, [name]: updatedValue }));
+      } else {
+        // If the value was changed back to the original, remove it from changesToConfirm
+        const updatedChanges = { ...changesToConfirm };
+        delete updatedChanges[name];
+        setChangesToConfirm(updatedChanges);
+      }
+  };
+
+  const [isConfirmed, setIsConfirmed] = useState(false); 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (errors.phoneNumber) {
+      alert("Please correct the errors before submitting.");
+      return;
+    }
+    if (isConfirmed) {
+      // If already confirmed through some logic, directly perform submission
+      performSubmission();
+    } else {
+          // If not confirmed, open the confirmation modal and close the edit modal
+          setIsEditModalOpen(false);
+          setIsConfirmModalOpen(true);
+
+    }  
+  };
+
+  // Adjust the confirmation and cancellation handlers accordingly
+  const handleConfirmationAccept = async () => {
+    setIsConfirmed(true);
+    setIsConfirmModalOpen(false); // Ensure confirmation modal is closed
+  // Directly perform the submission logic here
+  await performSubmission();
+  };
+  
+  const handleConfirmationCancel = () => {
+    setIsConfirmModalOpen(false);
+    setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
+    setIsConfirmed(false);
+  };
+
+
+ // Extracted submission logic into a separate function for clarity
+  const performSubmission = async () => {
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const opts = {
+        body: {
+          "collectionName": "employees",
+          "query": {
+            "username": originalUsername // Use the correct identifier for the employee
+          },
+          "type": 'updateOne',
+          "update": {
+              "employeeName": editingEmployee.employeeName,
+              "role": editingEmployee.role,
+              "phoneNumber": editingEmployee.phoneNumber,
+              "username":editingEmployee.username,
+              "branch": editingEmployee.branch,
+              "password": editingEmployee.password,
+              // Include other fields that need to be updated
+            
+          }
+        }
+      };
+      console.log(originalUsername);
+      api.dbUpdate(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          setIsEditModalOpen(false);
+          setEditingEmployee(null);
+          alert("Employee Updated Successfully");
+          window.location.reload();
+        }
+      });
+    } catch (error) {
+      console.error('There was an error updating the employee!', error);
+    }
+    console.log("Performing submission with the edited data...");
+  }; 
+  
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -286,7 +330,7 @@ function AddEmployee() {
         };
     
         console.log(opts.body);
-    
+        
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -325,7 +369,7 @@ function AddEmployee() {
         };
     
         console.log(opts.body);
-    
+        
         api.dbGet(opts, function(error, data, response) {
           if (error) {
             console.error('API Error:', error);
@@ -409,7 +453,7 @@ function AddEmployee() {
     fetchBranches();
   }, []);
   
-  
+
 
 
   return (
@@ -453,13 +497,14 @@ function AddEmployee() {
                         readOnly
                       />
                     ) : (
-                      <SelectField
-                        label="Branch"
-                        name="branch"
-                        options={branches.map(branch => ({ label: branch.branchCode, value: branch.branchCode }))}
-                        value={employeeData.branch}
-                        handleChange={handleChange}
-                      />
+                        <SelectField
+                          label="Branch"
+                          name="branch"
+                          options={branches.map(branch => ({ label: `${branch.branchName} (${branch.branchCode})`, value: branch.branchCode }))}
+                          value={employeeData.branch}
+                          handleChange={handleChange}
+                        />
+
                     )}
                   <InputField label="Username" name="username" type="email" value={employeeData.username} handleChange={handleChange} error={errors.username} />
                   <InputField label="Password" name="password" type="password" value={employeeData.password} handleChange={handleChange} />
@@ -528,16 +573,15 @@ function AddEmployee() {
       {isEditModalOpen && (
         <div className="edit-modal">
                     <h3 className="text-lg font-semibold mb-4">Editing Employee Details</h3>
-        <h3 className="text-lg font-semibold mb-4">Employee Id:{editingEmployee.employeeId}</h3>
           {/* Edit form layout */}
           <form onSubmit={handleEditSubmit}>
             {/* Include InputField components for each editable field */}
-              <label className="form-control">
-                <span className="label-text">Employee Name</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Employee Name</span>
                 <input type="text" name="employeeName" value={editingEmployee.employeeName} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
-                <span className="label-text">Role</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Role</span>
                 <select 
                   name="role" 
                   value={editingEmployee.role || ''} // Ensure this matches the value in editingEmployee
@@ -551,13 +595,13 @@ function AddEmployee() {
                 </select>
               </label>
 
-              <label className="form-control">
-                <span className="label-text">Phone Number</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Phone Number</span>
                 <input type="text" name="phoneNumber" value={editingEmployee.phoneNumber} onChange={handleEditChange} />
                 {errors.phoneNumber && <h className="text-red-500 text-xs italic">{errors.phoneNumber}</h>}
               </label>
-              <label className="form-control">
-                <span className="label-text">Branch</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Branch</span>
                 <select 
                   name="branch" 
                   value={editingEmployee.branch || ''} // Ensure this matches the value in editingEmployee
@@ -565,19 +609,19 @@ function AddEmployee() {
                   className="select select-bordered w-full max-w-xs"
                 >
                   <option value="" disabled>Select Branch</option>
+                  <option value="ALL">ALL</option>
                   {filteredBranches.map(branch => (
-                    <option key={branch._id} value={branch.branchCode}>{branch.branchCode}</option>
+                    <option key={branch._id} value={branch.branchCode}>{branch.branchName} ({branch.branchCode})</option>
                     
                   ))}
-                  <option>ALL</option>
                 </select>
               </label>
-              <label className="form-control">
-                <span className="label-text">Username</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Username</span>
                 <input type="text" name="username" value={editingEmployee.username} onChange={handleEditChange} />
               </label>
-              <label className="form-control">
-                <span className="label-text">Password</span>
+              <label className="form-control text-xs">
+                <span className="label-text  text-xs">Password</span>
                 <input type="text" name="password" value={editingEmployee.password} onChange={handleEditChange} />
               </label>
             {/* ...other input fields as needed */}
@@ -586,6 +630,48 @@ function AddEmployee() {
           </form>
         </div>
       )}
+
+{isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="mt-3 text-center">
+        <h3 className="text-lg leading-6 font-medium text-black-900">Confirm Changes</h3>
+        <div className="mt-2">
+          {Object.keys(changesToConfirm).length > 0 ? (
+            <>
+              <p className="text-sm text-black-500">Are you sure you want to save these changes?</p>
+              <ul className="text-sm text-black-500 list-disc list-inside">
+                {Object.entries(changesToConfirm).map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationAccept}>
+                  Confirm
+                </button>
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-black-500">No changes made.</p>
+              <div className="items-center gap-4 mt-4">
+                <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
+                  onClick={handleConfirmationCancel}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

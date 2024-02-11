@@ -9,7 +9,9 @@ function Login2() {
   const [password, setPassword] = useState('');
   const { login: authServiceLogin } = useAuth();
   let userRole = '';
-  let userBranch = '';;
+  let userBranch = '';
+  let employeeName='';
+  let userName='';
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -27,14 +29,17 @@ function Login2() {
         } else {
           try {
             var responseBody = JSON.parse(response.text); // Assuming response.body is already in JSON format
-            console.log(responseBody.message);
+            console.log(responseBody);
             console.log(responseBody.data.employeeRole);
             if (responseBody.message === 'Login Successful') {
               userRole = responseBody.data.employeeRole;
               userBranch = responseBody.data.employeeBranch;
+              employeeName= responseBody.data.employeeName;
+              userName= responseBody.data.employeeUsername;
+
               // Fetch students based on the branch here
               const isManager = userRole==="Manager";
-              const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch};
+              const query = isManager?{"studentStatus": "Active"} : {"studentStatus": "Active", "branch": userBranch, "username":userName};
               try {
                 var SchoolManagementSystemApi = require('school_management_system_api');
                 var api = new SchoolManagementSystemApi.DbApi();
@@ -58,7 +63,7 @@ function Login2() {
                       
                       const studentsCount = responseBody.length; // This is an example, adjust based on actual API response structure
                       // Now call authServiceLogin with role, branch, and students count
-                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount }); 
+                      authServiceLogin({ role: userRole, branch: userBranch, totalStudentCount:studentsCount, employeeName:employeeName, userName:userName }); 
                       navigate('/');
                     } catch (parseError) {
                       console.error('Error parsing response:', parseError);
@@ -91,14 +96,16 @@ function Login2() {
       <Navbar/>
     <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card shadow-md bg-base-100 p-6 w-96">
-      <img alt="logo" src="/9logo.webp" className="responsive-logo" />
+        <div className="center-absolute justify-center image-full">
+          <img alt="logo" src="/9logo.webp" className="responsive-logo" />
+        </div>
         <form onSubmit={(e) => handleLogin(e)} className="space-y-4">
           {/* ... (rest of the form) */}
           <div className="flex flex-col">
-            <label className="text-sm mb-1">Email</label>
+            <label className="text-sm mb-1 mt-3">Email</label>
             <input
               type="email"
-              placeholder="email"
+              placeholder="Email"
               className="input input-bordered"
               required
               value={email}
@@ -109,7 +116,7 @@ function Login2() {
             <label className="text-sm mb-1">Password</label>
             <input
               type="password"
-              placeholder="password"
+              placeholder="Password"
               className="input input-bordered"
               required
               value={password}
