@@ -13,22 +13,12 @@ function ListReceipts() {
     const [editingReceipt, setEditingReceipt] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const formatFourDaysAgoDate = (date) => {
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
+    const currentDate = new Date();
+    const fourDaysAgo = new Date(currentDate);
+    fourDaysAgo.setDate(currentDate.getDate() - 4);
     
-      // Assuming you want to keep the format as HH-mm DD-MM-YYYY
-      return `${hours}-${minutes} ${day}-${month}-${year}`;
-    };
-     
     
-    const fourDaysAgo = new Date(new Date().setDate(new Date().getDate() - 1));
-    const fourDaysAgoFormatted = formatFourDaysAgoDate(fourDaysAgo);
-    
-    console.log('---->', fourDaysAgoFormatted);
+    console.log('---->', fourDaysAgo);
 
     const [sortConfig, setSortConfig] = useState({ key: 'dateOfPayment', direction: 'descending' });
 
@@ -47,7 +37,7 @@ function ListReceipts() {
         console.log(user.role);
         if (user.role === 'Accountant') {
           query = {
-            'dateOfPayment': {'$gte': fourDaysAgoFormatted},
+            'dateIso': {'$gte': fourDaysAgo},
             'branch':user.branch
           }
         };
@@ -581,15 +571,13 @@ const isRecentlyAdded = (dateOfPayment) => {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          <td className="border-2 text-sm border-gray-800 px-4 py-2">
-                            {!isAccountant && (
-                              (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) ? (
-                                <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
-                                  <i className="fas fa-edit"></i> Edit
-                                </button>
-                              ) : <p></p> // Empty paragraph for maintaining cell layout
-                            )}
-                          </td>
+                          {!isAccountant && (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) && (
+                            <td className="border-2 text-sm border-gray-800 px-4 py-2">
+                              <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
+                                <i className="fas fa-edit"></i> Edit
+                              </button>
+                            </td>
+                          )}
                             <td className="border-2 border-gray-800 px-4 py-2">
                                 <button style={{backgroundColor: '#2D5990'}} onClick={() => handleDownload(receipt)} className="btn btn-blue text-white">
                                     Download
