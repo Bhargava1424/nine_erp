@@ -12,9 +12,24 @@ function ListReceipts() {
     const [rowsPerPage] = useState(10);
     const [editingReceipt, setEditingReceipt] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const currentDate = new Date();
-    const fourDaysAgo = new Date(currentDate);
-    fourDaysAgo.setDate(currentDate.getDate() - 4);
+
+    const formatFourDaysAgoDate = (date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+    
+      // Assuming you want to keep the format as HH-mm DD-MM-YYYY
+      return `${hours}-${minutes} ${day}-${month}-${year}`;
+    };
+     
+    
+    const fourDaysAgo = new Date(new Date().setDate(new Date().getDate() - 1));
+    const fourDaysAgoFormatted = formatFourDaysAgoDate(fourDaysAgo);
+    
+    console.log('---->', fourDaysAgoFormatted);
+
     const [sortConfig, setSortConfig] = useState({ key: 'dateOfPayment', direction: 'descending' });
 
     const user = JSON.parse(localStorage.getItem('user'));
@@ -30,9 +45,9 @@ function ListReceipts() {
         let query = {};
         
         console.log(user.role);
-        if (user.role === 'Accountant' || user.role === 'Executive') {
+        if (user.role === 'Accountant') {
           query = {
-            'dateOfPayment': {'$gte': fourDaysAgo},
+            'dateOfPayment': {'$gte': fourDaysAgoFormatted},
             'branch':user.branch
           }
         };
@@ -54,6 +69,7 @@ function ListReceipts() {
               const responseBody = response.body; // Assuming response.body is already in JSON format
               console.log(responseBody);
               setReceipts(responseBody); // Assuming the actual data is in responseBody
+              
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
             }
@@ -450,26 +466,7 @@ const determineFeeType = (receipt) => {
  // Default value if none of the fees are paid
 };
  
-const sortedReceipts = useMemo(() => {
-  let sortableItems = [...receipts];
-  if (sortConfig !== null) {
-    sortableItems.sort((a, b) => {
-      if (a[sortConfig.key] === b[sortConfig.key]) {
-        return 0;
-      }
-      const order = (sortConfig.direction === 'ascending') ? 1 : -1;
-      // For date comparison, convert strings to date objects
-      let comparison = 0;
-      if (sortConfig.key === 'dateOfPayment') {
-        comparison = new Date(a[sortConfig.key]) < new Date(b[sortConfig.key]) ? -1 : 1;
-      } else {
-        comparison = a[sortConfig.key] < b[sortConfig.key] ? -1 : 1;
-      }
-      return comparison * order;
-    });
-  }
-  return sortableItems;
-}, [receipts, sortConfig]);
+
 
 const requestSort = (key) => {
   let direction = 'ascending';
