@@ -48,6 +48,21 @@ function ListReceipts() {
             "type": "findMany"
           }
         };
+        
+        function getFeeType(feeType) {
+          if (feeType === 'First Year Tuition Fee') {
+            return 'firstYearTuitionFeePaid';
+          } 
+          else if (feeType === 'First Year Hostel Fee') {
+            return 'firstYearHostelFeePaid';
+          }
+          else if (feeType === 'Second Year Tuition Fee') {
+            return 'secondYearTuitionFeePaid';
+          }
+          else if (feeType === 'Second Year Hostel Fee') {
+            return 'secondYearHostelFeePaid';
+          }
+        };
   
         console.log(opts.body);
   
@@ -57,8 +72,17 @@ function ListReceipts() {
           } else {
             try {
               const responseBody = response.body; // Assuming response.body is already in JSON format
-              console.log(responseBody);
-              setReceipts(responseBody); // Assuming the actual data is in responseBody
+              console.log('Response:', responseBody);
+              const updatedReceipts = responseBody.map(receipt => {
+                const feeType = determineFeeType(receipt);
+                console.log('Fee Type:', feeType);
+                const amountPaid = determineAmountPaid(receipt);
+                const amountFeeType = getFeeType(feeType);
+                const updatedAmount = amountPaid;
+                return { ...receipt, feeType, amountPaid, amountFeeType, updatedAmount };
+              });
+              console.log('Updated Receipts:', updatedReceipts);
+              setReceipts(updatedReceipts); // Assuming the actual data is in responseBody
               
             } catch (parseError) {
               console.error('Error parsing response:', parseError);
@@ -118,6 +142,7 @@ function ListReceipts() {
 
     const openEditModal = (receipt) => {
       setEditingReceipt({ ...receipt });
+
       setOriginalReceiptData({ ...receipt }); 
       setIsEditModalOpen(true);
   };
@@ -129,10 +154,12 @@ function ListReceipts() {
     const { name, value } = e.target;
       // Use the original value from originalStudentData for comparison
   const originalValue = originalReceiptData[name];
-    if (name === 'modeOfPayment' && value !== 'Cheque') {
+    if (name === 'modeOfPayment' && value !== 'CHEQUE') {
+        console.log('Mode of Payment:', value);
         // If mode of payment is changed from 'Cheque' to something else, set chequeNumber to null
-        setEditingReceipt({ ...editingReceipt, [name]: value, chequeNumber: null });
+        setEditingReceipt({ ...editingReceipt, [name]: value, chequeNumber: null, amountPaid: editingReceipt.amountPaid });
     } else {
+        console.log(value);
         setEditingReceipt({ ...editingReceipt, [name]: value });
     }
       // Track changes for confirmation
@@ -146,14 +173,31 @@ function ListReceipts() {
   }
 };
 
+const getPendingAmountFeeType = (amountFeeType) => {
+  let pendingAmountFeeType = amountFeeType;
+
+  if (amountFeeType === 'firstYearTuitionFeePaid') {
+    pendingAmountFeeType = 'firstYearTotalTuitionFeePending';
+  } else if (amountFeeType === 'firstYearHostelFeePaid') {
+    pendingAmountFeeType = 'firstYearTotalHostelFeePending';
+  } else if (amountFeeType === 'secondYearTuitionFeePaid') {
+    pendingAmountFeeType = 'secondYearTotalTuitionFeePending';
+  } else if (amountFeeType === 'secondYearHostelFeePaid') {
+    pendingAmountFeeType = 'secondYearTotalHostelFeePending';
+  }
+
+  return pendingAmountFeeType;
+};
+
+
 const [isConfirmed, setIsConfirmed] = useState(false); 
 const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
 const handleEditSubmit = () => {
-
+  console.log(isConfirmed);
   if (isConfirmed) {
     // If already confirmed through some logic, directly perform submission
-    performSubmission();
+    performSubmission(editingReceipt);
   } else {
         // If not confirmed, open the confirmation modal and close the edit modal
         setIsEditModalOpen(false);
@@ -179,22 +223,19 @@ const handleConfirmationCancel = () => {
 
 // Extracted submission logic into a separate function for clarity
 const performSubmission = async (editingReceipt) => {
-  determineFeeType(editingReceipt)
-  const updatedReceipt = {
-    ...editingReceipt,
-    chequeNumber: editingReceipt.modeOfPayment !== 'Cheque' ? null : editingReceipt.chequeNumber,
-};
 
-if (updatedReceipt.modeOfPayment === 'Cheque' && !updatedReceipt.chequeNumber) {
+console.log('---->', editingReceipt);
+if (editingReceipt.modeOfPayment === 'CHEQUE' && !editingReceipt.chequeNumber) {
     alert("Please enter the Cheque Number.");
     return;
 }
 
 // Assuming amountPaid is always related to tuition fees
-const amountDifference = parseFloat(updatedReceipt.amountPaid) - parseFloat(editingReceipt[PaidfeeType]);
+const amountDifference = parseFloat(editingReceipt.updatedAmount) - parseFloat(editingReceipt.amountPaid);
 
 let totalPaidField, pendingField, studentFeePaid, studentFeePending;
-
+console.log(editingReceipt.amountFeeType);
+const PaidfeeType = editingReceipt.amountFeeType;
 switch (PaidfeeType) {
     case 'firstYearTuitionFeePaid':
         totalPaidField = 'firstYearTotalTuitionFeePaid';
@@ -225,20 +266,25 @@ switch (PaidfeeType) {
         return;
 }
 
+console.log('amountDifference:', amountDifference);
+
 // Update the dynamic field and calculate new totals and pendings
 const updateData = {
     modeOfPayment: editingReceipt.modeOfPayment,
     chequeNumber: editingReceipt.chequeNumber,
-    [PaidfeeType]: parseInt(updatedReceipt.amountPaid),
+    [PaidfeeType]: parseInt(editingReceipt.updatedAmount),
     [totalPaidField]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
     [pendingField]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
 };
+
+console.log('updateData:', updateData);
 
 const updateStudentData = {
     [studentFeePaid]: (parseFloat(editingReceipt[totalPaidField]) || 0) + amountDifference,
     [studentFeePending]: Math.max(0, (parseFloat(editingReceipt[pendingField]) || 0) - amountDifference),
 };
 
+console.log('updateStudentData:', updateStudentData);
   try {
     var SchoolManagementSystemApi = require('school_management_system_api');
     var api = new SchoolManagementSystemApi.DbApi();
@@ -270,6 +316,7 @@ const updateStudentData = {
           } else {
             console.log('Update successful:', response.body);
             setIsEditModalOpen(false);
+            setIsConfirmed(false);
             setEditingReceipt(null);
             fetchReceipts();
           }
@@ -282,12 +329,7 @@ const updateStudentData = {
   }
   console.log("Performing submission with the edited data...");
 };
-
-
-
-
-
-  
+ 
     const filteredReceipts = handleSearch(searchTerm);
 
     // Calculate the pagination
@@ -375,12 +417,11 @@ const updateStudentData = {
 
 
 
-      amountPaid = determineAmountPaid(receipt);
-      feeType = determineFeeType(receipt);
+      amountPaid = receipt.amountPaid;
+      feeType = receipt.feeType;
       // Redirect to DownloadReceipt component or specific URL
       // For example, using window.location:
 
-      amountPaid = determineAmountPaid(receipt);
       console.log('Amount Paid for download:', amountPaid); // Ensure this logs a valid number
 
       
@@ -416,8 +457,8 @@ const updateStudentData = {
       'Date of Payment': formatDate(receipt.dateOfPayment),
       'Student Name': receipt.studentName,
       'Batch': receipt.batch,
-      'Amount Paid': determineAmountPaid(receipt),
-      'Fee Type': determineFeeType(receipt),
+      'Amount Paid': receipt.amountPaid,
+      'Fee Type': receipt.feeType,
       'Mode of Payment': receipt.modeOfPayment,
       'Cheque Number': receipt.chequeNumber || 'N/A', // Assuming chequeNumber might be null or not applicable
       // Add other fields if necessary
@@ -567,8 +608,8 @@ const isRecentlyAdded = (dateOfPayment) => {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.studentName}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.batch}</td>
-                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineAmountPaid(receipt)}</td>
-                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{determineFeeType(receipt)}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.amountPaid}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.feeType}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
                           {!isAccountant && (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) && (
@@ -600,26 +641,40 @@ const isRecentlyAdded = (dateOfPayment) => {
         <p><strong>Receipt Number:</strong> {editingReceipt.receiptNumber}</p>
         <p><strong>Type of Payment:</strong> {editingReceipt.typeOfPayment}</p>
         <label className="form-control">
-            <span className="label-text">Mode of Payment</span>
-            <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
-                <option value="">Select Mode of Payment</option>
-                <option value="BANK TRANSFER/UPI">Bank Transfer/UPI</option>
-                <option value="CARD">Card</option>
-                <option value="CASH">Cash</option>
-                <option value="CHEQUE">Cheque</option>
-            </select>
+          <span className="label-text">Mode of Payment</span>
+          <select name="modeOfPayment" value={editingReceipt.modeOfPayment} onChange={handleEditChange}>
+            <option value="">Select Mode of Payment</option>
+            <option value="BANK TRANSFER/UPI">Bank Transfer/UPI</option>
+            <option value="CARD">Card</option>
+            <option value="CASH">Cash</option>
+            <option value="CHEQUE">Cheque</option>
+          </select>
         </label>
-        {editingReceipt.modeOfPayment === 'Cheque' && (
-            <label className="form-control">
-                <span className="label-text">Cheque Number</span>
-                <input type="text" name="chequeNumber" value={editingReceipt.chequeNumber || ''} onChange={handleEditChange} required />
-            </label>
+        {editingReceipt.modeOfPayment === 'CHEQUE' && (
+          <label className="form-control">
+            <span className="label-text">Cheque Number</span>
+            <input type="text" name="chequeNumber" value={editingReceipt.chequeNumber || ''} onChange={handleEditChange} required />
+          </label>
         )}
         <label className="form-control">
-            <div className='label-text'>Current Amount Paid:{determineAmountPaid(editingReceipt)}</div>
-            <div className='label-text'>Current Fee Type:{determineFeeType(editingReceipt)}</div>
-            <span className="label-text">Enter Updated Amount Paid</span>
-            <input type="text" name="amountPaid" value={editingReceipt.amountPaid} onChange={handleEditChange} />
+            <div className='label-text'>Current Amount Paid:{editingReceipt.amountPaid}</div>
+            <div className='label-text'>Current Fee Type:{editingReceipt.feeType}</div>
+            <span className="label-text">Enter Updated Amount Paid</span>    
+            <input
+              type="text"
+              name="updatedAmount"
+              value={editingReceipt.updatedAmount}
+              onChange={(e) => {
+                const updatedAmount = e.target.value;
+                const maxAmount = editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid;
+                if (updatedAmount > maxAmount) {
+                  alert("Value cannot be greater than the Pending fee: " + maxAmount);
+                } else {
+                  handleEditChange(e);
+                }
+              }}
+            />
+            <p>Max Amount: {editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid}</p>
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
@@ -643,7 +698,6 @@ const isRecentlyAdded = (dateOfPayment) => {
                 <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
                     onClick={() => {
                       handleConfirmationAccept(editingReceipt);
-                      determineFeeType(editingReceipt);
                     }}>
                   Confirm
                 </button>

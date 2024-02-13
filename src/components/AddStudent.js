@@ -227,6 +227,12 @@ const handleInputChange = (e) => {
   // const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
     e.preventDefault();    
+        // Check for errors before proceeding
+        const hasErrors = Object.values(errors).some(error => error !== '');
+        if (hasErrors) {
+          alert('Please correct the errors before submitting.');
+          return; // Prevent form submission
+        }
 
     if (validateForm()) {
         const updatedStudentData = {
