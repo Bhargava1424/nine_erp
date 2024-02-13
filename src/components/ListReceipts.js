@@ -173,6 +173,23 @@ function ListReceipts() {
   }
 };
 
+const getPendingAmountFeeType = (amountFeeType) => {
+  let pendingAmountFeeType = amountFeeType;
+
+  if (amountFeeType === 'firstYearTuitionFeePaid') {
+    pendingAmountFeeType = 'firstYearTotalTuitionFeePending';
+  } else if (amountFeeType === 'firstYearHostelFeePaid') {
+    pendingAmountFeeType = 'firstYearTotalHostelFeePending';
+  } else if (amountFeeType === 'secondYearTuitionFeePaid') {
+    pendingAmountFeeType = 'secondYearTotalTuitionFeePending';
+  } else if (amountFeeType === 'secondYearHostelFeePaid') {
+    pendingAmountFeeType = 'secondYearTotalHostelFeePending';
+  }
+
+  return pendingAmountFeeType;
+};
+
+
 const [isConfirmed, setIsConfirmed] = useState(false); 
 const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -642,8 +659,22 @@ const isRecentlyAdded = (dateOfPayment) => {
         <label className="form-control">
             <div className='label-text'>Current Amount Paid:{editingReceipt.amountPaid}</div>
             <div className='label-text'>Current Fee Type:{editingReceipt.feeType}</div>
-            <span className="label-text">Enter Updated Amount Paid</span>
-            <input type="text" name="updatedAmount" value={editingReceipt.updatedAmount} onChange={handleEditChange} />
+            <span className="label-text">Enter Updated Amount Paid</span>    
+            <input
+              type="text"
+              name="updatedAmount"
+              value={editingReceipt.updatedAmount}
+              onChange={(e) => {
+                const updatedAmount = e.target.value;
+                const maxAmount = editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid;
+                if (updatedAmount > maxAmount) {
+                  alert("Value cannot be greater than the Pending fee: " + maxAmount);
+                } else {
+                  handleEditChange(e);
+                }
+              }}
+            />
+            <p>Max Amount: {editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid}</p>
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
@@ -667,7 +698,6 @@ const isRecentlyAdded = (dateOfPayment) => {
                 <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }}
                     onClick={() => {
                       handleConfirmationAccept(editingReceipt);
-                      editingReceipt.feeType;
                     }}>
                   Confirm
                 </button>
