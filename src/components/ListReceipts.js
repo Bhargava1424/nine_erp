@@ -2,8 +2,7 @@ import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { BlobProvider } from '@react-pdf/renderer';
-import PrintReceipt from './PrintReceipt';
+import { BlobProvider } from '@react-pdf/renderer'; 
 
 
 
@@ -537,21 +536,7 @@ const isRecentlyAdded = (dateOfPayment) => {
     return (
       <div className="main-container root-container">
         <Navbar/>
-
-        <BlobProvider document={<PrintReceipt/>}>
-          {({ blob, url, loading, error }) => {
-            if (error) {
-              return <div>An error occurred while generating the PDF</div>;
-            }
-            return loading ? (
-              <button disabled>Loading PDF...</button>
-            ) : (
-              <a href={url} download="mydocument.pdf">
-                <button>Download PDF</button>
-              </a>
-            );
-          }}
-        </BlobProvider>
+ 
 
         {/* Render your receipts table here */}
         <div> 
