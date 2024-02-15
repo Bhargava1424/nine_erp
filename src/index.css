@@ -21,6 +21,11 @@ code {
     monospace;
 }
 
+.no-daisyui * {
+  all: revert;
+}
+
+
 .logo-container {
   width: auto; /* Allow the container to grow */
   max-width: 100%; /* Ensure it doesn't exceed the parent width */
@@ -153,6 +158,7 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
 /* Ensure the parent of content-header has these styles */
 .warning-container {
   display: flex;
