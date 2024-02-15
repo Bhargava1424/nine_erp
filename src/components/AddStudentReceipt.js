@@ -240,6 +240,17 @@ function AddStudentReceipt() {
         }
     };
 
+    function formatNumberIndia(num) {
+        var x = num.toString();
+        var lastThree = x.substring(x.length - 3);
+        var otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers !== '')
+            lastThree = ',' + lastThree;
+        var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return res;
+    } 
+
+
     return (
         <div className="main-container root-container">
             <Navbar />
@@ -291,6 +302,7 @@ function AddStudentReceipt() {
                                                 onChange={(e) => handleAmountChange(e, fee)}
                                                 max={fee.pendingFee}
                                             />
+                                            <h1>Verify Amount Entered:{formatNumberIndia(amountPaid)}</h1>
                                         </label>
                                         <div>
                                             <p>Mode of Payment:</p>
