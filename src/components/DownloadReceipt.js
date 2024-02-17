@@ -51,12 +51,19 @@ function DownloadReceipt() {
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const position = 0; // Start position; adjust as needed
                 pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                pdf.save("downloadReceipt.pdf");
+    
+                // Get current date
+                const today = new Date();
+                const date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+                const fileName = `Receipt ${date}.pdf`;
+    
+                pdf.save(fileName); // Save the PDF with the dynamic name
             }).catch((error) => {
                 console.error("Error generating PDF", error);
             });
         }
     };
+    
     
     // Effect to generate and download PDF
     console.log(''+shouldDownloadPdf)
@@ -195,14 +202,21 @@ function DownloadReceipt() {
 
 
     function formatNumberIndia(num) {
+        // Check if num is null or undefined before proceeding
+        if (num === null || num === undefined) {
+            return "0"; // Or any other fallback value you prefer
+        }
+    
         var x = num.toString();
         var lastThree = x.substring(x.length - 3);
         var otherNumbers = x.substring(0, x.length - 3);
-        if (otherNumbers !== '')
+        if (otherNumbers !== '') {
             lastThree = ',' + lastThree;
+        }
         var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
         return res;
     }
+    
 
 
     
