@@ -209,6 +209,7 @@ function AddStudentConcession() {
                             try {
                               const responseBody = response.body; // Assuming response.body is already in JSON format
                               console.log(responseBody);
+                              alert("Concession Added Successfully");
                               // Reload the page
                             //   window.location.reload();
                             } catch (parseError) {
