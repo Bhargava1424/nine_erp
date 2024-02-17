@@ -2,6 +2,8 @@ import Navbar from './Navbar'; // Adjust the import path if necessary
 import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { BlobProvider } from '@react-pdf/renderer'; 
+
 
 
 
@@ -38,6 +40,11 @@ function ListReceipts() {
         if (user.role === 'Accountant') {
           query = {
             'dateIso': {'$gte': fourDaysAgo},
+            'branch':user.branch
+          }
+        };
+        if (user.role === 'Executive') {
+          query = { 
             'branch':user.branch
           }
         };
@@ -125,15 +132,34 @@ function ListReceipts() {
               String(value).toLowerCase().includes(searchTerm.toLowerCase())
           );
       });
-
+    
       return filteredReceipts.sort((a, b) => {
           if (sortConfig === null) return 0;
+    
+          // Special handling for dateOfPayment
+          if (sortConfig.key === 'dateOfPayment') {
+              const parseDate = (dateStr) => {
+                  // Split the date and time parts
+                  const [time, date] = dateStr.split(' ');
+                  const [hours, minutes] = time.split('-').map(Number);
+                  const [day, month, year] = date.split('-').map(Number);
+                  // Return a Date object
+                  return new Date(year, month - 1, day, hours, minutes);
+              };
+    
+              const dateA = parseDate(a.dateOfPayment);
+              const dateB = parseDate(b.dateOfPayment);
+              // Compare the Date objects
+              return (dateA - dateB) * (sortConfig.direction === 'ascending' ? 1 : -1);
+          }
+    
+          // Handle other fields generically
           if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
           if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
           return 0;
       });
-  }, [receipts, searchTerm, sortConfig]);
-
+    }, [receipts, searchTerm, sortConfig]);
+    
   const handleSearchChange = (e) => {
       setSearchTerm(e.target.value);
       setCurrentPage(1); // Reset to first page
@@ -534,6 +560,7 @@ const isRecentlyAdded = (dateOfPayment) => {
     return (
       <div className="main-container root-container">
         <Navbar/>
+ 
 
         {/* Render your receipts table here */}
         <div> 
@@ -594,7 +621,7 @@ const isRecentlyAdded = (dateOfPayment) => {
                 <th onClick={() => requestSort('chequeNumber')}>
                   Cheque Number{getSortIndicator('chequeNumber')}
                 </th>
-                {!isAccountant && <th>Action</th>}
+                {!isAccountant && (isManager || isExecutive) && <th>Action</th>}
                 <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
               </tr>
             </thead>
@@ -617,6 +644,11 @@ const isRecentlyAdded = (dateOfPayment) => {
                               <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
                                 <i className="fas fa-edit"></i> Edit
                               </button>
+                            </td>
+                          )}
+                          {!isAccountant && (isManager || (isExecutive && !isRecentlyAdded(receipt.dateOfPayment))) && (
+                            <td className="border-2 text-sm border-gray-800 px-4 py-2">
+                              <p></p>
                             </td>
                           )}
                             <td className="border-2 border-gray-800 px-4 py-2">

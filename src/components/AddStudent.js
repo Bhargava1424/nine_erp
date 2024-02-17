@@ -345,7 +345,17 @@ const handleInputChange = (e) => {
           }));
       }
   }, [branch, role]);
-  
+
+  function formatNumberIndia(num) {
+    var x = num.toString();
+    var lastThree = x.substring(x.length - 3);
+    var otherNumbers = x.substring(0, x.length - 3);
+    if (otherNumbers !== '')
+        lastThree = ',' + lastThree;
+    var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+    return res;
+}  
+
     return (
       <div className='root-container'>
           <Navbar/>
@@ -611,6 +621,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isOnTC}
                   />
+                  <h1>Verify Amount Entered:{formatNumberIndia(studentData.firstYearTuitionFee)}</h1>
                 </label>
                 <label className="form-control w-1/2 pr-2">
                   <div className="label">
@@ -629,6 +640,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isOnTC || isDayScholar}
                   />
+                  <h1>Verify Amount Entered:{formatNumberIndia(studentData.firstYearHostelFee)}</h1>
                 </label>
         </div>
         <div className="flex justify-between space-x-1">        {/* 2 Tuition and Hostel Fees Fields */}
@@ -648,6 +660,7 @@ const handleInputChange = (e) => {
                       }
                     }}
                   />
+                  <h1>Verify Amount Entered:{formatNumberIndia(studentData.secondYearTuitionFee)}</h1>
                 </label>
                 <label className="form-control w-1/2 pr-2">
                   <div className="label">
@@ -666,6 +679,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isDayScholar}
                   />
+                  <h1>Verify Amount Entered:{formatNumberIndia(studentData.secondYearHostelFee)}</h1>
                 </label>
         </div>
         <div className="flex justify-between space-x-1">        {/* active status Field */}

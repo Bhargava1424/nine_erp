@@ -17,8 +17,7 @@ import ForgotPassword from './components/ForgotPassword';
 import AddStudentReceipt from './components/AddStudentReceipt';
 import DownloadReceipt from './components/DownloadReceipt';
 import AddStudentConcession from './components/AddStudentConcession';
-import ProtectedRoute from './components/ProtectedRoute';
-import Temp from './components/Temp';
+import ProtectedRoute from './components/ProtectedRoute';  
 
 function App() {
 
@@ -78,8 +77,7 @@ function App() {
       <Route path='/AddEmployee' element={<ProtectedRoute roles={['Manager']}><AddEmployee /></ProtectedRoute>}></Route>
       <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
       <Route path='/DownloadReceipt' element={<ProtectedRoute><DownloadReceipt /></ProtectedRoute>}></Route>
-      <Route path="/AddStudentReceipt" element={<ProtectedRoute><AddStudentReceipt /></ProtectedRoute>}></Route>
-      <Route path="/Temp" element={<ProtectedRoute><Temp/></ProtectedRoute>}></Route>
+      <Route path="/AddStudentReceipt" element={<ProtectedRoute><AddStudentReceipt /></ProtectedRoute>}></Route> 
       <Route path="/AddStudentConcession" element={<ProtectedRoute><AddStudentConcession /></ProtectedRoute>} />
 
     </Routes>

@@ -117,6 +117,23 @@ function AddStudentReceipt() {
         }
     }, [applicationNumber]);
 
+    function getISTTime() {
+        // Indian Standard Time is 5 hours 30 minutes ahead of UTC
+        const offset = 5.5;
+        let now = new Date(new Date().getTime() + offset * 3600 * 1000);
+      
+        // Format the date and time in the desired format: "HH-MM DD-MM-YYYY"
+        let hours = String(now.getUTCHours()).padStart(2, '0');
+        let minutes = String(now.getUTCMinutes()).padStart(2, '0');
+        let date = String(now.getUTCDate()).padStart(2, '0');
+        let month = String(now.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        let year = now.getUTCFullYear();
+      
+        return `${hours}-${minutes} ${date}-${month}-${year}`;
+      }
+
+      console.log(getISTTime())
+
 
     const handleSubmit = async (feeType) => {
         if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
@@ -156,7 +173,8 @@ function AddStudentReceipt() {
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
-            body.dateOfPayment= `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+            body.dateOfPayment= getISTTime();    
+            // body.dateOfPayment= `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
             console.log(body);
             
@@ -240,6 +258,17 @@ function AddStudentReceipt() {
         }
     };
 
+    function formatNumberIndia(num) {
+        var x = num.toString();
+        var lastThree = x.substring(x.length - 3);
+        var otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers !== '')
+            lastThree = ',' + lastThree;
+        var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return res;
+    } 
+
+
     return (
         <div className="main-container root-container">
             <Navbar />
@@ -291,6 +320,7 @@ function AddStudentReceipt() {
                                                 onChange={(e) => handleAmountChange(e, fee)}
                                                 max={fee.pendingFee}
                                             />
+                                            <h1>Verify Amount Entered:{formatNumberIndia(amountPaid)}</h1>
                                         </label>
                                         <div>
                                             <p>Mode of Payment:</p>

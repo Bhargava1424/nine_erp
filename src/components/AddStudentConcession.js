@@ -209,6 +209,7 @@ function AddStudentConcession() {
                             try {
                               const responseBody = response.body; // Assuming response.body is already in JSON format
                               console.log(responseBody);
+                              alert("Concession Added Successfully");
                               // Reload the page
                             //   window.location.reload();
                             } catch (parseError) {
@@ -255,7 +256,18 @@ function AddStudentConcession() {
     const handleCancel = () => {
         setIsConfirmModalVisible(false);
         setReEnteredPassword('');
-    };    
+    };  
+    function formatNumberIndia(num) {
+        var x = num.toString();
+        var lastThree = x.substring(x.length - 3);
+        var otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers !== '')
+            lastThree = ',' + lastThree;
+        var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return res;
+    } 
+    
+
     return (
         <>
         <div className="main-container root-container">
@@ -293,6 +305,7 @@ function AddStudentConcession() {
                                         <label>
                                             Amount Waived:
                                             <input className='ml-2' type="text" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
+                                            <h1>Verify Amount Entered:{formatNumberIndia(amountWaived)}</h1>
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>
