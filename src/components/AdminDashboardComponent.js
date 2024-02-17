@@ -459,7 +459,7 @@ const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
       'Primary Contact': student.primaryContact,
       'Gender': student.gender,
       'Batch': student.batch,
-      'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
+      // 'Date of Joining': student.dateOfJoining ? new Date(student.dateOfJoining).toLocaleDateString() : '',
       'Course': student.course,
       'Mode of Residence': student.modeOfResidence,
       '1st Year Tuition Fee': student.firstYearTuitionFee,
