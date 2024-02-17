@@ -646,7 +646,7 @@ const isRecentlyAdded = (dateOfPayment) => {
                               </button>
                             </td>
                           )}
-                          {!isAccountant && (isManager || (isExecutive && !isRecentlyAdded(receipt.dateOfPayment))) && (
+                          {!isAccountant && ((isExecutive && !isRecentlyAdded(receipt.dateOfPayment))) && (
                             <td className="border-2 text-sm border-gray-800 px-4 py-2">
                               <p></p>
                             </td>
@@ -706,6 +706,7 @@ const isRecentlyAdded = (dateOfPayment) => {
                 }
               }}
             />
+            <h1 className='text-green-500 text-lg '>Verify Amount Entered:{editingReceipt.updatedAmount}</h1>
             <p>Max Amount: {editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid}</p>
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>

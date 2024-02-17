@@ -561,7 +561,7 @@ const [originalStudentData, setOriginalStudentData] = useState(null);
               <th  className="text-xs" onClick={() => requestSort('pendingFirstYearHostelFee')}>Pending 1st Year Hostel Fee {getSortDirection('pendingFirstYearHostelFee')}</th>
               <th  className="text-xs" onClick={() => requestSort('pendingSecondYearTuitionFee')}>Pending 2nd Year Tuition Fee {getSortDirection('pendingSecondYearTuitionFee')}</th>
               <th  className="text-xs" onClick={() => requestSort('pendingSecondYearHostelFee')}>Pending 2nd Year Hostel Fee {getSortDirection('pendingSecondYearHostelFee')}</th>
-              {!isAccountant && <th  className="text-xs">Action</th>} {/* Assuming no sorting for the action column */}
+              {/* {!isAccountant && <th  className="text-xs">Action</th>} */}
             </tr>
           </thead>
 
@@ -580,12 +580,12 @@ const [originalStudentData, setOriginalStudentData] = useState(null);
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingFirstYearHostelFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearTuitionFee}</td>
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">{student.pendingSecondYearHostelFee}</td>
-                {!isAccountant && (
+                {/* {!isAccountant && (
                 <td className="border-2 border-gray-800 px-4 py-2 text-xs">
                     <button onClick={() => openEditModal(student)} style={{ color: "#2D5990" }}>
                         <i className="fas fa-edit"></i>
                     </button>
-                </td>)}
+                </td>)} */}
       </tr>
 
             ))}
