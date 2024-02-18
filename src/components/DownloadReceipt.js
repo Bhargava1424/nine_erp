@@ -54,7 +54,7 @@ function DownloadReceipt() {
     
                 // Get current date
                 const today = new Date();
-                const date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+                const date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear() + ' ' + today.getHours() +'-' +today.getMinutes();
                 const fileName = `Receipt ${date}.pdf`;
     
                 pdf.save(fileName); // Save the PDF with the dynamic name
@@ -66,14 +66,14 @@ function DownloadReceipt() {
     
     
     // Effect to generate and download PDF
-    console.log(''+shouldDownloadPdf)
-    useEffect(() => {
-        // This useEffect depends on shouldDownloadPdf, which is set to true after data is fetched
-        if (shouldDownloadPdf) {
-            // Delay the PDF download to ensure the DOM has updated
-            setTimeout(() => downloadPdfDocument(), 1000); // Adjust delay as needed
-        }
-    }, [shouldDownloadPdf]);
+    // console.log(''+shouldDownloadPdf)
+    // useEffect(() => {
+    //     // This useEffect depends on shouldDownloadPdf, which is set to true after data is fetched
+    //     if (shouldDownloadPdf) {
+    //         // Delay the PDF download to ensure the DOM has updated
+    //         setTimeout(() => downloadPdfDocument(), 500); // Adjust delay as needed
+    //     }
+    // }, [shouldDownloadPdf]);
 
      
 
@@ -238,6 +238,24 @@ function DownloadReceipt() {
     return (
 
         <div class="no-daisyui">
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                <button 
+                    style={{
+                        backgroundColor: '#2D5990',
+                        color: 'white',
+                        padding: '10px 20px', // Increase padding for a bigger size
+                        fontSize: '18px', // Increase font size
+                        borderRadius: '5px', // Optional: if you want rounded corners
+                        cursor: 'pointer', // Changes the cursor on hover
+                        border: 'none' // Removes the default button border
+                    }}
+                    onClick={downloadPdfDocument}
+                    className="btn btn-blue text-white">
+                    Download
+                </button>
+            </div>
+
             <div id="download-receipt-content">
         
             
