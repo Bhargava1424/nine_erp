@@ -554,6 +554,22 @@ const isRecentlyAdded = (dateOfPayment) => {
   return receiptDate > oneHourAgo;
 };
 
+function formatNumberIndia(num) {
+  // Check if num is null or undefined before proceeding
+  if (num === null || num === undefined) {
+      return "0"; // Or any other fallback value you prefer
+  }
+
+  var x = num.toString();
+  var lastThree = x.substring(x.length - 3);
+  var otherNumbers = x.substring(0, x.length - 3);
+  if (otherNumbers !== '') {
+      lastThree = ',' + lastThree;
+  }
+  var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+  return res;
+}
+
 
 
   
@@ -706,7 +722,7 @@ const isRecentlyAdded = (dateOfPayment) => {
                 }
               }}
             />
-            <h1 className='text-green-500 text-lg '>You have entered: {editingReceipt.updatedAmount}</h1>
+            <h1 className='text-green-500 text-lg '>You have entered: {formatNumberIndia(editingReceipt.updatedAmount)}</h1>
             <p>Max Amount: {editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid}</p>
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>

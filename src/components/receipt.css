@@ -13,6 +13,11 @@
   margin-bottom: 30px;
 }
 
+.no-daisyui .text-colour {
+  color :white
+  
+}
+
 /* Increase font size for larger headers */
 .no-daisyui .text-3xl {
   font-size: 3.5rem; /* Increased from 1.875rem (30px) to 36px */
@@ -119,8 +124,8 @@
 }
 
 .no-daisyui .py-1 {
-  padding-top: 9px;
-  padding-bottom: 9px;
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 
 .no-daisyui .bg-slate-800 {
@@ -129,6 +134,10 @@
 
 .no-daisyui .emoji {
   filter: grayscale(100%) brightness(0);
+}
+
+.no-daisyui .bg-black {
+  background-color: black;
 }
 
 /* Removing this to avoid potential override issues */
@@ -144,18 +153,19 @@
 @media (max-width: 768px) {
   
   .no-daisyui .p-8 { padding: 2px; } /* Reduced padding */
-  .no-daisyui .text-3xl { font-size: 1.2rem; line-height: 0.5rem; } /* Significantly reduced font size for large headers */
+  .no-daisyui .text-3xl { font-size: 0.75rem; line-height: 0.3rem; } /* Significantly reduced font size for large headers */
   .no-daisyui .text-2xl { font-size: 0.75rem; line-height: 0.01rem; } /* Adjusted font size for secondary headers */
   .no-daisyui .text-lg { font-size: 0.4rem; line-height: 0.01rem; } /* Adjusted larger body text size */
-  .no-daisyui .text-xs { font-size: 0.35rem; line-height: 0.7rem; } /* Adjusted base text size */
+  .no-daisyui .text-xs { font-size: 0.35rem; line-height: 0.2rem; } /* Adjusted base text size */
   .no-daisyui .text-sm { font-size: 0.375rem; line-height: 0.01rem; } /* Further reduced smaller text size */
   .no-daisyui .mb-4 { margin-bottom: 2px; }
   .no-daisyui .px-4 { padding-left: 20px; padding-right: 20px; }
-  .no-daisyui .py-3, .no-daisyui .py-2, .no-daisyui .py-1 { padding-top: 2px; padding-bottom: 2px; }
+  .no-daisyui .py-3, .no-daisyui .py-2, .no-daisyui .py-1 { padding-top: 4px; padding-bottom: 4px; }
   .no-daisyui .btn { padding: 8px 16px; font-size: 0.26rem; } /* Adjusted button styles */
   .no-daisyui .form-input { padding: 8px; font-size: 0.26rem; } /* Adjusted form input styles */
   .no-daisyui .navbar { flex-direction: column; padding: 2px; } /* Adjusted navbar for vertical layout */
   .no-daisyui .nav-link { margin-bottom: 2px; } /* Space between vertical nav links */
   .no-daisyui .modal { width: 90%; margin: 2px; } /* Adjusted modal width */
   .no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span { font-size: 0.3rem; } /* Uniformly reduced base font size for smaller screens */
+  .no-daisyui .phone-padding {padding-left: 2rem; padding-right: 2rem ;}
 }
