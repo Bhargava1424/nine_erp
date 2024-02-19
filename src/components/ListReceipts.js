@@ -706,7 +706,7 @@ const isRecentlyAdded = (dateOfPayment) => {
                 }
               }}
             />
-            <h1 className='text-green-500 text-lg '>Verify Amount Entered:{editingReceipt.updatedAmount}</h1>
+            <h1 className='text-green-500 text-lg '>You have entered: {editingReceipt.updatedAmount}</h1>
             <p>Max Amount: {editingReceipt[getPendingAmountFeeType(editingReceipt.amountFeeType)] + editingReceipt.amountPaid}</p>
         </label>
         <button className="btn btn-outline  text-white" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Save Changes</button>

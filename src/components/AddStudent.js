@@ -621,7 +621,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isOnTC}
                   />
-                  <h1 className='text-green-500 text-lg '>Verify Amount Entered:{formatNumberIndia(studentData.firstYearTuitionFee)}</h1>
+                  <h1 className='text-green-500 text-lg '>You have entered: {formatNumberIndia(studentData.firstYearTuitionFee)}</h1>
                 </label>
                 <label className="form-control w-1/2 pr-2">
                   <div className="label">
@@ -640,7 +640,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isOnTC || isDayScholar}
                   />
-                  <h1 className='text-green-500 text-lg'>Verify Amount Entered:{formatNumberIndia(studentData.firstYearHostelFee)}</h1>
+                  <h1 className='text-green-500 text-lg'>You have entered: {formatNumberIndia(studentData.firstYearHostelFee)}</h1>
                 </label>
         </div>
         <div className="flex justify-between space-x-1">        {/* 2 Tuition and Hostel Fees Fields */}
@@ -660,7 +660,7 @@ const handleInputChange = (e) => {
                       }
                     }}
                   />
-                  <h1 className='text-green-500 text-lg'>Verify Amount Entered:{formatNumberIndia(studentData.secondYearTuitionFee)}</h1>
+                  <h1 className='text-green-500 text-lg'>You have entered: {formatNumberIndia(studentData.secondYearTuitionFee)}</h1>
                 </label>
                 <label className="form-control w-1/2 pr-2">
                   <div className="label">
@@ -679,7 +679,7 @@ const handleInputChange = (e) => {
                     }}
                     disabled={isDayScholar}
                   />
-                  <h1 className='text-green-500 text-lg'>Verify Amount Entered:{formatNumberIndia(studentData.secondYearHostelFee)}</h1>
+                  <h1 className='text-green-500 text-lg'>You have entered: {formatNumberIndia(studentData.secondYearHostelFee)}</h1>
                 </label>
         </div>
         <div className="flex justify-between space-x-1">        {/* active status Field */}

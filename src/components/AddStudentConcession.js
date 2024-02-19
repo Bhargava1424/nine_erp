@@ -305,7 +305,7 @@ function AddStudentConcession() {
                                         <label>
                                             Amount Waived:
                                             <input className='ml-2' type="text" value={amountWaived} onChange={(e) => handleAmountChange(e, fee)} />
-                                            <h1 className='text-green-500 text-lg'>Verify Amount Entered:{formatNumberIndia(amountWaived)}</h1>
+                                            <h1 className='text-green-500 text-lg'>You have entered: {formatNumberIndia(amountWaived)}</h1>
                                         </label>
                                         <label className="block mt-4">
                                             <span className="text-gray-700">Reason:</span>

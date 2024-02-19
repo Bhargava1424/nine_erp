@@ -45,7 +45,7 @@ function DownloadReceipt() {
     const downloadPdfDocument = () => {
         const input = document.getElementById('download-receipt-content');
         if (input) {
-            html2canvas(input, { scale: 1 /* Adjust scale as needed */ }).then((canvas) => {
+            html2canvas(input, { scale: window.devicePixelRatio}).then((canvas) => {
                 const imgWidth = 208; // Example width in mm; adjust as needed
                 const imgHeight = (canvas.height * imgWidth) / canvas.width; // Adjust height to maintain aspect ratio
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -262,21 +262,21 @@ function DownloadReceipt() {
             
             <div class="bg-white p-8" >
                 
-                <div class="  mb-4">
-                    <h1 class="text-3xl font-bold text-center mb-4 py-2" >NINE EDUCATION</h1>
+                <div class="  mb-4 py-3">
+                    <h1 class="text-3xl font-bold text-center mb-4 py-3 " >NINE EDUCATION</h1>
                     <h1 class="text-2xl font-bold text-center bg-black text-white py-2 ">FEE RECEIPT</h1>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4  ">
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  ">
                     <div>
-                        <p class="text-xs">Receipt Number : <span class="font-bold py-2 ">{receiptNumber}</span></p>
+                        <p class="text-xs">Receipt Number : <span class="font-bold py-2 ">{receiptNumber}</span></p>    
                     </div>
                     <div class="text-right">
                         <p class="text-xs">Payment Date : <span class="font-bold py-2 ">{formatDate(receiptsData.dateOfPayment)}</span></p> 
                     </div>
                 </div>
                 <h1 class="  text-lg font-bold text-center bg-slate-400  py-2 ">STUDENT DETAILS</h1>
-                <div class="grid grid-cols-2 gap-4 mb-4  ">
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  ">
                     
                 <div>
                     <p class="text-xs mb-2 whitespace-nowrap mt-2 py-2 ">Student's Name : <span class="font-bold">{receiptsData.studentName} {receiptsData.surName}</span></p>
@@ -287,7 +287,7 @@ function DownloadReceipt() {
 
                 </div>
                 <h1 class="  text-lg font-bold text-center bg-slate-400  py-2 ">REGISTRATION DETAILS</h1>
-                <div class="grid grid-cols-2 gap-4 mb-4  " >
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  " >
                     
                     <div>
                         <p class="text-xs mb-2 py-2 ">Batch : <span class='font-bold'>{receiptsData.batch}</span></p>
@@ -301,7 +301,7 @@ function DownloadReceipt() {
                     </div>
                 </div>
                 <h1 class="  text-lg font-bold text-center bg-slate-400 mb-2 py-2 ">FEE DETAILS OF THE STUDENT</h1>
-                <div class="grid grid-cols-2 gap-4 mb-4  ">
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  ">
                     
                     <div>
                         <p class="text-xs mb-2 py-2 ">Tuition Fee Payable (1st Year) : <span class="font-bold">₹ {formatNumberIndia(receiptsData.firstYearTuitionFeePayable)}/-</span></p>
@@ -313,7 +313,7 @@ function DownloadReceipt() {
                     </div>
                 </div>
                 <h1 class="  text-lg font-bold text-center bg-slate-400 mb-2 py-2 ">DETAILS OF THE CURRENT TRANSACTION</h1>
-                <div class="grid grid-cols-2 gap-4 mb-4  ">
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  ">
                     <div>
                         <p class="text-xs mb-2 py-2 ">Amount Paid in Current Transaction : <span class="font-bold">₹ {formatNumberIndia(amountPaid)}/-</span></p>
                         <p class="text-xs mb-2 whitespace-nowrap py-2 ">Amount Paid in Words : <span class='font-bold text-transform: uppercase'>Rupees {amountInWords} Only</span>{/*Placeholder 1 */}</p>
@@ -323,7 +323,7 @@ function DownloadReceipt() {
                     </div>
                 </div>
                 <h1 class="  text-lg font-bold text-center bg-slate-400 mb-2 py-2 ">DETAILS OF ALL TRANSACTIONS</h1>
-                <div class="grid grid-cols-2 gap-4 mb-4  ">
+                <div class="grid grid-cols-2 gap-4 mb-4 py-3  ">
                     
                     <div>
                         <p class="text-xs mb-2 py-2 ">Total Tuition Fee Paid (1st Year) : <span class="font-bold">₹ {formatNumberIndia(receiptsData.firstYearTotalTuitionFeePaid)}/-</span></p>
