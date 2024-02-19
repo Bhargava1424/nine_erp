@@ -144,10 +144,10 @@
 @media (max-width: 768px) {
   
   .no-daisyui .p-8 { padding: 2px; } /* Reduced padding */
-  .no-daisyui .text-3xl { font-size: 1.2rem; line-height: 0.5rem; } /* Significantly reduced font size for large headers */
+  .no-daisyui .text-3xl { font-size: 0.75rem; line-height: 0.3rem; } /* Significantly reduced font size for large headers */
   .no-daisyui .text-2xl { font-size: 0.75rem; line-height: 0.01rem; } /* Adjusted font size for secondary headers */
   .no-daisyui .text-lg { font-size: 0.4rem; line-height: 0.01rem; } /* Adjusted larger body text size */
-  .no-daisyui .text-xs { font-size: 0.35rem; line-height: 0.7rem; } /* Adjusted base text size */
+  .no-daisyui .text-xs { font-size: 0.35rem; line-height: 0.2rem; } /* Adjusted base text size */
   .no-daisyui .text-sm { font-size: 0.375rem; line-height: 0.01rem; } /* Further reduced smaller text size */
   .no-daisyui .mb-4 { margin-bottom: 2px; }
   .no-daisyui .px-4 { padding-left: 20px; padding-right: 20px; }
