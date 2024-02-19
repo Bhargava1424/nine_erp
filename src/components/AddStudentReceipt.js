@@ -320,7 +320,7 @@ function AddStudentReceipt() {
                                                 onChange={(e) => handleAmountChange(e, fee)}
                                                 max={fee.pendingFee}
                                             />
-                                            <h1 className='text-green-500 text-lg'>Verify Amount Entered:{formatNumberIndia(amountPaid)}</h1>
+                                            <h1 className='text-green-500 text-lg'>You have entered: {formatNumberIndia(amountPaid)}</h1>
                                         </label>
                                         <div>
                                             <p>Mode of Payment:</p>
