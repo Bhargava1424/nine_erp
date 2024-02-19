@@ -1,136 +1,42 @@
-/* Updated styles.css */
-.no-daisyui .bg-white {
-  background-color: white;
+/* Base styles for non-responsive design */
+.no-daisyui .bg-white { background-color: white; }
+.no-daisyui .p-8 { padding: 48px; } /* Increased from 32px */
+.no-daisyui .mb-4 { margin-bottom: 30px; }
+.no-daisyui .text-3xl { font-size: 3.5rem; line-height: 4rem; } /* For large headers */
+.no-daisyui .font-bold { font-weight: bold; }
+.no-daisyui .text-center, .no-daisyui .text-right { text-align: center; }
+.no-daisyui .text-2xl { font-size: 2.5rem; line-height: 3rem; } /* For secondary headers */
+.no-daisyui .bg-black { background-color: black; }
+.no-daisyui .text-white { color: white; }
+.no-daisyui .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+.no-daisyui .text-xs { font-size: 2rem; line-height: 2.25rem; }
+.no-daisyui .bg-slate-400, .no-daisyui .bg-slate-800 { background-color: #cbd5e0; } /* Adjust color */
+.no-daisyui .text-lg { font-size: 2rem; line-height: 2.5rem; }
+.no-daisyui .whitespace-nowrap { white-space: nowrap; }
+.no-daisyui .justify-center, .no-daisyui .flex, .no-daisyui .justify-between, .no-daisyui .items-center { display: flex; }
+.no-daisyui .px-4 { padding-left: 16px; padding-right: 16px; }
+.no-daisyui .py-3, .no-daisyui .py-2, .no-daisyui .py-1 { padding-top: 15px; padding-bottom: 15px; }
+.no-daisyui .emoji { filter: grayscale(100%) brightness(0); }
+.no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span { font-size: 30px; } /* Base font size for consistency */
+
+/* Responsive adjustments for smartphones */
+@media (max-width: 768px) {
+  
+  .no-daisyui .p-8 { padding: 24px; } /* Reduced padding */
+  .no-daisyui .text-3xl { font-size: 1.5rem; line-height: 1.75rem; } /* Significantly reduced font size for large headers */
+  .no-daisyui .text-2xl { font-size: 1.25rem; line-height: 1.5rem; } /* Adjusted font size for secondary headers */
+  .no-daisyui .text-lg { font-size: 1rem; line-height: 1.25rem; } /* Adjusted larger body text size */
+  .no-daisyui .text-xs { font-size: 0.65rem; line-height: 1.25rem; } /* Adjusted base text size */
+  .no-daisyui .text-sm { font-size: 0.875rem; line-height: 1rem; } /* Further reduced smaller text size */
+  .no-daisyui .mb-4 { margin-bottom: 20px; }
+  .no-daisyui .px-4 { padding-left: 12px; padding-right: 12px; }
+  .no-daisyui .py-3, .no-daisyui .py-2, .no-daisyui .py-1 { padding-top: 10px; padding-bottom: 10px; }
+  .no-daisyui .btn { padding: 8px 16px; font-size: 0.875rem; } /* Adjusted button styles */
+  .no-daisyui .form-input { padding: 8px; font-size: 0.875rem; } /* Adjusted form input styles */
+  .no-daisyui .navbar { flex-direction: column; padding: 10px; } /* Adjusted navbar for vertical layout */
+  .no-daisyui .nav-link { margin-bottom: 10px; } /* Space between vertical nav links */
+  .no-daisyui .modal { width: 90%; margin: 10px; } /* Adjusted modal width */
+  .no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span { font-size: 1.25rem; } /* Uniformly reduced base font size for smaller screens */
 }
 
-/* Increase padding around the content for better spacing */
-.no-daisyui .p-8 {
-  padding: 48px; /* Increased from 32px */
-}
-
-.no-daisyui .mb-4 {
-  margin-bottom: 30px;
-}
-
-/* Increase font size for larger headers */
-.no-daisyui .text-3xl {
-  font-size: 3.5rem; /* Increased from 1.875rem (30px) to 36px */
-  line-height:4rem; /* Increased from 2.25rem (36px) to 44px */
-}
-
-.no-daisyui .font-bold {
-  font-weight: bold;
-}
-
-.no-daisyui .text-center {
-  text-align: center;
-}
-
-/* Increase font size for secondary headers */
-.no-daisyui .text-2xl {
-  font-size: 2.5rem; /* Increased from 1.5rem (24px) to 28px */
-  line-height: 3rem; /* Increased from 2rem (32px) to 36px */
-}
-
-.no-daisyui .bg-black {
-  background-color: black;
-}
-
-.no-daisyui .text-white {
-  color: white;
-}
-
-/* Adjust grid layout for wider content spread */
-.no-daisyui .grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Adjusted for full width utilization */
-  gap: 32px; /* Increased gap from 16px for better spacing */
-}
-
-/* Increase base text size for better readability */
-.no-daisyui .text-xs {
-  font-size: 2rem; /* Increased from 18px */
-  line-height: 2.25px; /* Increased from 22px */
-}
-
-.no-daisyui .bg-slate-400 {
-  background-color: #cbd5e0;
-}
-
-/* Increase text size for larger body text */
-.no-daisyui .text-lg {
-  font-size: 2rem; /* Increased from 1.125rem (18px) to 20px */
-  line-height: 2.5rem; /* Increased from 1.75rem (28px) to 32px */
-}
-
-.no-daisyui .text-right {
-  text-align: right;
-}
-
-.no-daisyui .whitespace-nowrap {
-  white-space: nowrap;
-}
-
-.no-daisyui .justify-center {
-  justify-content: center;
-}
-
-.no-daisyui .text-center {
-  text-align: center;
-}
-
-/* Slightly larger than default for subtext */
-.no-daisyui .text-sm {
-  font-size: 1rem; /* Increased from 0.875rem (14px) to 16px */
-  line-height: 1.5rem; /* Increased from 1.25rem (20px) to 24px */
-}
-
-.no-daisyui .flex {
-  display: flex;
-}
-
-.no-daisyui .justify-between {
-  justify-content: space-between;
-}
-
-.no-daisyui .items-center {
-  align-items: center;
-}
-
-.no-daisyui .px-4 {
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.no-daisyui .py-3 {
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-
-.no-daisyui .py-2 {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.no-daisyui .py-1 {
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.no-daisyui .bg-slate-800 {
-  background-color: #1e293b;
-}
-
-.no-daisyui .emoji {
-  filter: grayscale(100%) brightness(0);
-}
-
-/* Removing this to avoid potential override issues */
-/* .no-daisyui h1[style], .no-daisyui p[style], .no-daisyui span[style] {
-  padding: '2px';
-} */
-
-/* Ensure all text elements have increased font size */
-.no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span {
-  font-size: 30px; /* Set a base font size for consistency */
-}
+/* This comprehensive CSS aims to ensure that all elements of the website adapt smoothly to smartphone screens, enhancing readability and user interaction. */
