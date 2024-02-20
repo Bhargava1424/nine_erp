@@ -60,7 +60,7 @@
 
 /* Increase base text size for better readability */
 .no-daisyui .text-xs {
-  font-size: 1.25rem; /* Increased from 18px */
+  font-size: 1.5rem; /* Increased from 18px */
   line-height: 1.75px; /* Increased from 22px */
 }
 
