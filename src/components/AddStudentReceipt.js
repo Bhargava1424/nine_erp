@@ -117,22 +117,38 @@ function AddStudentReceipt() {
         }
     }, [applicationNumber]);
 
-    function getISTTime() {
-        // Indian Standard Time is 5 hours 30 minutes ahead of UTC
-        const offset = 5.5;
-        let now = new Date(new Date().getTime() + offset * 3600 * 1000);
-      
-        // Format the date and time in the desired format: "HH-MM DD-MM-YYYY"
-        let hours = String(now.getUTCHours()).padStart(2, '0');
-        let minutes = String(now.getUTCMinutes()).padStart(2, '0');
-        let date = String(now.getUTCDate()).padStart(2, '0');
-        let month = String(now.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-        let year = now.getUTCFullYear();
-      
-        return `${hours}-${minutes} ${date}-${month}-${year}`;
-      }
+    async function getISTTime() {
+        try {
+            // Fetching time data from WorldTimeAPI for the Asia/Kolkata timezone
+            const response = await fetch('http://worldtimeapi.org/api/timezone/Asia/Kolkata');
+            const data = await response.json();
+            
+            // The API returns the current time in ISO 8601 format
+            const currentTime = new Date(data.datetime);
+    
+            // Extracting hours, minutes, day, month, year from the Date object
+            let hours = String(currentTime.getHours()).padStart(2, '0');
+            let minutes = String(currentTime.getMinutes()).padStart(2, '0');
+            let date = String(currentTime.getDate()).padStart(2, '0');
+            let month = String(currentTime.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+            let year = currentTime.getFullYear();
+            
+            // Formatting the date and time in the 'HH-mm DD-MM-YYYY' format
+            const istTime = `${hours}-${minutes} ${date}-${month}-${year}`;
+            
+            return istTime;
+        } catch (error) {
+            console.error('Failed to fetch external time:', error);
+            return 'Error fetching time'; // Or handle the error as per your application's requirements
+        }
+    }
+    
+    // Example usage
+    getISTTime().then((time) => {
+        console.log(time); // Logs the time in the 'HH-mm DD-MM-YYYY' format
+    });
+    
 
-      console.log(getISTTime())
 
 
     const handleSubmit = async (feeType) => {
@@ -150,6 +166,9 @@ function AddStudentReceipt() {
         }
 
         try {
+
+            // Fetch the formatted IST time asynchronously
+            const dateOfPayment = await getISTTime();            
             // Assuming the backend expects an object with the payment details
             const paymentDetails = {
                 amountPaid: Number(parseFloat(amountPaid)),
@@ -173,7 +192,7 @@ function AddStudentReceipt() {
             body.amount = paymentDetails.amountPaid;
             body.modeOfPayment = paymentDetails.modeOfPayment;
             body.chequeNumber = paymentDetails.chequeNumber;
-            body.dateOfPayment= getISTTime();    
+            body.dateOfPayment= dateOfPayment;    
             // body.dateOfPayment= `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')} ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
             console.log(body);
