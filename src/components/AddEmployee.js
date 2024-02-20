@@ -47,6 +47,7 @@ function AddEmployee() {
     const [originalUsername, setOriginalUsername] = useState('');
 
     const [originalEmployeeData, setOriginalEmployeeData] = useState(null);
+    
 
     const openEditModal = (employee) => {
       setEditingEmployee(employee);
@@ -96,9 +97,7 @@ function AddEmployee() {
     e.preventDefault();
     
     // Check if it's already submitting, if so, then return
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
   
     let formData = { ...employeeData };
     if (formData.role === 'Manager') {
@@ -513,11 +512,12 @@ function AddEmployee() {
                 <div className="mt-4">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
+                  disabled={isSubmitting} // Disable button during submission
+                  className={`btn btn-outline ${isSubmitting ? 'text-gray-500' : 'text-white'} ${isSubmitting ? 'bg-gray-300' : 'bg-[#2D5990]'}`}
                 >
-                  Add Employee
+                  {isSubmitting ? 'Submitting...' : 'Add Employee'} {/* Change button text based on isSubmitting */}
                 </button>
+
 
                 </div>
               </form>

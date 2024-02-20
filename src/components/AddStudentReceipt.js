@@ -11,7 +11,7 @@ function AddStudentReceipt() {
     const [chequeNumber, setChequeNumber] = useState('');
     const [selectedFeeType, setSelectedFeeType] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const handleAddReceiptClick = (feeType) => {
@@ -152,6 +152,8 @@ function AddStudentReceipt() {
 
 
     const handleSubmit = async (feeType) => {
+        if (isSubmitting) return;
+
         if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
             alert("Please enter a valid amount.");
             return;
@@ -164,6 +166,8 @@ function AddStudentReceipt() {
             alert("Please enter a cheque number.");
             return;
         }
+
+        setIsSubmitting(true);
 
         try {
 
@@ -362,9 +366,14 @@ function AddStudentReceipt() {
                                             {modeOfPayment === 'CHEQUE' && (
                                                 <input type="text" placeholder="Enter cheque number" value={chequeNumber} onChange={handleChequeNumberChange} maxLength={6} />
                                             )}
-                                            <button onClick={() => handleSubmit(fee.key)} className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
-                                                Submit Payment
-                                            </button>                    
+                                            <button
+                                                onClick={() => handleSubmit(selectedFeeType)}
+                                                className={`btn btn-outline ${isSubmitting ? 'text-gray-500' : 'text-white'} ${isSubmitting ? 'bg-gray-300' : 'bg-[#2D5990]'}`}
+                                                disabled={isSubmitting} // Disable the button based on isSubmitting state
+                                            >
+                                                {isSubmitting ? 'Submitting...' : 'Submit Payment'}
+                                            </button>
+                  
 
                                             
                                         </div>
@@ -382,7 +391,13 @@ function AddStudentReceipt() {
             </div>
             
             {/* Repeat the above block for each fee type */}
+            {isSubmitting && (
+                <div className="flex justify-center items-center">
+                    <div className="loader">Loading</div>
+                </div>
+            )}
         </div>
+        
     );
 }
 

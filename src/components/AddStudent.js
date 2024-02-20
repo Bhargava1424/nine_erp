@@ -41,6 +41,7 @@ const AddStudent = () => {
   });
   const [isOnTC, setIsOnTC] = useState(false);
   const [isDayScholar, setIsDayScholar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // useEffect hook for handling changes in isOnTC state
   useEffect(() => {
@@ -226,6 +227,8 @@ const handleInputChange = (e) => {
   
   // const navigate = useNavigate(); // **Create an instance of navigate** 
   const handleSubmit = async (e) => {
+
+
     e.preventDefault();    
         // Check for errors before proceeding
         const hasErrors = Object.values(errors).some(error => error !== '');
@@ -233,6 +236,7 @@ const handleInputChange = (e) => {
           alert('Please correct the errors before submitting.');
           return; // Prevent form submission
         }
+    if (isSubmitting) return;
 
     if (validateForm()) {
         const updatedStudentData = {
@@ -242,6 +246,9 @@ const handleInputChange = (e) => {
             pendingSecondYearHostelFee: studentData.secondYearHostelFee
         };
         console.log('Form Data:', studentData);
+
+        setIsSubmitting(true);
+
         try {
             var SchoolManagementSystemApi = require('school_management_system_api')
             var api = new SchoolManagementSystemApi.StudentsApi()
@@ -702,12 +709,18 @@ const handleInputChange = (e) => {
             </div>
         )}
         {/* Submit Button */}
-        <button type="submit"  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}>
-          Submit
+        <button 
+            type="submit"  
+            className={`btn btn-outline ${isSubmitting ? 'bg-gray-500' : 'bg-[#2D5990]'} text-white`} 
+            disabled={isSubmitting}
+        >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </div>
-  
+    {isSubmitting && (
+        <div className="loader" aria-hidden="true"></div>
+    )}
     </div>
   );
 };
