@@ -46,36 +46,37 @@ function DownloadReceipt() {
     const downloadPdfDocument = () => {
         const input = document.getElementById('download-receipt-content');
         if (input) {
-            html2canvas(input, { scale: window.devicePixelRatio, scrollY: -window.scrollY }).then(canvas => {
+            // Adjust the scale to match the desired output on A4
+            // Assume the content is designed to fit a 1920px wide screen
+            // Calculate the scale factor based on the A4 width in pixels and the desired viewport width
+            const scaleFactor = 794 / 1920; // A4 width in pixels (approx for 96 DPI) / desired viewport width
+    
+            html2canvas(input, { 
+                scale: scaleFactor * window.devicePixelRatio, // Adjust scale based on device pixel ratio
+                scrollY: -window.scrollY,
+                windowWidth: 1920 // Force html2canvas to render the canvas as it appears in a 1920px wide viewport
+            }).then(canvas => {
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const imgWidth = 210;  // A4 width in mm
-                const pageHeight = 297;  // A4 height in mm
                 const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
+                const position = 0;  // Initial position to start adding images
     
-                let position = 0;
-    
+                // Add the canvas as an image to the PDF, scaled to fit A4
                 pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
     
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-    
-                // Get current date for filename
+                // Generate filename based on current date and time
                 const today = new Date();
-                const date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear() + ' ' + today.getHours() +'-' +today.getMinutes();
+                const date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()} ${today.getHours()}-${today.getMinutes()}`;
                 const fileName = `Receipt ${date}.pdf`;
     
+                // Save the PDF
                 pdf.save(fileName);
             }).catch(error => {
                 console.error("Error generating PDF", error);
             });
         }
     };
+    
     
     // Effect to generate and download PDF
     // console.log(''+shouldDownloadPdf)
@@ -273,7 +274,7 @@ function DownloadReceipt() {
                 
                 <div class="  mb-1">
                     <h1 class="text-3xl font-bold text-center  py-2 " >NINE EDUCATION</h1>
-                    <h1 class="text-lg font-bold text-center bg-slate-400  py-2 ">FEE RECEIPT</h1>
+                    <h1 class="text-lg font-bold text-center bg-slate-800 text-colour  py-2 ">FEE RECEIPT</h1>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-1 py-3  ">
