@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import AdminComponent from './AdminDashboardComponent';
 import ExecutiveComponent from './ExecutiveDashboardComponent';
 import AccountantComponent from './AccountantDashboardComponent';
+import DirectorComponent from './DirectorDashboardCompnent';
 
 function HeroSection2() {
   const userRole = useSelector((state) => state.auth.user?.role);
@@ -14,6 +15,7 @@ function HeroSection2() {
       {userRole === 'Manager' && <AdminComponent/>}
       {userRole === 'Executive' && <ExecutiveComponent />}
       {userRole === 'Accountant' && <AccountantComponent />}
+      {userRole === 'Director' && <DirectorComponent />}
     </div>  
   );
 }

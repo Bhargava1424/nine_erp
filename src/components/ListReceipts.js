@@ -29,6 +29,7 @@ function ListReceipts() {
     const isAccountant = ['Accountant'].includes(user.role);
     const isExecutive = ['Executive'].includes(user.role);
     const isManager = ['Manager'].includes(user.role);
+    const isDirector = ['Director'].includes(user.role);
 
     const fetchReceipts = async () => {
       try {
@@ -44,6 +45,11 @@ function ListReceipts() {
           }
         };
         if (user.role === 'Executive') {
+          query = { 
+            'branch':user.branch
+          }
+        };
+        if (user.role === 'Director') {
           query = { 
             'branch':user.branch
           }

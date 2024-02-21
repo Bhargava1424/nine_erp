@@ -485,7 +485,7 @@ function AddEmployee() {
                   {/* ... existing input fields */}
                   <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
                   <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-                  <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
+                  <SelectField label="Role" name="role" options={['Manager', 'Director', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
                   <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
                    {employeeData.role === "Manager" ? (
                       <InputField
@@ -592,6 +592,7 @@ function AddEmployee() {
                   <option value="Manager">Manager</option>
                   <option value="Executive">Executive</option>
                   <option value="Accountant">Accountant</option>
+                  <option value="Director">Director</option>
                 </select>
               </label>
 

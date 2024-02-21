@@ -83,7 +83,13 @@ Employee.RoleEnum = {
    * value: "Executive"
    * @const
    */
-  executive: "Executive"
+  executive: "Executive",
+
+  /**
+   * value: "Director"
+   * @const
+   */
+  director: "Director"
 };
 /**
  * @member {module:model/Employee.RoleEnum} role

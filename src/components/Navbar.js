@@ -143,7 +143,7 @@ function Navbar() {
               </div>
           </div>
 
-          {(user.role === 'Manager' || user.role === 'Executive') && (
+          {(user.role === 'Manager' || user.role === 'Executive' || user.role === 'Director') && (
             <div className="flex-1 min-w-max">
                           <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col" onClick={() => {
                   window.location.href = '/Concessions';

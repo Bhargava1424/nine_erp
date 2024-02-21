@@ -345,7 +345,7 @@ const handleInputChange = (e) => {
     const role = useSelector((state) => state.auth.role);
 
     useEffect(() => {
-      if (role === 'Executive' || role === 'Accountant') {
+      if (role === 'Executive' || role === 'Accountant' || role === 'Director') {
           setStudentData(prevState => ({
               ...prevState,
               branch: branch // assuming 'branch' is the value fetched from your global state or prop
@@ -442,7 +442,7 @@ const handleInputChange = (e) => {
               <span className="label-text">Branch</span>
             </div>
             {
-              (role === 'Executive' || role === 'Accountant') ? (
+              (role === 'Executive' || role === 'Accountant' || role === 'Director') ? (
                 <input
                   type="text"
                   className="input input-bordered w-full max-w-xs bg-[#F2F2F2]"
