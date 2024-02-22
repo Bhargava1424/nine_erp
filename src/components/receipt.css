@@ -1,4 +1,3 @@
-
 /* Updated styles.css */
 .no-daisyui .bg-white {
   background-color: white;
@@ -14,19 +13,18 @@
 }
 
 .no-daisyui .text-colour {
-  color :white
-  
+  color: white;
 }
 
 /* Increase font size for larger headers */
 .no-daisyui .text-3xl {
   font-size: 3.5rem; /* Increased from 1.875rem (30px) to 36px */
-  line-height:4rem; /* Increased from 2.25rem (36px) to 44px */
+  line-height: 4rem; /* Increased from 2.25rem (36px) to 44px */
 }
 
 .no-daisyui .font-bold-2 {
   font-weight: bold;
-  font-size: 1.5rem
+  font-size: 1.5rem;
 }
 
 .no-daisyui .font-bold {
@@ -60,8 +58,8 @@
 
 /* Increase base text size for better readability */
 .no-daisyui .text-xs {
-  font-size: 1.25rem; /* Increased from 18px */
-  line-height: 1.75px; /* Increased from 22px */
+  font-size: 1.5rem; /* Increased from 18px */
+  line-height: 1.75rem; /* Increased from 22px */
 }
 
 .no-daisyui .bg-slate-400 {
@@ -140,18 +138,12 @@
   background-color: black;
 }
 
-/* Removing this to avoid potential override issues */
-/* .no-daisyui h1[style], .no-daisyui p[style], .no-daisyui span[style] {
-  padding: '2px';
-} */
-
 /* Ensure all text elements have increased font size */
 .no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span {
   font-size: 30px; /* Set a base font size for consistency */
 }
 
 @media (max-width: 768px) {
-  
   .no-daisyui .p-8 { padding: 2px; } /* Reduced padding */
   .no-daisyui .text-3xl { font-size: 0.75rem; line-height: 0.3rem; } /* Significantly reduced font size for large headers */
   .no-daisyui .text-2xl { font-size: 0.75rem; line-height: 0.01rem; } /* Adjusted font size for secondary headers */
@@ -167,5 +159,17 @@
   .no-daisyui .nav-link { margin-bottom: 2px; } /* Space between vertical nav links */
   .no-daisyui .modal { width: 90%; margin: 2px; } /* Adjusted modal width */
   .no-daisyui h1, .no-daisyui h2, .no-daisyui h3, .no-daisyui p, .no-daisyui span { font-size: 0.3rem; } /* Uniformly reduced base font size for smaller screens */
-  .no-daisyui .phone-padding {padding-left: 2rem; padding-right: 2rem ;}
+  .no-daisyui .phone-padding {padding-left: 2rem; padding-right: 2rem;}
+}
+
+@media print {
+  .container {
+    width: 794px; /* Approximate conversion of A4 width to pixels */
+    max-width: 100%;
+  }
+
+  /* Adjust font sizes and other elements as needed for print */
+  h1, h2, h3, p, .your-class {
+    font-size: 10pt; /* Example to adjust font sizes for print */
+  }
 }

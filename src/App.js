@@ -19,6 +19,7 @@ import DownloadReceipt from './components/DownloadReceipt';
 import AddStudentConcession from './components/AddStudentConcession';
 import ProtectedRoute from './components/ProtectedRoute';  
 
+
 function App() {
 
   const dispatch = useDispatch();
@@ -70,7 +71,7 @@ function App() {
       <Route path='/AddStudent' element={<ProtectedRoute><AddStudent /></ProtectedRoute> }></Route>
       <Route path='/AddReceipts' element={<ProtectedRoute><AddReceipts /></ProtectedRoute>}></Route>
       <Route path='/ListReceipts' element={<ProtectedRoute><ListReceipts /></ProtectedRoute>}></Route>
-      <Route path='/Concessions' element={< ProtectedRoute roles={['Manager','Executive']}><Concessions /></ProtectedRoute>}></Route>
+      <Route path='/Concessions' element={< ProtectedRoute roles={['Manager','Executive','Director']}><Concessions /></ProtectedRoute>}></Route>
       <Route path='/Login2' element={<Login2 />}></Route>
       <Route path='/HeroSection2' element={<HeroSection2/>}></Route>
       <Route path='/AddBranch' element={<ProtectedRoute roles={['Manager']}><AddBranch /></ProtectedRoute>}></Route>

@@ -29,6 +29,7 @@ function ListReceipts() {
     const isAccountant = ['Accountant'].includes(user.role);
     const isExecutive = ['Executive'].includes(user.role);
     const isManager = ['Manager'].includes(user.role);
+    const isDirector = ['Director'].includes(user.role);
 
     const fetchReceipts = async () => {
       try {
@@ -44,6 +45,11 @@ function ListReceipts() {
           }
         };
         if (user.role === 'Executive') {
+          query = { 
+            'branch':user.branch
+          }
+        };
+        if (user.role === 'Director') {
           query = { 
             'branch':user.branch
           }
@@ -637,7 +643,7 @@ function formatNumberIndia(num) {
                 <th onClick={() => requestSort('chequeNumber')}>
                   Cheque Number{getSortIndicator('chequeNumber')}
                 </th>
-                {!isAccountant && (isManager || isExecutive) && <th>Action</th>}
+                {!isAccountant && (isManager || isExecutive || isDirector) && <th>Action</th>}
                 <th className="px-4 py-2 text-white border-r-2 border-gray-800">Download</th>
               </tr>
             </thead>
@@ -655,14 +661,14 @@ function formatNumberIndia(num) {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.feeType}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.modeOfPayment}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.chequeNumber}</td>
-                          {!isAccountant && (isManager || (isExecutive && isRecentlyAdded(receipt.dateOfPayment))) && (
+                          {!isAccountant && (isManager || ((isExecutive || isDirector) && isRecentlyAdded(receipt.dateOfPayment))) && (
                             <td className="border-2 text-sm border-gray-800 px-4 py-2">
                               <button onClick={() => openEditModal(receipt)} style={{ color: "#2D5990" }}>
                                 <i className="fas fa-edit"></i> Edit
                               </button>
                             </td>
                           )}
-                          {!isAccountant && ((isExecutive && !isRecentlyAdded(receipt.dateOfPayment))) && (
+                          {!isAccountant && (((isExecutive || isDirector) && !isRecentlyAdded(receipt.dateOfPayment))) && (
                             <td className="border-2 text-sm border-gray-800 px-4 py-2">
                               <p></p>
                             </td>

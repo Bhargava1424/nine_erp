@@ -47,6 +47,7 @@ function AddEmployee() {
     const [originalUsername, setOriginalUsername] = useState('');
 
     const [originalEmployeeData, setOriginalEmployeeData] = useState(null);
+    
 
     const openEditModal = (employee) => {
       setEditingEmployee(employee);
@@ -96,9 +97,7 @@ function AddEmployee() {
     e.preventDefault();
     
     // Check if it's already submitting, if so, then return
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
   
     let formData = { ...employeeData };
     if (formData.role === 'Manager') {
@@ -486,7 +485,7 @@ function AddEmployee() {
                   {/* ... existing input fields */}
                   <InputField label="First Name" name="firstName" value={employeeData.firstName} handleChange={handleNameInput} />
                   <InputField label="Last Name" name="lastName" value={employeeData.lastName} handleChange={handleNameInput} />
-                  <SelectField label="Role" name="role" options={['Manager', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
+                  <SelectField label="Role" name="role" options={['Manager', 'Director', 'Executive', 'Accountant']} value={employeeData.role} handleChange={handleChange} />
                   <InputField label="Phone Number" name="phoneNumber" type="tel" pattern="\d*" value={employeeData.phoneNumber} handleChange={handleNumberInput} error={errors.phoneNumber} />
                    {employeeData.role === "Manager" ? (
                       <InputField
@@ -513,11 +512,12 @@ function AddEmployee() {
                 <div className="mt-4">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-outline text-white" style={{ backgroundColor: '#2D5990' }}
+                  disabled={isSubmitting} // Disable button during submission
+                  className={`btn btn-outline ${isSubmitting ? 'text-gray-500' : 'text-white'} ${isSubmitting ? 'bg-gray-300' : 'bg-[#2D5990]'}`}
                 >
-                  Add Employee
+                  {isSubmitting ? 'Submitting...' : 'Add Employee'} {/* Change button text based on isSubmitting */}
                 </button>
+
 
                 </div>
               </form>
@@ -592,6 +592,7 @@ function AddEmployee() {
                   <option value="Manager">Manager</option>
                   <option value="Executive">Executive</option>
                   <option value="Accountant">Accountant</option>
+                  <option value="Director">Director</option>
                 </select>
               </label>
 

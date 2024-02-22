@@ -17,7 +17,7 @@ function Home() {
   return (
     <div className="main-container root-container" style={{ minHeight: '537px' }}>
       <Navbar />
-      <HeroSection2 />
+      <HeroSection2 />                                                                                                     
       <Footer />
     </div>
   );

@@ -16,4 +16,5 @@ Name | Type | Description | Notes
 * `manager` (value: `"Manager"`)
 * `accountant` (value: `"Accountant"`)
 * `executive` (value: `"Executive"`)
+* `executive` (value: `"Director"`)
 
