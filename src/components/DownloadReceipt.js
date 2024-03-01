@@ -266,7 +266,8 @@ function DownloadReceipt() {
                 </button>
             </div>
 
-            <div id="download-receipt-content" class='phone-padding'>
+            <div id="download-receipt-content" class='phone-padding thick-font main-padding'>
+                
         
             
             
@@ -291,6 +292,8 @@ function DownloadReceipt() {
                 <div>
                     <p class="text-xs mb-1 whitespace-nowrap mt-2 py-2 ">Student's Name : <span class="font-bold-2 text-xs ">{receiptsData.studentName} {receiptsData.surName}</span></p>
                     <p class="text-xs mb-1 py-2 ">Parent's Name : <span class="font-bold-2 text-xs">{receiptsData.parentName}</span></p>
+                </div>
+                <div class="text-right">
                     <p class="text-xs mb-1 py-2 ">Application Number : <span class="font-bold-2 text-xs">{receiptsData.applicationNumber}</span></p>
                     <p class="text-xs mb-1 py-2 ">Registered Mobile Number : <span class="font-bold-2 text-xs">{receiptsData.registeredMobileNumber}</span></p>
                 </div>
