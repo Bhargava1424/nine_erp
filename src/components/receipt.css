@@ -23,12 +23,16 @@
 }
 
 .no-daisyui .font-bold-2 {
-  font-weight: bold;
+  font-weight: 1000;
   font-size: 1.5rem;
 }
 
 .no-daisyui .font-bold {
-  font-weight: bold;
+  font-weight: 1000;
+}
+
+.no-daisyui .thick-font {
+  font-weight: 800;
 }
 
 .no-daisyui .text-center {
@@ -58,8 +62,8 @@
 
 /* Increase base text size for better readability */
 .no-daisyui .text-xs {
-  font-size: 1.5rem; /* Increased from 18px */
-  line-height: 1.75rem; /* Increased from 22px */
+  font-size: 1.75rem; /* Increased from 18px */
+  line-height: 2rem; /* Increased from 22px */
 }
 
 .no-daisyui .bg-slate-400 {
@@ -71,6 +75,7 @@
   font-size: 2rem; /* Increased from 1.125rem (18px) to 20px */
   line-height: 2.5rem; /* Increased from 1.75rem (28px) to 32px */
 }
+
 
 .no-daisyui .text-right {
   text-align: right;
@@ -90,8 +95,8 @@
 
 /* Slightly larger than default for subtext */
 .no-daisyui .text-sm {
-  font-size: 1rem; /* Increased from 0.875rem (14px) to 16px */
-  line-height: 1.5rem; /* Increased from 1.25rem (20px) to 24px */
+  font-size: 2rem; /* Increased from 1.75rem */
+  line-height: 2.05rem; /* Increased from 2rem */
 }
 
 .no-daisyui .flex {
@@ -124,6 +129,13 @@
 .no-daisyui .py-1 {
   padding-top: 7px;
   padding-bottom: 7px;
+}
+
+.no-daisyui .main-padding {
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+  padding-left: 10rem;
+  padding-right: 10rem;
 }
 
 .no-daisyui .bg-slate-800 {

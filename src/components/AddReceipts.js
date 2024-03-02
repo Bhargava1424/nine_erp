@@ -200,6 +200,8 @@ function AddReceipts() {
               <thead>
                 <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
                   <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Student Name</th>
+                  <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Parent Name</th>
+                  <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Primary Contact</th>
                   <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Batch</th>
                   <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Action</th>
                 </tr>
@@ -212,6 +214,8 @@ function AddReceipts() {
                         {`${student.firstName} ${student.surName}`.trim()}
                       </a>
                     </td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black text-sm">{student.parentName}</td>
+                    <td className="border-2 border-gray-800 px-4 py-2 text-black text-sm">{student.primaryContact}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black text-sm">{student.batch}</td>
                     <td className="border-2 border-gray-800 px-4 py-2 text-black text-sm">
                     <button style={{backgroundColor: '#2D5990', margin: '2px'}}
