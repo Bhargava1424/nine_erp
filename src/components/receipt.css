@@ -95,8 +95,8 @@
 
 /* Slightly larger than default for subtext */
 .no-daisyui .text-sm {
-  font-size: 1rem; /* Increased from 0.875rem (14px) to 16px */
-  line-height: 1.5rem; /* Increased from 1.25rem (20px) to 24px */
+  font-size: 2rem; /* Increased from 1.75rem */
+  line-height: 2.05rem; /* Increased from 2rem */
 }
 
 .no-daisyui .flex {
@@ -132,7 +132,7 @@
 }
 
 .no-daisyui .main-padding {
-  padding-top: 4rem;
+  padding-top: 2.5rem;
   padding-bottom: 4rem;
   padding-left: 10rem;
   padding-right: 10rem;

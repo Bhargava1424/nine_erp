@@ -131,13 +131,20 @@ function ListReceipts() {
         });
     };
 
-    const sortedAndFilteredReceipts = useMemo(() => {
-      const filteredReceipts = receipts.filter(receipt => {
-          if (!searchTerm) return true; // If no search term, don't filter
-          return Object.values(receipt).some(value =>
-              String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredReceipts = useMemo(() => {
+        if (!searchTerm) return receipts;
+        const searchTerms = searchTerm.split(',').map(term => term.trim().toLowerCase());
+        return receipts.filter(receipt =>
+            searchTerms.every(term =>
+                Object.keys(receipt).some(key =>
+                    receipt[key] && receipt[key].toString().toLowerCase().includes(term)
+                  )
+              )
           );
-      });
+      }, [searchTerm, receipts]);
+
+    const sortedAndFilteredReceipts = useMemo(() => {
+      
     
       return filteredReceipts.sort((a, b) => {
           if (sortConfig === null) return 0;
@@ -164,7 +171,7 @@ function ListReceipts() {
           if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
           return 0;
       });
-    }, [receipts, searchTerm, sortConfig]);
+    }, [filteredReceipts, receipts, searchTerm, sortConfig]);
     
   const handleSearchChange = (e) => {
       setSearchTerm(e.target.value);
@@ -362,7 +369,7 @@ console.log('updateStudentData:', updateStudentData);
   console.log("Performing submission with the edited data...");
 };
  
-    const filteredReceipts = handleSearch(searchTerm);
+    // const filteredReceipts = handleSearch(searchTerm);
 
     // Calculate the pagination
     const indexOfLastReceipt = currentPage * rowsPerPage;
@@ -488,6 +495,8 @@ console.log('updateStudentData:', updateStudentData);
       'Receipt Number': receipt.receiptNumber,
       'Date of Payment': formatDate(receipt.dateOfPayment),
       'Student Name': receipt.studentName,
+      'Parent Name' :receipt.parentName,
+      'Primary Contact' :receipt.registeredMobileNumber,
       'Batch': receipt.batch,
       'Amount Paid': receipt.amountPaid,
       'Fee Type': receipt.feeType,
@@ -628,6 +637,12 @@ function formatNumberIndia(num) {
                 <th onClick={() => requestSort('studentName')}>
                   Student Name{getSortIndicator('studentName')}
                 </th>
+                <th onClick={() => requestSort('parentName')}>
+                  Parent Name{getSortIndicator('parentName')}
+                </th>
+                <th onClick={() => requestSort('registeredMobileNumber')}>
+                  Primary Contact{getSortIndicator('registeredMobileNumber')}
+                </th>
                 <th onClick={() => requestSort('batch')}>
                   Batch{getSortIndicator('batch')}
                 </th>
@@ -656,6 +671,8 @@ function formatNumberIndia(num) {
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.receiptNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{formatDate(receipt.dateOfPayment)}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.studentName}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.parentName}</td>
+                          <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.registeredMobileNumber}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.batch}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.amountPaid}</td>
                           <td className="border-2 text-sm border-gray-800 px-4 py-2">{receipt.feeType}</td>
