@@ -18,7 +18,7 @@ import AddStudentReceipt from './components/AddStudentReceipt';
 import DownloadReceipt from './components/DownloadReceipt';
 import AddStudentConcession from './components/AddStudentConcession';
 import ProtectedRoute from './components/ProtectedRoute';  
-
+import Analytics from './components/Analytics';  
 
 function App() {
 
@@ -76,6 +76,7 @@ function App() {
       <Route path='/HeroSection2' element={<HeroSection2/>}></Route>
       <Route path='/AddBranch' element={<ProtectedRoute roles={['Manager']}><AddBranch /></ProtectedRoute>}></Route>
       <Route path='/AddEmployee' element={<ProtectedRoute roles={['Manager']}><AddEmployee /></ProtectedRoute>}></Route>
+      <Route path='/Analytics' element={<ProtectedRoute roles={['Manager']}><Analytics /></ProtectedRoute>}></Route>
       <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
       <Route path='/DownloadReceipt' element={<ProtectedRoute><DownloadReceipt /></ProtectedRoute>}></Route>
       <Route path="/AddStudentReceipt" element={<ProtectedRoute><AddStudentReceipt /></ProtectedRoute>}></Route> 
