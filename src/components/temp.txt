@@ -1,3 +1,25 @@
-"Student details and current transaction details can be moved right as well to use the space"
+firstYearTuitionFeePayable
+firstYearTotalTuitionFeePaid
+firstYearTotalTuitionFeePending
 
-<Student details> chesa but <current transaction> details cheyyaledu, endukante (amount in words) will extend to right and may collide with (fee type) and (mode of payment)
+========================================================================================================
+
+now fetch receipts from collectionName only for the query
+where branch : selectedBranch
+batch: selectedBatch
+modeOfPayment: selectedModeOfPayment
+
+===================================================================================================================
+
+calculateSumOfFirstYearHostelFeePayable
+calculateSumOfFirstYearTotalHostelFeePaid
+calculateSumOfFirstYearTotalHostelFeePending
+calculateSumOfFirstYearTuitionFeePayable
+calculateSumOfFirstYearTTotaluitionFeePaid
+calculateSumOfFirstYearTTotaluitionFeePending
+calculateSumOfSecondYearHostelFeePayable
+calculateSumOfSecondYearTotalHostelFeePaid
+calculateSumOfSecondYearTotalHostelFeePending
+calculateSumOfSecondYearTuitionFeePayable
+calculateSumOfSecondYearTTotaluitionFeePaid
+calculateSumOfSecondYearTTotaluitionFeePending
