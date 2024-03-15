@@ -169,7 +169,7 @@ const Analytics = () => {
           if (selectedBranch && selectedBatch && selectedModeOfPayment) {
             fetchReportReceipts();
           }
-        }, [selectedBranch, selectedBatch, selectedModeOfPayment,]);
+        }, [selectedBranch, selectedBatch, selectedModeOfPayment]);
 
         //All Sum Logic
 
