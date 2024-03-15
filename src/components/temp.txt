@@ -1,25 +1,34 @@
-firstYearTuitionFeePayable
-firstYearTotalTuitionFeePaid
-firstYearTotalTuitionFeePending
-
-========================================================================================================
-
-now fetch receipts from collectionName only for the query
-where branch : selectedBranch
-batch: selectedBatch
-modeOfPayment: selectedModeOfPayment
-
-===================================================================================================================
-
-calculateSumOfFirstYearHostelFeePayable
-calculateSumOfFirstYearTotalHostelFeePaid
-calculateSumOfFirstYearTotalHostelFeePending
-calculateSumOfFirstYearTuitionFeePayable
-calculateSumOfFirstYearTTotaluitionFeePaid
-calculateSumOfFirstYearTTotaluitionFeePending
-calculateSumOfSecondYearHostelFeePayable
-calculateSumOfSecondYearTotalHostelFeePaid
-calculateSumOfSecondYearTotalHostelFeePending
-calculateSumOfSecondYearTuitionFeePayable
-calculateSumOfSecondYearTTotaluitionFeePaid
-calculateSumOfSecondYearTTotaluitionFeePending
+{
+    "applicationNumber": "KTP2024900001",
+    "batch": "2024-2026",
+    "branch": "KTP",
+    "chequeNumber": null,
+    "dateIso": "2024-02-06 09:49:00.243231",
+    "dateOfJoining": "06-03-2025",
+    "dateOfPayment": "09-49 06-02-2024",
+    "firstYearHostelFeePaid": null,
+    "firstYearHostelFeePayable": 100000.0,
+    "firstYearTotalHostelFeePaid": 0.0,
+    "firstYearTotalHostelFeePending": 100000.0,
+    "firstYearTotalTuitionFeePaid": 10000.0,
+    "firstYearTotalTuitionFeePending": 90000.0,
+    "firstYearTuitionFeePaid": 10000.0,
+    "firstYearTuitionFeePayable": 100000.0,
+    "gender": "Male",
+    "modeOfPayment": "BANK TRANSFER/UPI",
+    "parentName": "Halfdan",
+    "receiptNumber": "NINEKTP000001",
+    "registeredMobileNumber": "7894561236",
+    "residenceType": "Hostel",
+    "secondYearHostelFeePaid": null,
+    "secondYearHostelFeePayable": 100000.0,
+    "secondYearTotalHostelFeePaid": 0.0,
+    "secondYearTotalHostelFeePending": 100000.0,
+    "secondYearTotalTuitionFeePaid": 0.0,
+    "secondYearTotalTuitionFeePending": 100000.0,
+    "secondYearTuitionFeePaid": null,
+    "secondYearTuitionFeePayable": 100000.0,
+    "stream": "ENG",
+    "studentName": "Harald Finehair",
+    "studentStatus": "Active"
+  },

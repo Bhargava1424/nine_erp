@@ -14,14 +14,18 @@ const Analytics = () => {
     const [selectedModeOfPayment, setSelectedModeOfPayment] = useState(null);
     const [receipts, setReceipts] = useState([]); 
     const [analyticsReceipts, setAnalyticsReceipts] = useState([]); 
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
     const [highestFeeMonth, setHighestFeeMonth] = useState('');
     const [leastFeeMonth, setLeastFeeMonth] = useState('');
     const [averageFeePaid, setAverageFeePaid] = useState('');
     const [mostFeePaidDate, setMostFeePaidDate] = useState('');
     const [averageDailyFee, setAverageDailyFee] = useState('');
     const [totalFeeInRange, setTotalFeeInRange] = useState('');
+
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
+    const [endDate, setEndDate] = useState(currentDate);
+    console.log(currentDate)
 
     
     const isoFormattedStartDate = `${startDate}T00:00:00.000Z`;
@@ -580,10 +584,6 @@ const Analytics = () => {
     
       return { labels, datasets };
     };
-    
-    
-    
-    
 
 // Inside your component, after fetching the data and transforming it for the chart:
     const { labels, datasets } = transformForChart(aggregateMonthlyFees(analyticsReceipts));
@@ -592,6 +592,68 @@ const Analytics = () => {
       labels,
       datasets,
     };
+
+
+    const aggregateFeesByBranch = (receipts) => {
+      const branchAggregates = {}; // Holds the aggregated data by branch
+    
+      receipts.forEach((receipt) => {
+        const { branch, 
+                firstYearTotalHostelFeePaid, firstYearTotalTuitionFeePaid, secondYearTotalHostelFeePaid, secondYearTotalTuitionFeePaid,
+                firstYearTotalHostelFeePending, firstYearTotalTuitionFeePending, secondYearTotalHostelFeePending, secondYearTotalTuitionFeePending
+              } = receipt;
+    
+        // Calculate the total fee paid and pending for the current receipt
+        const totalFeePaid = firstYearTotalHostelFeePaid + firstYearTotalTuitionFeePaid + secondYearTotalHostelFeePaid + secondYearTotalTuitionFeePaid;
+        const totalFeePending = firstYearTotalHostelFeePending + firstYearTotalTuitionFeePending + secondYearTotalHostelFeePending + secondYearTotalTuitionFeePending;
+    
+        if (!branchAggregates[branch]) {
+          branchAggregates[branch] = {
+            feePaid: 0,
+            feePending: 0,
+          };
+        }
+    
+        // Accumulate totals for each branch
+        branchAggregates[branch].feePaid += totalFeePaid;
+        branchAggregates[branch].feePending += totalFeePending;
+      });
+    
+      return branchAggregates;
+    };
+    
+    
+    const transformForBranchChart = (aggregatedData) => {
+      const branches = Object.keys(aggregatedData);
+    
+      const datasets = [
+        {
+          label: 'Fee Paid',
+          data: branches.map((branch) => aggregatedData[branch].feePaid),
+          backgroundColor: 'rgba(54, 162, 235, 0.8)', // Example color for fee paid
+        },
+        {
+          label: 'Fee Pending',
+          data: branches.map((branch) => aggregatedData[branch].feePending),
+          backgroundColor: 'rgba(255, 99, 132, 0.8)', // Example color for fee pending
+        },
+      ];
+    
+      return { labels: branches, datasets };
+    };
+    
+    // Assuming analyticsReceipts is your array of receipt objects
+    const aggregatedDataByBranch = aggregateFeesByBranch(analyticsReceipts);
+    const { labels: branchLabels, datasets: branchDatasets } = transformForBranchChart(aggregatedDataByBranch);
+    
+    const branchChartData = {
+      labels: branchLabels,
+      datasets: branchDatasets,
+    };
+
+
+
+
 
 
 
@@ -855,9 +917,71 @@ const Analytics = () => {
 
 
           <div className='pt-16'>
-          <Bar data={chartData} options={{ responsive: true, plugins: { legend: { position: 'top', }, title: { display: true, text: 'Monthly Fee Payment Summary', }, }, }} />
-
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}> {/* Make sure minWidth is sufficient for your chart */}
+                <Bar data={chartData} options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Monthly Fee Payment Summary',
+                      font: {
+                        size: 24 // You can set the font size here
+                      },
+                    },
+                  },
+                }} />
+              </div>
+            </div>
           </div>
+
+
+          <div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}> {/* Make sure minWidth is sufficient for your chart */}
+                <Bar data={branchChartData} options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Fee Payment Summary by Branch',
+                      font: {
+                        size: 24, // Adjust as needed
+                      },
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Amount in Currency',
+                        font: {
+                          size: 16, // Adjust as needed
+                        },
+                      },
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Branch',
+                        font: {
+                          size: 16, // Adjust as needed
+                        },
+                      },
+                    },
+                  },
+                }} />
+              </div>
+            </div>
+          </div>
+
 
           
 
