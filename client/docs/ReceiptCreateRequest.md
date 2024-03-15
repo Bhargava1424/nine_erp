@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **amount** | **Number** |  | [optional] 
 **modeOfPayment** | **String** |  | [optional] 
 **chequeNumber** | **String** |  | [optional] 
+**dateOfPayment** | **String** |  | [optional] 
 
 <a name="FeeTypeEnum"></a>
 ## Enum: FeeTypeEnum

@@ -1,3 +1,37 @@
-"Student details and current transaction details can be moved right as well to use the space"
-
-<Student details> chesa but <current transaction> details cheyyaledu, endukante (amount in words) will extend to right and may collide with (fee type) and (mode of payment)
+/** 
+* Paste one or more documents here
+*/
+{
+  "receiptNumber": "NINEMRD000008",
+  "dateOfPayment": "11-51 15-03-2021",
+  "dateIso": "2021-03-15 11:51:21.868246",
+  "studentName": "Rollo Sigurdsson",
+  "parentName": "Ragnar",
+  "applicationNumber": "MRD2024900001",
+  "registeredMobileNumber": "7894561239",
+  "batch": "2024-2026",
+  "dateOfJoining": "09-03-2025",
+  "stream": "ENG",
+  "gender": "Male",
+  "branch": "MRD",
+  "residenceType": "Hostel",
+  "firstYearTuitionFeePayable": 100000,
+  "firstYearTuitionFeePaid": null,
+  "firstYearHostelFeePayable": 100000,
+  "firstYearHostelFeePaid": 50000,
+  "secondYearTuitionFeePayable": 100000,
+  "secondYearTuitionFeePaid": null,
+  "secondYearHostelFeePayable": 100000,
+  "secondYearHostelFeePaid": null,
+  "firstYearTotalTuitionFeePaid": 72000,
+  "firstYearTotalTuitionFeePending": 28000,
+  "firstYearTotalHostelFeePaid": 92000,
+  "firstYearTotalHostelFeePending": 8000,
+  "secondYearTotalTuitionFeePaid": 0,
+  "secondYearTotalTuitionFeePending": 100000,
+  "secondYearTotalHostelFeePaid": 0,
+  "secondYearTotalHostelFeePending": 100000,
+  "modeOfPayment": "CHEQUE",
+  "chequeNumber": "050500",
+  "studentStatus": "Active"
+}
