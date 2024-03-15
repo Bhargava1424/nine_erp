@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import * as XLSX from 'xlsx';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement  } from 'chart.js';
 
 
 const Analytics = () => {
@@ -521,7 +521,7 @@ const Analytics = () => {
         
         
         
-    ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+    ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement );
 
     const aggregateMonthlyFees = (receipts) => {
       const monthlyAggregates = {}; // Example: { '2024-03': { firstYearTotalHostelFeePaid: 10000, ... }, ... }
@@ -650,6 +650,88 @@ const Analytics = () => {
       labels: branchLabels,
       datasets: branchDatasets,
     };
+
+
+    const aggregateFeesByYear = (receipts) => {
+      const yearAggregates = {}; // Holds the aggregated data by year
+    
+      receipts.forEach((receipt) => {
+        const year = new Date(receipt.dateIso).getFullYear();
+        console.log(year)
+        const totalFeePaid = receipt.firstYearTotalHostelFeePaid + receipt.firstYearTotalTuitionFeePaid +
+                             receipt.secondYearTotalHostelFeePaid + receipt.secondYearTotalTuitionFeePaid;
+        const totalFeePending = receipt.firstYearTotalHostelFeePending + receipt.firstYearTotalTuitionFeePending +
+                                receipt.secondYearTotalHostelFeePending + receipt.secondYearTotalTuitionFeePending;
+    
+        if (!yearAggregates[year]) {
+          yearAggregates[year] = {
+            feePaid: 0,
+            feePending: 0,
+          };
+        }
+    
+        yearAggregates[year].feePaid += totalFeePaid;
+        yearAggregates[year].feePending += totalFeePending;
+      });
+    
+      return yearAggregates;
+    };
+
+    // Assuming you have a function to transform the aggregated data for ChartJS
+    
+    
+    const calculateGrowthRates = (feePaidData) => {
+      let growthRates = [0]; // The first year has no growth rate, so it starts with 0
+    
+      for (let i = 1; i < feePaidData.length; i++) {
+        let growth = (feePaidData[i] - feePaidData[i - 1]);
+        growthRates.push(growth);
+      }
+    
+      return growthRates;
+    };
+    
+    const transformYearlyDataForChart = (aggregatedData) => {
+      const years = Object.keys(aggregatedData).sort();
+      const feePaidData = years.map(year => aggregatedData[year].feePaid);
+      const feePendingData = years.map(year => aggregatedData[year].feePending);
+      const growthRates = calculateGrowthRates(feePaidData);
+    
+      const borderColor = growthRates.map(rate => rate >= 0 ? 'green' : 'red');
+    
+      return {  
+        labels: years,
+        datasets: [
+          {
+            label: 'Fees Paid',
+            data: feePaidData,
+            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+          },
+          {
+            label: 'Fees Pending',
+            data: feePendingData,
+            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+          },
+          {
+            label: 'Growth Rate',
+            data: growthRates,
+            type: 'line',
+            borderColor: borderColor,
+            segment: {
+              borderColor: context => borderColor[context.p0DataIndex], // Dynamically assign the color based on the growth rate
+            },
+            borderWidth: 2,
+            fill: false,
+          },
+        ],
+      };
+    };
+    
+    
+    // Now you can call this function with your aggregated data to get the data structure required by Chart.js
+    const yearlyChartData = transformYearlyDataForChart(aggregateFeesByYear(analyticsReceipts));
+    
+
 
 
 
@@ -974,6 +1056,43 @@ const Analytics = () => {
                         font: {
                           size: 16, // Adjust as needed
                         },
+                      },
+                    },
+                  },
+                }} />
+              </div>
+            </div>
+          </div>
+
+          <div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}> {/* Make sure minWidth is sufficient for your chart */}
+                <Bar data={yearlyChartData} options={{
+                  responsive: true,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Amount in Rupees'
+                      }
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Year'
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Yearly Fee Collection Summary',
+                      font: {
+                        size: 24
                       },
                     },
                   },
