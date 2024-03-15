@@ -20,6 +20,8 @@ const Analytics = () => {
     const [mostFeePaidDate, setMostFeePaidDate] = useState('');
     const [averageDailyFee, setAverageDailyFee] = useState('');
     const [totalFeeInRange, setTotalFeeInRange] = useState('');
+    const [concessions, setConcessions] = useState([]);
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const currentDate = new Date().toISOString().split('T')[0];
 
@@ -31,8 +33,13 @@ const Analytics = () => {
     const isoFormattedStartDate = `${startDate}T00:00:00.000Z`;
     const isoFormattedEndDate = `${endDate}T00:00:00.000Z`;
 
-     
+    const convertDateFormat = (dateString) => {
+      const parts = dateString.split('-'); // Split the date by hyphen
+      return `${parts[2]}-${parts[1]}-${parts[0]}`; // Rearrange the parts
+    };
   
+    const startDateDDMMYYYY = convertDateFormat(startDate);
+    const endDateDDMMYYYY = convertDateFormat(endDate);
 
       const handleBranchChange = (event) => {
       setSelectedBranch(event.target.value);
@@ -73,7 +80,10 @@ const Analytics = () => {
         };
       
         useEffect(() => {
+          if(branches.length===0){
+            
           fetchBranches();
+          }
         }, []);
        
 
@@ -167,9 +177,11 @@ const Analytics = () => {
         useEffect(() => {
           // Ensure all selections are made before attempting to fetch receipts
           if (selectedBranch && selectedBatch && selectedModeOfPayment) {
-            fetchReportReceipts();
+            if(receipts.length===0){
+              fetchReportReceipts();
+            }
           }
-        }, [selectedBranch, selectedBatch, selectedModeOfPayment]);
+        });
 
         //All Sum Logic
 
@@ -514,7 +526,73 @@ const Analytics = () => {
       return new Intl.NumberFormat('en-IN').format(totalFeePaidInRange.toFixed(2));
     };
     
+    const fetchConcessions = async () => {
+      try {
+        // Your API setup
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var api = new SchoolManagementSystemApi.DbApi();
+        console.log("Fetching concessions for branch:", user.branch);
+        
+        // Define the query options to fetch all concessions
+        const opts = {
+          body: {
+            "collectionName": "concessions",
+            "query": {}, // Initially fetch all, then filter client-side
+            "type": "findMany"
+          }
+        };
     
+        // Perform the API call
+        api.dbGet(opts, function(error, data, response) {
+          if (error) {
+            console.error('API Error:', error);
+          } else {
+            try {
+              // If the response is already an object, directly use it. 
+              // Adjust 'response.body' or 'data' based on the actual structure of your response.
+              const responseBody = response.body; // OR data, if that's where the response is.
+              console.log("Concessions fetched:", responseBody);
+        
+              const filteredConcessions = responseBody.filter(concession => {
+                const [day, month, year] = concession.issuedDate.split('-');
+                const concessionDate = new Date(year, month - 1, day); // JavaScript's Date month is 0-indexed
+        
+                const [startDay, startMonth, startYear] = startDateDDMMYYYY.split('-');
+                const startDate = new Date(startYear, startMonth - 1, startDay);
+        
+                const [endDay, endMonth, endYear] = endDateDDMMYYYY.split('-');
+                const endDate = new Date(endYear, endMonth - 1, endDay);
+        
+                return concessionDate >= startDate && concessionDate <= endDate;
+              });
+        
+              setConcessions(filteredConcessions);
+            } catch (parseError) {
+              console.error('Error accessing or filtering concessions:', parseError);
+            }
+          }
+        });
+        
+      } catch (error) {
+        console.error("Error setting up or making the API call:", error);
+      }
+    };
+    
+    var isfetchConcessions = false;
+    useEffect(() => {
+      if (isfetchConcessions) {
+        fetchConcessions();
+      }
+    }, );
+    
+    
+
+    const handleButtonClick = () => {
+      isfetchConcessions=true;
+      fetchAnalyticsReceipts();
+      fetchConcessions();
+    };
+
 
 
   
@@ -731,6 +809,86 @@ const Analytics = () => {
     // Now you can call this function with your aggregated data to get the data structure required by Chart.js
     const yearlyChartData = transformYearlyDataForChart(aggregateFeesByYear(analyticsReceipts));
     
+
+    const aggregateConcessionsByYear = (concessions) => {
+      const yearAggregates = {}; // Example: { '2021': { concession: 10000 }, '2022': { concession: 8000 }, ... }
+      console.log(concessions)
+      concessions.forEach((concession) => {
+        // Convert 'dd-mm-yyyy' to 'yyyy-mm-dd'
+        const dateParts = concession.issuedDate.split('-');
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+      
+        const year = new Date(formattedDate).getFullYear();
+      
+        if (!yearAggregates[year]) {
+          yearAggregates[year] = {
+            totalConcession: 0,
+            count: 0, // Keep track of the number of concessions for the average
+          };
+        }
+        yearAggregates[year].totalConcession += concession.amount;
+        yearAggregates[year].count++;
+      });
+      
+      console.log(yearAggregates);
+      return yearAggregates;
+    };
+
+    const transformConcessionDataForChart = (aggregatedData) => {
+      const years = Object.keys(aggregatedData).sort();
+      const averageConcessionData = years.map(year => {
+        const totalConcessionForYear = aggregatedData[year].totalConcession;
+        const count = aggregatedData[year].count;
+        return count > 0 ? totalConcessionForYear / count : 0;
+      });
+    
+      const concessionData = years.map(year => aggregatedData[year].totalConcession);
+    
+      return {
+        labels: years,
+        datasets: [
+          {
+            label: 'Total Concessions',
+            data: concessionData,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          },
+          {
+            label: 'Average Concession',
+            data: averageConcessionData,
+            borderColor: 'rgba(255, 206, 86, 1)',
+            borderWidth: 3,
+            type: 'line',
+            // Ensure that line data fills the entire chart
+            fill: false,
+            tension: 0.1, // Apply some tension for a smoother line curve
+            pointRadius: 3, // Display points on the line
+            pointBackgroundColor: 'rgba(255, 206, 86, 1)', // Use the same color as the line for points
+          },
+        ],
+      };
+    };
+
+    console.log(concessions)
+    const concessionsChartData = transformConcessionDataForChart(aggregateConcessionsByYear(concessions));
+
+    const concessionsChartOptions = {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Yearly Concession Summary',
+        },
+      },
+    };
+
+
 
 
 
@@ -950,7 +1108,7 @@ const Analytics = () => {
 
           <div className="flex justify-center items-center">
             <button
-              onClick={fetchAnalyticsReceipts} // Call fetchAnalyticsReceipts when the button is clicked
+              onClick={handleButtonClick} // Call fetchAnalyticsReceipts when the button is clicked
               className="btn my-8"
               style={{ backgroundColor: '#00A0E3', color: '#FFFFFF' }}
             >
@@ -1100,6 +1258,15 @@ const Analytics = () => {
               </div>
             </div>
           </div>
+
+          <div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}>
+                <Bar data={concessionsChartData} options={concessionsChartOptions} />
+              </div>
+            </div>
+          </div>
+
 
 
           
