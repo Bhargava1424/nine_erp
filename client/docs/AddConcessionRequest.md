@@ -4,9 +4,12 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **applicationNumber** | **String** |  | [optional] 
+**studentName** | **String** |  | [optional] 
 **feeType** | **String** |  | [optional] 
 **amount** | **Number** |  | [optional] 
-**modeOfPayment** | **String** |  | [optional] 
+**reason** | **String** |  | [optional] 
+**issuedBy** | **String** |  | [optional] 
+**issuedDate** | **String** |  | [optional] 
 
 <a name="FeeTypeEnum"></a>
 ## Enum: FeeTypeEnum

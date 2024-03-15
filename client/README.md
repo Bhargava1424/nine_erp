@@ -97,6 +97,7 @@ Class | Method | HTTP request | Description
 *SchoolManagementSystemApi.DbApi* | [**dbUpdate**](docs/DbApi.md#dbUpdate) | **POST** /db/update | Update data in database
 *SchoolManagementSystemApi.DbApi* | [**getExcel**](docs/DbApi.md#getExcel) | **POST** /db/get_excel | Retrieve all data from database
 *SchoolManagementSystemApi.EmployeesApi* | [**employeesPost**](docs/EmployeesApi.md#employeesPost) | **POST** /employees | Create a new employee
+*SchoolManagementSystemApi.ReceiptsApi* | [**concessionAdd**](docs/ReceiptsApi.md#concessionAdd) | **POST** /concession/add | Add concession
 *SchoolManagementSystemApi.ReceiptsApi* | [**receiptsPost**](docs/ReceiptsApi.md#receiptsPost) | **POST** /receipt/create | Create a new receipt
 *SchoolManagementSystemApi.StudentsApi* | [**studentsPost**](docs/StudentsApi.md#studentsPost) | **POST** /students | Create a new student
 

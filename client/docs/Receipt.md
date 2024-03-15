@@ -5,6 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **receiptNumber** | **String** |  | [optional] 
 **dateOfPayment** | **String** |  | [optional] 
+**dateISO** | **String** |  | [optional] 
 **studentName** | **String** |  | [optional] 
 **parentName** | **String** |  | [optional] 
 **applicationNumber** | **String** |  | [optional] 
@@ -33,10 +34,18 @@ Name | Type | Description | Notes
 **secondYearTotalHostelFeePending** | **Number** |  | [optional] 
 **modeOfPayment** | **String** |  | [optional] 
 **chequeNumber** | **String** |  | [optional] 
+**studentStatus** | **String** |  | [optional] 
 
 <a name="GenderEnum"></a>
 ## Enum: GenderEnum
 
 * `male` (value: `"Male"`)
 * `female` (value: `"Female"`)
+
+
+<a name="StudentStatusEnum"></a>
+## Enum: StudentStatusEnum
+
+* `active` (value: `"Active"`)
+* `cancelled` (value: `"Cancelled"`)
 
