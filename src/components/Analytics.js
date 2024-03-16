@@ -9,6 +9,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 const Analytics = () => {
   
     const [branches, setBranches] = useState([]);
+    const [students, setStudents] = useState([]);
     const [selectedBranch, setSelectedBranch] = useState(null);
     const [selectedBatch, setSelectedBatch] = useState(null);
     const [selectedModeOfPayment, setSelectedModeOfPayment] = useState(null);
@@ -26,8 +27,7 @@ const Analytics = () => {
     const currentDate = new Date().toISOString().split('T')[0];
 
     const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
-    const [endDate, setEndDate] = useState(currentDate);
-    console.log(currentDate)
+    const [endDate, setEndDate] = useState(currentDate); 
 
     
     const isoFormattedStartDate = `${startDate}T00:00:00.000Z`;
@@ -78,13 +78,6 @@ const Analytics = () => {
             console.error('Error:', error);
           }
         };
-      
-        useEffect(() => {
-          if(branches.length===0){
-            
-          fetchBranches();
-          }
-        }, []);
        
 
         const generateBatches = () => {
@@ -116,9 +109,64 @@ const Analytics = () => {
           }
           else {
             fetchReportReceipts();
+            fetchStudents();
+            fetchBranches();
           }
           fetchReportReceipts();
+          fetchStudents();
+          fetchBranches();
         };
+
+        const fetchStudents = async () => {
+          try {
+            const SchoolManagementSystemApi = require('school_management_system_api');
+            const api = new SchoolManagementSystemApi.DbApi();
+            
+            let query = {};
+
+            if (selectedBranch !== null) {
+              query.branch = selectedBranch;
+            }
+
+            if (selectedBatch !== null) {
+              query.batch = selectedBatch;
+            }
+
+            console.log(query);
+            const opts = {
+              body: {
+                collectionName: 'students',
+                query: query,
+                type: 'findMany',
+              },
+            };
+        
+            console.log(opts.body);
+        
+            api.dbGet(opts, function(error, data, response) {
+              if (error) {
+                console.error('API Error:', error);
+              } else {
+                try {
+                  const responseBody = response.body; // Assuming response.body is already in JSON format
+                  console.log(responseBody);
+                  setStudents(responseBody); // Assuming the actual data is in responseBody.data
+                } catch (parseError) {
+                  console.error('Error parsing response:', parseError);
+                }
+              }
+            });
+            
+            
+            
+            
+          } catch (error) {
+            console.error('Error during fetch:', error);
+          }
+        };
+        useEffect(() => {
+          console.log(students); // This will log every time students is updated
+        }, [students]);
 
 
         const fetchReportReceipts = async () => {
@@ -191,18 +239,21 @@ const Analytics = () => {
         };
         
         // Use the above generic function to calculate each of the sums you need
-        const sumOfFirstYearHostelFeePayable = calculateSum(receipts, 'firstYearHostelFeePayable');
-        const sumOfFirstYearTotalHostelFeePaid = calculateSum(receipts, 'firstYearTotalHostelFeePaid');
-        const sumOfFirstYearTotalHostelFeePending = calculateSum(receipts, 'firstYearTotalHostelFeePending');
-        const sumOfFirstYearTuitionFeePayable = calculateSum(receipts, 'firstYearTuitionFeePayable');
-        const sumOfFirstYearTotalTuitionFeePaid = calculateSum(receipts, 'firstYearTotalTuitionFeePaid');
-        const sumOfFirstYearTotalTuitionFeePending = calculateSum(receipts, 'firstYearTotalTuitionFeePending');
-        const sumOfSecondYearHostelFeePayable = calculateSum(receipts, 'secondYearHostelFeePayable');
-        const sumOfSecondYearTotalHostelFeePaid = calculateSum(receipts, 'secondYearTotalHostelFeePaid');
-        const sumOfSecondYearTotalHostelFeePending = calculateSum(receipts, 'secondYearTotalHostelFeePending');
-        const sumOfSecondYearTuitionFeePayable = calculateSum(receipts, 'secondYearTuitionFeePayable');
-        const sumOfSecondYearTotalTuitionFeePaid = calculateSum(receipts, 'secondYearTotalTuitionFeePaid');
-        const sumOfSecondYearTotalTuitionFeePending = calculateSum(receipts, 'secondYearTotalTuitionFeePending');
+        
+        const sumOfFirstYearHostelFeePayable = calculateSum(students, 'firstYearHostelFee');
+        const sumOfFirstYearTotalHostelFeePaid = calculateSum(students, 'paidFirstYearHostelFee');
+        const sumOfFirstYearTotalHostelFeePending = calculateSum(students, 'pendingFirstYearHostelFee');
+        const sumOfFirstYearTuitionFeePayable = calculateSum(students, 'firstYearTuitionFee');
+        const sumOfFirstYearTotalTuitionFeePaid = calculateSum(students, 'paidFirstYearTuitionFee');
+        const sumOfFirstYearTotalTuitionFeePending = calculateSum(students, 'pendingFirstYearTuitionFee');
+        const sumOfSecondYearHostelFeePayable = calculateSum(students, 'secondYearHostelFee');
+        const sumOfSecondYearTotalHostelFeePaid = calculateSum(students, 'paidSecondYearHostelFee');
+        const sumOfSecondYearTotalHostelFeePending = calculateSum(students, 'pendingSecondYearHostelFee');
+        const sumOfSecondYearTuitionFeePayable = calculateSum(students, 'secondYearTuitionFee');
+        const sumOfSecondYearTotalTuitionFeePaid = calculateSum(students, 'paidSecondYearTuitionFee');
+        const sumOfSecondYearTotalTuitionFeePending = calculateSum(students, 'pendingSecondYearTuitionFee');
+
+        
         
 
         const exportSumsToExcel = () => {
@@ -673,28 +724,33 @@ const Analytics = () => {
 
 
     const aggregateFeesByBranch = (receipts) => {
-      const branchAggregates = {}; // Holds the aggregated data by branch
-    
+      const branchAggregates = {}; 
+      var totalFeePaid =0;
+      var totalFeePending =0; 
       receipts.forEach((receipt) => {
         const { branch, 
-                firstYearTotalHostelFeePaid, firstYearTotalTuitionFeePaid, secondYearTotalHostelFeePaid, secondYearTotalTuitionFeePaid,
+                firstYearHostelFeePaid, firstYearTuitionFeePaid, secondYearHostelFeePaid, secondYearTuitionFeePaid,
                 firstYearTotalHostelFeePending, firstYearTotalTuitionFeePending, secondYearTotalHostelFeePending, secondYearTotalTuitionFeePending
               } = receipt;
-    
-        // Calculate the total fee paid and pending for the current receipt
-        const totalFeePaid = firstYearTotalHostelFeePaid + firstYearTotalTuitionFeePaid + secondYearTotalHostelFeePaid + secondYearTotalTuitionFeePaid;
-        const totalFeePending = firstYearTotalHostelFeePending + firstYearTotalTuitionFeePending + secondYearTotalHostelFeePending + secondYearTotalTuitionFeePending;
-    
-        if (!branchAggregates[branch]) {
-          branchAggregates[branch] = {
-            feePaid: 0,
-            feePending: 0,
-          };
-        }
-    
-        // Accumulate totals for each branch
-        branchAggregates[branch].feePaid += totalFeePaid;
-        branchAggregates[branch].feePending += totalFeePending;
+      
+          // Calculate the total fee paid and pending for the current receipt
+          totalFeePaid = firstYearHostelFeePaid + firstYearTuitionFeePaid + secondYearHostelFeePaid + secondYearTuitionFeePaid;
+          totalFeePending = firstYearTotalHostelFeePending + firstYearTotalTuitionFeePending + secondYearTotalHostelFeePending + secondYearTotalTuitionFeePending;
+          console.log(totalFeePaid, 'end');
+          if (!branchAggregates[branch]) {
+            branchAggregates[branch] = {
+              feePaid: 0,
+              feePending: 0,
+            };
+          }
+          
+          // Accumulate totals for each branch
+          branchAggregates[branch].feePaid += totalFeePaid;
+          branchAggregates[branch].feePending += totalFeePending;
+          totalFeePaid=0;
+          totalFeePending=0;
+
+          console.log(branchAggregates)
       });
     
       return branchAggregates;
