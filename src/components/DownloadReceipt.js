@@ -247,7 +247,7 @@ function DownloadReceipt() {
       
     return (
 
-        <div class="no-daisyui">
+        <div className="no-daisyui">
 
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                 <button 

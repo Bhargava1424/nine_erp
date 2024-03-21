@@ -233,12 +233,47 @@ function AddStudentConcession() {
                                 try {
                                     const responseBody = response.body; // Assuming response.body is already in JSON format
                                     console.log(responseBody);
+                                    // window.location.reload();
+                                } catch (parseError) {
+                                    console.error('Error parsing response:', parseError);
+                                }
+                            }
+                        });
+
+                        const formatDate = (date) => {
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+                            const year = date.getFullYear();
+                            return day + '-' + month + '-' + year;
+                        };
+
+                        // variables to set concession object in the database 
+                        var concessionAPI = new SchoolManagementSystemApi.ReceiptsApi();
+                        var concessionBody = new SchoolManagementSystemApi.AddConcessionRequest();
+
+                        concessionBody.applicationNumber = studentData.applicationNumber;
+                        concessionBody.studentName = studentData.firstName + " " + studentData.surName;
+                        concessionBody.feeType = selectedFeeType;
+                        concessionBody.amount = parseInt(amountWaived);
+                        concessionBody.reason = reason;
+                        concessionBody.issuedBy = JSON.parse(localStorage.getItem('user')).employeeName;
+                        concessionBody.issuedDate = formatDate(new Date());
+
+                        concessionAPI.concessionAdd(concessionBody, function(error, data, response) {
+                            if (error) {
+                                console.error('API Error:', error);
+                            }
+                            else {
+                                try {
+                                    const responseBody = response.body; // Assuming response.body is already in JSON format
+                                    console.log(responseBody);
                                     window.location.reload();
                                 } catch (parseError) {
                                     console.error('Error parsing response:', parseError);
                                 }
                             }
                         });
+
                     } catch (error) {
                         console.error("Error updating student: ", error);
                     }

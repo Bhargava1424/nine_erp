@@ -280,6 +280,47 @@ const [originalStudentData, setOriginalStudentData] = useState(null);
       setIsEditModalOpen(true); // Reopen the editing modal if the user cancels
       setIsConfirmed(false);
     };
+
+
+
+    const sendMail = async () => {
+      try {
+        const totalFeePaid = editingStudent.paidFirstYearTuitionFee + editingStudent.paidFirstYearHostelFee + editingStudent.paidSecondYearTuitionFee + editingStudent.paidSecondYearHostelFee;
+        var SchoolManagementSystemApi = require('school_management_system_api');
+        var authorizationApi = new SchoolManagementSystemApi.AuthorizationApi();
+        let body = {
+            "subject": "Student Cancelled",
+            "message":
+                "Name :" + editingStudent.firstName + " " + editingStudent.surName + "\n"  +
+                "Application Number :" + editingStudent.applicationNumber + "\n" +
+                "Branch :" + editingStudent.branch + "\n" +
+                "Batch :" + editingStudent.batch + "\n" +
+                "refundGiven :" + editingStudent.refundGiven + "\n" + 
+                "For the following reason :" + editingStudent.reason + "\n" +
+                "Name on the cheque :" + editingStudent.nameOnCheque + "\n" +
+                "Total Fee Paid :" + totalFeePaid + "\n" +
+                "Pending First Year Tuition Fee :" + editingStudent.pendingFirstYearTuitionFee + "\n" +
+                "Pending First Year Hostel Fee :" + editingStudent.pendingFirstYearHostelFee + "\n" +
+                "Pending Second Year Tuition Fee :" + editingStudent.pendingSecondYearTuitionFee + "\n" +
+                "Pending Second Year Hostel Fee :" + editingStudent.pendingSecondYearHostelFee + "\n"
+        };
+        authorizationApi.sendMail(body, function(error, response) {
+            if (error) {
+                console.error('API Error:', error);
+            } else {
+                try {
+                    const responseBody = response.body; // Assuming response.body is already in JSON format
+                    console.log(responseBody);
+                    // window.location.reload();
+                } catch (parseError) {
+                    console.error('Error parsing response:', parseError);
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error sending mail: ", error);
+    }
+    };
  // Extracted submission logic into a separate function for clarity
  const performSubmission = async () => {
   try {
@@ -287,6 +328,8 @@ const [originalStudentData, setOriginalStudentData] = useState(null);
     var api = new SchoolManagementSystemApi.DbApi();
     if (editingStudent.studentStatus === "Cancelled") {
       editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName + " (Cancelled)";
+      console.log("Sending mail");
+      sendMail(editingStudent);
     }
     else {
       editingStudent.studentName = editingStudent.firstName + " " + editingStudent.surName;
@@ -684,6 +727,23 @@ const [originalStudentData, setOriginalStudentData] = useState(null);
             <option value="Cancelled">CANCELLED</option>
           </select>
         </label>
+
+        {editingStudent.studentStatus === 'Cancelled' && (
+          <>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">Cancellation Reason</span>
+              <input type="text" name="reason" value={editingStudent.reason || ''} onChange={handleEditChange} />
+            </label>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">Refund Given</span>
+              <input type="number" name="refundGiven" value={editingStudent.refundGiven || ''} onChange={handleEditChange} />
+            </label>
+            <label className="form-control text-xs">
+              <span className="label-text text-xs">Name on Cheque</span>
+              <input type="text" name="nameOnCheque" value={editingStudent.nameOnCheque || ''} onChange={handleEditChange} />
+            </label>
+          </>
+        )}
 
         <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={handleEditSubmit}>Submit</button>
         <button className="btn btn-outline text-white text-xs" style={{ backgroundColor: '#2D5990' }} onClick={() => setIsEditModalOpen(false)}>Close</button>

@@ -166,10 +166,23 @@ function Navbar() {
               <div className="flex-1 min-w-max">
               <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col" onClick={() => {
               window.location.href = '/AddBranch';
-          }}>
-                          <i className="fa fa-building fa-3x"></i> {/* or use fa-university */}
-                          <h3 className="mt-2">Add Branch</h3>
-                      </div>
+              }}>
+                      <i className="fa fa-building fa-3x"></i> {/* or use fa-university */}
+                      <h3 className="mt-2">Add Branch</h3>
+                    </div>
+              </div>
+
+            </>
+          )}
+          {user.role === 'Manager' && (
+            <>
+              <div className="flex-1 min-w-max">
+              <div id="cardbox1" className="text-xs statistic-box flex items-center justify-center flex-col" onClick={() => {
+                  window.location.href = '/Analytics';
+              }}>
+                    <i className="fa fa-user-secret fa-3x"></i>
+                    <h3 className="mt-2">Analytics</h3>
+                  </div>
               </div>
 
             </>

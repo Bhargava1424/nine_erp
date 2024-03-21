@@ -4,13 +4,18 @@ import React, { useState, useEffect } from 'react';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { useSelector } from 'react-redux';
 
 function Concessions() {
     const [students, setStudents] = useState([]);
+    const [concessions, setConcessions] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const studentsPerPage = 100;
+    const [searchText, setSearchText] = useState("");
+    const [currentConcessionsPage, setCurrentConcessionsPage] = useState(1);
+    const concessionsPerPage = 100;
+
+
 
     const indexOfLastStudent = currentPage * studentsPerPage; 
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
@@ -144,6 +149,97 @@ function Concessions() {
   };
 
 
+  // ==========================================================================
+
+  const fetchConcessions = async () => {
+    try {
+      var SchoolManagementSystemApi = require('school_management_system_api');
+      var api = new SchoolManagementSystemApi.DbApi();
+      const isManager = user.role==="Manager";
+      console.log("Testing concession:",user.branch);
+      const query = isManager?{} : {};
+      const opts = {
+        body: {
+          "collectionName": "concessions",
+          "query": query,
+          "type": "findMany"
+        }
+      };
+
+      console.log(opts.body);
+
+      api.dbGet(opts, function(error, data, response) {
+        if (error) {
+          console.error('API Error:', error);
+        } else {
+          try {
+            const responseBody = response.body; // Assuming response.body is already in JSON format
+            console.log(responseBody);
+            setConcessions(responseBody) // Assuming the actual data is in responseBody.data
+          } catch (parseError) {
+            console.error('Error parsing response:', parseError);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  }; 
+
+  useEffect(() => {
+    if(concessions.length===0){
+      fetchConcessions()
+    }
+  }, );
+
+
+  const handleSearchTextChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const filterConcessions = (query) => {
+    if (!query) {
+        return concessions; // Return all concessions if the search query is empty
+    }
+
+    const terms = query.split(',').map(term => term.trim().toLowerCase());
+
+    return concessions.filter(concession => {
+        return terms.every(term =>
+            concession.concessionId.toLowerCase().includes(term) ||
+            concession.applicationNumber.toLowerCase().includes(term) ||
+            concession.studentName.toLowerCase().includes(term) ||
+            concession.feeType.toLowerCase().includes(term) ||
+            concession.amount.toString().includes(term) || // Assuming amount is a number
+            concession.reason.toLowerCase().includes(term) ||
+            concession.issuedBy.toLowerCase().includes(term) ||
+            concession.issuedDate.toLowerCase().includes(term)
+        );
+    });
+  };
+
+  const filteredConcessions = filterConcessions(searchText);
+
+  
+  const indexOfLastConcession = currentConcessionsPage * concessionsPerPage;
+  const indexOfFirstConcession = indexOfLastConcession - concessionsPerPage;
+  const currentConcessions = filteredConcessions.slice(indexOfFirstConcession, indexOfLastConcession);
+  const totalConcessionsPages = Math.ceil(filteredConcessions.length / concessionsPerPage);
+
+
+  const renderConcessionsPageNumbers = () => {
+    let pages = [];
+    for (let i = 1; i <= totalConcessionsPages; i++) {
+        pages.push(
+            <button key={i} onClick={() => setCurrentConcessionsPage(i)} className={`mx-2 px-4 py-2 rounded ${currentConcessionsPage === i ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'}`}>
+                {i}
+            </button>
+        );
+    }
+    return <div className="flex justify-center mt-4">{pages}</div>;
+};
+
     return (
         <div className="main-container root-container">
           <Navbar />
@@ -210,9 +306,63 @@ function Concessions() {
             <div className="pagination">
               {renderPageNumbers()}
             </div>
+
+          <div className='py-16'>
+          <div className="flex flex-col items-center mb-4">
+            <div className="flex w-full justify-between items-center">
+              <div className="w-1/2"></div> {/* Invisible spacer to center the title */}
+              <h2 className="text-2xl font-bold text-center w-1/2">Concessions List</h2>
+              <div className="flex justify-end w-1/2">
+                <input
+                    type="text"
+                    placeholder="Search by ID, Name, etc..."
+                    className="input input-bordered"
+                    value={searchText}
+                    onChange={handleSearchTextChange}
+                />
+              </div>
+            </div>
           </div>
+
+            
+            <table className="border border-gray-800 border-collapse">
+                <thead>
+                    <tr style={{backgroundColor: '#2D5990', color:'#FFFFFF'}}>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Concession ID</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Application Number</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Student Name</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Fee Type</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Amount</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Reason</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Issued By</th>
+                        <th className="px-4 py-2 text-white border-r-2 border-gray-800 text-sm">Issued Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {currentConcessions.map((concession, index) => (
+                        <tr className="odd:bg-[#FFFFFF] even:bg-[#F2F2F2]" key={index}>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.concessionId}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.applicationNumber}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.studentName}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.feeType}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.amount}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.reason}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.issuedBy}</td>
+                            <td className="border-2 border-gray-800 px-4 py-2 text-sm">{concession.issuedDate}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            
+            {renderConcessionsPageNumbers()}
+        </div>
+          </div>
+
+          
       
         </div>
+
+        
       );
 }
 
