@@ -90,26 +90,30 @@ const AddStudent = () => {
 });
 
 useEffect(() => {
+  // Only add or remove asterisk if necessary, without resetting the batch state
   setStudentData(prevState => {
-    // Determine if the batch already ends with an asterisk
-    const batchEndsWithAsterisk = prevState.batch.endsWith('*');
     let updatedBatch = prevState.batch;
+    const batchEndsWithAsterisk = updatedBatch.endsWith('*');
 
-    // If turning On TC, add asterisk if not already present
+    // If turning On TC and batch doesn't end with asterisk, add asterisk
     if (isOnTC && !batchEndsWithAsterisk) {
       updatedBatch += '*';
     }
-    // If turning Off TC, remove asterisk if present
+    // If turning Off TC and batch ends with asterisk, remove asterisk
     else if (!isOnTC && batchEndsWithAsterisk) {
-      updatedBatch = updatedBatch.slice(0, -1); // Remove last character (asterisk)
+      updatedBatch = updatedBatch.slice(0, -1);
     }
 
-    return {
-      ...prevState,
-      batch: updatedBatch,
-    };
+    // Only update the batch if there's a change
+    if (updatedBatch !== prevState.batch) {
+      return { ...prevState, batch: updatedBatch };
+    } else {
+      // Return the previous state if no changes are made to batch
+      return prevState;
+    }
   });
 }, [isOnTC]);
+
 
 
 
@@ -126,6 +130,10 @@ const handleInputChange = (e) => {
   // Convert firstName, surName, and parentName to uppercase and allow only alphabets
   if (name === 'firstName' || name === 'surName' || name === 'parentName') {
     updatedValue = value.toUpperCase().replace(/[^A-Z\s]/g, '');
+  }
+
+  if (name === 'batch' && isOnTC && !value.endsWith('*')) {
+    updatedValue += '*'; // Append asterisk if on TC and it's not already there
   }
 
   // Handling contact numbers validation
@@ -204,6 +212,7 @@ const handleInputChange = (e) => {
         !studentData.gender || 
         !studentData.studentStatus || 
         !studentData.batch || 
+        studentData.batch === 'none' ||
         !studentData.branch || 
         !studentData.dateOfJoining ||   
         !studentData.course || 
@@ -533,11 +542,12 @@ const handleInputChange = (e) => {
               value={studentData.batch}
               onChange={handleInputChange}
             >
-              <option value="" disabled>Select Batch</option>
+              <option value="none">Select Batch</option>
               {generateBatchOptions().map(batch => (
                 <option key={batch} value={batch}>{batch}</option>
               ))}
             </select>
+            <h1 className='text-green-500 text-lg'>You have selected: {studentData.batch}</h1>
           </label>
 
         </div>
