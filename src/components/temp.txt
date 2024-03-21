@@ -1,37 +1,120 @@
-/** 
-* Paste one or more documents here
-*/
 {
-  "receiptNumber": "NINEMRD000008",
-  "dateOfPayment": "11-51 15-03-2021",
-  "dateIso": "2021-03-15 11:51:21.868246",
-  "studentName": "Rollo Sigurdsson",
-  "parentName": "Ragnar",
-  "applicationNumber": "MRD2024900001",
-  "registeredMobileNumber": "7894561239",
-  "batch": "2024-2026",
-  "dateOfJoining": "09-03-2025",
-  "stream": "ENG",
+  "_id": {
+    "$oid": "65e7e7befbc8a9aa551fd0aa"
+  },
+  "applicationNumber": "SRN2023900001",
+  "dateOfJoining": "06-03-2024",
+  "course": "MPC",
+  "firstName": "LOTHBROK",
+  "surName": "UBBE",
+  "parentName": "RAGNAR",
   "gender": "Male",
-  "branch": "MRD",
-  "residenceType": "Hostel",
-  "firstYearTuitionFeePayable": 100000,
-  "firstYearTuitionFeePaid": null,
-  "firstYearHostelFeePayable": 100000,
-  "firstYearHostelFeePaid": 50000,
-  "secondYearTuitionFeePayable": 100000,
-  "secondYearTuitionFeePaid": null,
-  "secondYearHostelFeePayable": 100000,
-  "secondYearHostelFeePaid": null,
-  "firstYearTotalTuitionFeePaid": 72000,
-  "firstYearTotalTuitionFeePending": 28000,
-  "firstYearTotalHostelFeePaid": 92000,
-  "firstYearTotalHostelFeePending": 8000,
-  "secondYearTotalTuitionFeePaid": 0,
-  "secondYearTotalTuitionFeePending": 100000,
-  "secondYearTotalHostelFeePaid": 0,
-  "secondYearTotalHostelFeePending": 100000,
-  "modeOfPayment": "CHEQUE",
-  "chequeNumber": "050500",
-  "studentStatus": "Active"
+  "batch": "2023-2025",
+  "branch": "SRN",
+  "yearOfJoining": "2023",
+  "modeOfResidence": "Hostel",
+  "primaryContact": "7894561230",
+  "secondaryContact": "0123456789",
+  "firstYearHostelFee": 100000,
+  "firstYearTuitionFee": 100000,
+  "secondYearHostelFee": 100000,
+  "secondYearTuitionFee": 100000,
+  "pendingFirstYearTuitionFee": 97000,
+  "pendingFirstYearHostelFee": 100000,
+  "pendingSecondYearTuitionFee": 100000,
+  "pendingSecondYearHostelFee": 100000,
+  "paidFirstYearTuitionFee": 3000,
+  "paidFirstYearHostelFee": 5000,
+  "paidSecondYearTuitionFee": 0,
+  "paidSecondYearHostelFee": 0,
+  "studentStatus": "Cancelled"
 }
+
+
+<div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}> {/* Make sure minWidth is sufficient for your chart */}
+                <Bar data={branchChartData} options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Fee Payment Summary by Branch',
+                      font: {
+                        size: 24, // Adjust as needed
+                      },
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Amount in Currency',
+                        font: {
+                          size: 16, // Adjust as needed
+                        },
+                      },
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Branch',
+                        font: {
+                          size: 16, // Adjust as needed
+                        },
+                      },
+                    },
+                  },
+                }} />
+              </div>
+            </div>
+          </div>
+
+          <div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}> {/* Make sure minWidth is sufficient for your chart */}
+                <Bar data={yearlyChartData} options={{
+                  responsive: true,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Amount in Rupees'
+                      }
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Year'
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Yearly Fee Collection Summary',
+                      font: {
+                        size: 24
+                      },
+                    },
+                  },
+                }} />
+              </div>
+            </div>
+          </div>
+
+          <div className='pt-16'>
+            <div className="relative overflow-x-auto">
+              <div style={{ minWidth: '1200px' }}>
+                <Bar data={concessionsChartData} options={concessionsChartOptions} />
+              </div>
+            </div>
+          </div>
